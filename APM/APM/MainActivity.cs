@@ -7,7 +7,6 @@ using Android.Net.Wifi;
 using System.Collections.Generic;
 using Android.Support.V4.App;
 using Xamarin.Essentials;
-using Android.Content;
 
 namespace APM
 {
@@ -41,6 +40,8 @@ namespace APM
 
             wifiManager = (WifiManager)GetSystemService(WifiService);
 
+
+
             //Enable wifi if disabled
             if (!wifiManager.IsWifiEnabled)
             {
@@ -55,15 +56,18 @@ namespace APM
 
         private void UploadButton_Click(object sender, System.EventArgs e)
         {
-            //Api method
+            ApiHelper api = new ApiHelper();
+            api.send(AccessPoint.AccessPointContainer);
         }
 
+      
         private async void ScanButton_Click(object sender, System.EventArgs e)
         {
             startScan();
             accessPointCount.Text = AccessPoint.AccessPointContainer.Count.ToString();
         }
 
+        
         private async void startScan()
         {
             //get current location
