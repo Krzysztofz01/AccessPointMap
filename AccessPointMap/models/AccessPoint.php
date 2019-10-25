@@ -44,5 +44,40 @@ class AccessPoint {
         }
         return false;
     }
+
+    public function read() {
+        //Selectd all data from the AccessPoint table
+        $query = "SELECT * FROM " . $this->tablename;
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+
+        return $stmt;
+    }
+
+    public function update() {
+        //Update query
+        $query = "UPDATE " . $this->tablename . " SET signalLevel = :signalLevel, latitude = :latitude, longitude = :longitude WHERE bssid = :bssid";
+
+        $stmt = $this->connection->prepare($query);
+
+        //Delete html tags
+        $this->bssid=htmlspecialchars(strip_tags($this->bssid));
+        $this->signalLevel=htmlspecialchars(strip_tags($this->signalLevel));
+        $this->latitude=htmlspecialchars(strip_tags($this->latitude));
+        $this->longitude=htmlspecialchars(strip_tags($this->longitude));
+
+        //Bind param
+        $stmt->bindParam(":bssid", $this->bssid);
+        $stmt->bindParam(":signalLevel", $this->signalLevel);
+        $stmt->bindParam(":latitude", $this->latitude);
+        $stmt->bindParam(":longitude", $this->longitude);
+
+        //execute query
+        if($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
 }
 ?>
