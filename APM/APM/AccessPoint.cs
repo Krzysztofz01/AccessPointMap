@@ -14,7 +14,9 @@ namespace APM
         public double latitude { get; set; }
         public double longitude { get; set; }
 
-        public AccessPoint(string bssid, string ssid, int freq, int signalLevel, double latitude, double longitude)
+        public string security { get; set; }
+
+        public AccessPoint(string bssid, string ssid, int freq, int signalLevel, double latitude, double longitude, string security)
         {
             this.bssid = bssid;
             this.ssid = ssid;
@@ -22,6 +24,31 @@ namespace APM
             this.signalLevel = signalLevel;
             this.latitude = latitude;
             this.longitude = longitude;
+            this.security = security;
+        }
+
+        public static string securityType(string capabilities)
+        {
+            if (capabilities.Contains("WPA2"))
+            {
+                return "WPA";
+            }
+            else if (capabilities.Contains("WPA"))
+            {
+                return "WPA";
+            }
+            else if (capabilities.Contains("WEP"))
+            {
+                return "WEP";
+            }
+            else if (capabilities.Contains("WPS"))
+            {
+                return "WPS";
+            }
+            else
+            {
+                return "none";
+            }
         }
     }
 }

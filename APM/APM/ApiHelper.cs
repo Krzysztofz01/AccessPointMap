@@ -11,8 +11,9 @@ namespace APM
         private static HttpClient client = new HttpClient();
 
         private const string baseAddress = "http://localhost/";
-        private const string add = "api/action/add.php";
-        private const string read = "api/action/read.php";
+        private const string add = "api/actions/add.php";
+        private const string read = "api/actions/read.php";
+        private const string updataExisting = "api/actions/update.php";
 
         public ApiHelper()
         {
@@ -22,7 +23,6 @@ namespace APM
                 new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        //public async Task createorupdata()
         public async Task send(List<AccessPoint> accessPoints)
         {
             for(int i=0; i<accessPoints.Count; i++)
@@ -52,7 +52,18 @@ namespace APM
 
         private async Task<bool> update(AccessPoint accessPoint)
         {
-            return false;
+            var response = await client.PostAsJsonAsync(updataExisting, new {
+            bssid = accessPoint.bssid,
+            signalLevel = accessPoint.signalLevel,
+            latitude = accessPoint.latitude,
+            longitude = accessPoint.longitude});
+            
+            if(!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public async Task getData(List<string> bssid)

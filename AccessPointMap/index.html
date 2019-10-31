@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+
+        <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="style/style.css">
+
+        <script type="text/javascript" src="script/apiRead.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+        <title>AccessPointMap</title>
+    </head>
+    <body>
+        <div class="navbar">
+            <a href="#" class="logo">AccessPointMap</a>
+
+            <ul class="navbar-items">
+                <li><a href="#googleMap">Map</a></li>
+                <li><a href="#stat">Statistics</a></li>
+                <li><a href="#info">Info</a></li>
+                <li><a href="https://github.com/Krzysztofz01/AccessPointMap">Github</a></li>
+            </ul>
+        </div>
+
+        <div class="map-area" id="googleMap">
+            <div id="map"></div>     
+        </div>
+
+        <div class="stat-area" id="stat">
+            <canvas id="security-chart"></canvas>
+        </div>
+
+        <div class="info-area" id="info">
+
+        </div>
+
+        <script>
+            function initMap() {
+                var markers = [];
+                
+                var map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 8,
+                    center: {lat:  50.09, lng: 18.22}
+                });
+
+                let securityChar = document.getElementById('security-chart').getContext('2d');
+
+                fetch('http://localhost/accesspointmap/api/actions/read.php')
+                .then(function(resp) {
+                    return resp.json();
+                })
+                .then(function(data) {
+                    var chartData = {
+                        wpa: 0,
+                        wep: 0,
+                        wps: 0,
+                        none: 0
+                    };
+                    
+                    data.records.forEach(element => {
+                        console.log(element.latitude);
+                        console.log(parseFloat(element.latitude));
+                        console.log(element.longitude);
+                        console.log(element.bssid);
+                        console.log(element.security);
+
+                        if(element.security == 'WPA') {
+                            chartData.wpa++;
+                        } else if (element.security == "WEP") {
+                            chartData.wep++;
+                        } else if (element.security == "WPS") {
+                            chartData.wps++;
+                        } else if (element.security == "none") {
+                            chartData.none++;
+                        }
+
+                        markers = new google.maps.Marker({
+                            position: {lat: parseFloat(element.latitude), lng: parseFloat(element.longitude)},
+                            map: map,
+                            label: element.ssid + " (" + element.bssid + ")"
+                        });    
+                    });
+
+                    let barChart = new Chart(securityChar, {
+                    type: 'bar',
+                    data: {
+                        labels: ['WPA/WPA2', 'WEP', 'WPS', 'None'],
+                        datasets: [{
+                            label: 'Ilosc',
+                            data: [
+                                chartData.wpa,
+                                chartData.wep,
+                                chartData.wps,
+                                chartData.none
+                                ],
+                            backgroundColor: '#d35656',
+                            hoverBackgroundColor: '#f66767'
+                        }]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Typy zabezpieczen',
+                            fontSize: 25,
+                            fontFamily: 'Montserrat'
+                        },
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        layout: {
+                            padding: {
+                                left: 250,
+                                right: 250,
+                                top: 100,
+                                bottom: 50
+                            }
+                        },
+                        tooltips: {
+                            enabled: true
+                        }
+                    }
+                    }) 
+                })
+            }
+        </script>
+
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
+    </body>
+</html>

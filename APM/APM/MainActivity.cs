@@ -99,7 +99,8 @@ namespace APM
                         scanResultArray[i].Frequency,
                         scanResultArray[i].Level,
                         location.Latitude,
-                        location.Longitude));
+                        location.Longitude,
+                        AccessPoint.securityType(scanResultArray[i].Capabilities)));
                 }
             }
         }

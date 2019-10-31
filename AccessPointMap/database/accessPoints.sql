@@ -1,0 +1,13 @@
+CREATE TABLE `accesspoints` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `bssid` VARCHAR(25) NOT NULL,
+  `ssid` VARCHAR(40) NOT NULL,
+  `freq` INT(5) NOT NULL,
+  `signalLevel` INT(5) NOT NULL,
+  `longitude` DOUBLE NOT NULL,
+  `latitude` DOUBLE NOT NULL,
+  `security` VARCHAR(20) NOT NULL,
+  `added` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
