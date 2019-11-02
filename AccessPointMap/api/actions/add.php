@@ -11,6 +11,9 @@ include_once "../config/database.php";
 //Init the model
 include_once "../models/AccessPoint.php";
 
+//The Mac Vendor API
+include_once "../foreign/Vendor.php";
+
 $database = new Database();
 $db = $database->getConnection();
 
@@ -36,6 +39,7 @@ if(
     $accessPoint->latitude = $data->latitude;
     $accessPoint->longitude = $data->longitude;
     $accessPoint->security = $data->security;
+    $accessPoint->vendor = Vendor::getVendor($data->bssid);
 
     if($accessPoint->add())
     {

@@ -38,7 +38,7 @@ body {
     text-transform: uppercase;
 }
 
-a {
+.navbar a {
     margin: 20px;
     color: #f66767;
     text-decoration: none;
@@ -55,7 +55,7 @@ a:hover {
     height: 100vh;
 }
 
-.stat-area, .info-area {
+.security-stat-area, .info-area {
     position: relative;
     display: flex;
     justify-content: space-around;
@@ -73,4 +73,27 @@ a:hover {
     height: 800px;
     width: 80%;
     border: 2px solid #3c3d47;
+}
+
+.text-box {
+    color: #3c3d47;
+    text-align: center;
+    padding-left: 12%;
+    padding-right: 12%;
+    font-size: 20px;
+    
+}
+
+.text-box h2 {
+    color: #d35656;
+    font-size: 35px;
+}
+
+.text-box li {
+    list-style: none;
+}
+
+.text-box a {
+    color: #f66767;
+    text-decoration: none;
 }

@@ -54,9 +54,11 @@ namespace APM
 
         }
 
-        private void UploadButton_Click(object sender, System.EventArgs e)
+        private async void UploadButton_Click(object sender, System.EventArgs e)
         {
             ApiHelper api = new ApiHelper();
+
+            AccessPoint.AccessPointKnown = await api.getData();
             api.send(AccessPoint.AccessPointContainer);
         }
 

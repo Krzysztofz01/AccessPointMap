@@ -27,6 +27,18 @@ namespace APM
             this.security = security;
         }
 
+        public AccessPoint(string bssid, int signalLevel)
+        {
+            this.bssid = bssid;
+            this.signalLevel = signalLevel;
+
+            this.ssid = null;
+            this.freq = 0;
+            this.latitude = 0;
+            this.longitude = 0;
+            this.security = null;
+        }
+
         public static string securityType(string capabilities)
         {
             if (capabilities.Contains("WPA2"))

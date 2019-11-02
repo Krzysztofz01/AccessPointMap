@@ -31,7 +31,8 @@
                 "signalLevel" => $signalLevel,
                 "latitude" => $latitude,
                 "longitude" => $longitude,
-                "security" => $security
+                "security" => $security,
+                "vendor" => $vendor
             );
 
             array_push($accessPointArray["records"], $accessPointItem);

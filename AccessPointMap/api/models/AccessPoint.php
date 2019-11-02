@@ -12,6 +12,7 @@ class AccessPoint {
     public $latitude;
     public $longitude;
     public $security;
+    public $vendor;
 
     //Construc that connects with the db
     public function __construct($db) {
@@ -19,7 +20,7 @@ class AccessPoint {
     }
 
     public function add() {
-        $query = "INSERT INTO " . $this->tablename . " SET bssid=:bssid, ssid=:ssid, freq=:freq, signalLevel=:signalLevel, latitude=:latitude, longitude=:longitude, security=:security";
+        $query = "INSERT INTO " . $this->tablename . " SET bssid=:bssid, ssid=:ssid, freq=:freq, signalLevel=:signalLevel, latitude=:latitude, longitude=:longitude, security=:security, vendor=:vendor";
     
         $stmt = $this->connection->prepare($query);
 
@@ -31,6 +32,7 @@ class AccessPoint {
         $this->latitude = htmlspecialchars(strip_tags($this->latitude));
         $this->longitude = htmlspecialchars(strip_tags($this->longitude));
         $this->security = htmlspecialchars(strip_tags($this->security));
+        $this->vendor = htmlspecialchars(strip_tags($this->vendor));
 
         //Assign the value
         $stmt->bindParam(":bssid", $this->bssid);
@@ -40,6 +42,7 @@ class AccessPoint {
         $stmt->bindParam(":latitude", $this->latitude);
         $stmt->bindParam(":longitude", $this->longitude);
         $stmt->bindParam(":security", $this->security);
+        $stmt->bindParam(":vendor", $this->vendor);
 
         //Execute the query
         if($stmt->execute()) {

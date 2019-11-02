@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace APM
 {
@@ -10,7 +11,7 @@ namespace APM
     {
         private static HttpClient client = new HttpClient();
 
-        private const string baseAddress = "http://localhost/";
+        private const string baseAddress = "http://accesspointmap.ct8.pl/";
         private const string add = "api/actions/add.php";
         private const string read = "api/actions/read.php";
         private const string updataExisting = "api/actions/update.php";
@@ -66,15 +67,25 @@ namespace APM
             return true;
         }
 
-        public async Task getData(List<string> bssid)
+        public async Task<List<AccessPoint>> getData()
         {
+            List<AccessPoint> output = new List<AccessPoint>();
             var response = await client.GetAsync(read);
 
-            if(!response.IsSuccessStatusCode)
+            if(response.IsSuccessStatusCode)
             {
-                //AccessPoint.knownBssid;
-                //umieszczenie bssid obiekotw w liscie bssid
+                string jsonString = await response.Content.ReadAsStringAsync();
+                var jsonArray = JsonConvert.DeserializeObject<dynamic>(jsonString);
+
+                foreach(var package in jsonArray.records)
+                {
+                    output.Add(new AccessPoint(
+                        package.bssid.ToObject<string>(),
+                        package.signalLevel.ToObject<int>()));
+                }
+                return output;
             }
+            return null;
         }
 
         private bool alreadyKnown(string bssid)

@@ -6,7 +6,6 @@
         <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="style/style.css">
 
-        <script type="text/javascript" src="script/apiRead.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
         <title>AccessPointMap</title>
@@ -17,9 +16,10 @@
 
             <ul class="navbar-items">
                 <li><a href="#googleMap">Map</a></li>
-                <li><a href="#stat">Statistics</a></li>
+                <li><a href="#security-stat">Security</a></li>
+                <li><a href="#vendor-stat">Vendors</a></li>
                 <li><a href="#info">Info</a></li>
-                <li><a href="https://github.com/Krzysztofz01/AccessPointMap">Github</a></li>
+                <li><a href="https://github.com/Krzysztofz01/AccessPointMap" target="_blank">Github</a></li>
             </ul>
         </div>
 
@@ -27,12 +27,38 @@
             <div id="map"></div>     
         </div>
 
-        <div class="stat-area" id="stat">
+        <div class="security-stat-area" id="security-stat">
             <canvas id="security-chart"></canvas>
         </div>
 
-        <div class="info-area" id="info">
+        <div class="vandor-stat-area" id="vendor-stat">
+            <canvas id="vendor-chart"></canvas>
+        </div>
 
+        <div class="info-area" id="info">
+            <div class="text-box">
+                <h2>Projekt ,,AccessPointMap"</h2>
+                <p>
+                    Projekt wykonał Krzysztof Zoń, uczeń CKZiU nr.2 ,,Mechanik" w Raciborzu. Projekt powstał w celu nauki
+                    korzystania z różnych technologi webowych oraz nauki tworzenia aplikcji mobilnych przy użyciu technologi
+                    Xamarin. Celem projektu jest rówienież stworzenie statystki występowania access pointów w okolicy Raciborza,
+                    przedstawienie wkorzystywanych typów zabezpieczeń itp. Projekt nie przynośi żadnych korzyści finansowych i
+                    jest open-source. 
+                </p><br>
+                
+                <h2>Wykorzystane technologie i języki programowania</h2>
+                <ul>
+                    <li><a href="https://dotnet.microsoft.com/apps/xamarin" target="_blank">Środowisko Xamarin (C#)</a> - stworzenie aplikacji mobilnej, której zadaniem jest zbieranie informacji.</li>
+                    <li><a href="https://developers.google.com/maps/documentation" target="_blank">Google Maps API</a> - umieszczenie mapy na witrynie oraz dynamiczne dodawanie znaczników</li>
+                    <li><a href="https://macvendors.com" target="_blank">MACVendors API</a> - informacja o producencie urządzeń sieciowych na podstawie adresu MAC</li>
+                    <li><a href="https://www.chartjs.org" target="_blank">ChartJS</a> - biblioteka JavaScript umożliwiająca generowanie wykresów</li>
+                    <li><a href="https://www.php.net" target="_blank">Język PHP7</a> - stworzenie REST API, którego zadaniem jest komunikacja serwera z bazą danych z aplikacją mobilną oraz frontendem witryny.</li>
+                    <li><a href="https://www.w3schools.com" target="_blank">Język HTML5 oraz CSS3</a> - stworzenia frontendu strony</li>
+                </ul>
+
+                <br><iframe width="560" height="315" src="https://www.youtube.com/watch?v=C0DPdy98e4c" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            
+            </div>
         </div>
 
         <script>
@@ -45,6 +71,7 @@
                 });
 
                 let securityChar = document.getElementById('security-chart').getContext('2d');
+                let vendorChart = document.getElementById('vendor-chart').getContext('2d');
 
                 fetch('http://localhost/accesspointmap/api/actions/read.php')
                 .then(function(resp) {
@@ -57,22 +84,33 @@
                         wps: 0,
                         none: 0
                     };
+
+                    var chartVendor = {
+                        cisco: 0,
+                        tplink: 0,
+                        dlink: 0,
+                        huawei: 0,
+                        asus: 0,
+                        linksys: 0,
+                        sagem: 0
+                    }
                     
                     data.records.forEach(element => {
-                        console.log(element.latitude);
-                        console.log(parseFloat(element.latitude));
-                        console.log(element.longitude);
-                        console.log(element.bssid);
-                        console.log(element.security);
+                        switch(element.security) {
+                            case "WPA": chartData.wpa++; break;
+                            case "WEP": chartData.wep++; break;
+                            case "WPS": chartData.wps++; break;
+                            case "none": chartData.none++; break;
+                        }
 
-                        if(element.security == 'WPA') {
-                            chartData.wpa++;
-                        } else if (element.security == "WEP") {
-                            chartData.wep++;
-                        } else if (element.security == "WPS") {
-                            chartData.wps++;
-                        } else if (element.security == "none") {
-                            chartData.none++;
+                        switch(element.vendor) {
+                            case "Cisco Systems, Inc": chartVendor.cisco++; break;
+                            case "TP-LINK TECHNOLOGIES CO.,LTD.": chartVendor.tplink++; break;
+                            case "D-LINK SYSTEMS, INC.": chartVendor.dlink++; break;
+                            case "HUAWEI TECHNOLOGIES CO.,LTD": chartVendor.huawei++; break;
+                            case "Asus Network Technologies, Inc.": chartVendor.asus++; break;
+                            case "The Linksys Group, Inc.": chartVendor.linksys++; break;
+                            case "Sagemcom Broadband SAS": chartVendor.sagem++; break;
                         }
 
                         markers = new google.maps.Marker({
@@ -101,7 +139,7 @@
                     options: {
                         title: {
                             display: true,
-                            text: 'Typy zabezpieczen',
+                            text: 'Typy zabezpieczeń',
                             fontSize: 25,
                             fontFamily: 'Montserrat'
                         },
@@ -127,8 +165,58 @@
                             enabled: true
                         }
                     }
-                    }) 
-                })
+                    })
+                    
+                    let vndChart = new Chart(vendorChart, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Cisco', 'Tp-Link', 'D-Link', 'Huawei', 'Asus', 'Linksys', 'sagem'],
+                        datasets: [{
+                            label: 'Ilosc',
+                            data: [
+                                chartVendor.cisco,
+                                chartVendor.tplink,
+                                chartVendor.dlink,
+                                chartVendor.huawei,
+                                chartVendor.asus,
+                                chartVendor.linksys,
+                                chartVendor.sagem
+                                ],
+                            backgroundColor: '#d35656',
+                            hoverBackgroundColor: '#f66767'
+                        }]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Producenci Access pointów',
+                            fontSize: 25,
+                            fontFamily: 'Montserrat'
+                        },
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        layout: {
+                            padding: {
+                                left: 250,
+                                right: 250,
+                                top: 250,
+                                bottom: 0
+                            }
+                        },
+                        tooltips: {
+                            enabled: true
+                        }
+                    }
+                    })
+                })  
             }
         </script>
 
