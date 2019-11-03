@@ -92,7 +92,9 @@
                         huawei: 0,
                         asus: 0,
                         linksys: 0,
-                        sagem: 0
+                        sagem: 0,
+                        dasan: 0,
+                        other: 0
                     }
                     
                     data.records.forEach(element => {
@@ -111,6 +113,8 @@
                             case "Asus Network Technologies, Inc.": chartVendor.asus++; break;
                             case "The Linksys Group, Inc.": chartVendor.linksys++; break;
                             case "Sagemcom Broadband SAS": chartVendor.sagem++; break;
+                            case "DASAN Network Solutions": chartVendor.dasan++; break;
+                            default: chartVendor.other++; break;
                         }
 
                         markers = new google.maps.Marker({
@@ -170,7 +174,7 @@
                     let vndChart = new Chart(vendorChart, {
                     type: 'bar',
                     data: {
-                        labels: ['Cisco', 'Tp-Link', 'D-Link', 'Huawei', 'Asus', 'Linksys', 'sagem'],
+                        labels: ['Cisco', 'Tp-Link', 'D-Link', 'Huawei', 'Asus', 'Linksys', 'Sagem', 'Dasan (Ostrog.net)', 'Other'],
                         datasets: [{
                             label: 'Ilosc',
                             data: [
@@ -180,7 +184,9 @@
                                 chartVendor.huawei,
                                 chartVendor.asus,
                                 chartVendor.linksys,
-                                chartVendor.sagem
+                                chartVendor.sagem,
+                                chartVendor.dasan,
+                                chartVendor.other
                                 ],
                             backgroundColor: '#d35656',
                             hoverBackgroundColor: '#f66767'

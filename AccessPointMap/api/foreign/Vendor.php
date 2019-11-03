@@ -2,6 +2,7 @@
 class Vendor {
 
     public static function getVendor($mac_address) {
+      Sleep(1);
       $url = "https://api.macvendors.com/" . urlencode($mac_address);
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $url);

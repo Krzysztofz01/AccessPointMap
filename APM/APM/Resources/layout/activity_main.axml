@@ -12,12 +12,23 @@
         android:layout_height="wrap_content"
         android:text="Start Scan"
         android:layout_gravity="center"/>
-
+    <TextView
+        android:id="@+id/scanStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="default"
+        android:layout_gravity="center"/>
     <Button
         android:id="@+id/uploadData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Upload Data"
+        android:layout_gravity="center"/>
+    <TextView
+        android:id="@+id/uploadStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
         android:layout_gravity="center"/>
     <TextView
         android:layout_width="wrap_content"

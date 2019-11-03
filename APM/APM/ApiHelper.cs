@@ -26,15 +26,18 @@ namespace APM
 
         public async Task send(List<AccessPoint> accessPoints)
         {
-            for(int i=0; i<accessPoints.Count; i++)
+            System.Diagnostics.Debug.WriteLine("send");
+            for (int i=0; i<accessPoints.Count; i++)
             {
                 if(alreadyKnown(accessPoints[i].bssid))
                 {
-                    update(accessPoints[i]);   
+                    System.Diagnostics.Debug.WriteLine("updata");
+                    await update(accessPoints[i]);   
                 }
                 else
                 {
-                    addNew(accessPoints[i]);
+                    System.Diagnostics.Debug.WriteLine("add");
+                    await addNew(accessPoints[i]);
                 }
             }
         }
