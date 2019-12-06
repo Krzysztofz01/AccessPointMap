@@ -14,6 +14,9 @@ include_once "../models/AccessPoint.php";
 //The Mac Vendor API
 include_once "../foreign/Vendor.php";
 
+//Geomath alghoritm
+include_once "../foreign/Geomath.php";
+
 $database = new Database();
 $db = $database->getConnection();
 
@@ -30,6 +33,9 @@ if(
     !empty($data->signalLevel) &&
     !empty($data->latitude) &&
     !empty($data->longitude) &&
+    !empty($data->lowSignalLevel) &&
+    !empty($data->lowLatitude) &&
+    !empty($data->lowLongitude) &&
     !empty($data->security)
 ) {
     $accessPoint->bssid = $data->bssid;
@@ -38,6 +44,10 @@ if(
     $accessPoint->signalLevel = $data->signalLevel;
     $accessPoint->latitude = $data->latitude;
     $accessPoint->longitude = $data->longitude;
+    $accessPoint->lowSignalLevel = $data->lowSignalLevel;
+    $accessPoint->lowLatitude = $data->lowLatitude;
+    $accessPoint->lowLongitude = $data->lowLongitude;
+    $accessPoint->signalArea = GeoMath::areaByGeoloc($data->latitude, $data->longitude, $data->lowLatitude, $data->lowLongitude);
     $accessPoint->security = $data->security;
     $accessPoint->vendor = Vendor::getVendor($data->bssid);
 

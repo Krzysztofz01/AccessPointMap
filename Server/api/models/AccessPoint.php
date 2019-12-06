@@ -11,6 +11,10 @@ class AccessPoint {
     public $signalLevel;
     public $latitude;
     public $longitude;
+    public $lowSignalLevel;
+    public $lowLatitude;
+    public $lowLongitude;
+    public $signalArea;
     public $security;
     public $vendor;
 
@@ -20,7 +24,7 @@ class AccessPoint {
     }
 
     public function add() {
-        $query = "INSERT INTO " . $this->tablename . " SET bssid=:bssid, ssid=:ssid, freq=:freq, signalLevel=:signalLevel, latitude=:latitude, longitude=:longitude, security=:security, vendor=:vendor";
+        $query = "INSERT INTO " . $this->tablename . " SET bssid=:bssid, ssid=:ssid, freq=:freq, signalLevel=:signalLevel, latitude=:latitude, longitude=:longitude, lowSignalLevel=:lowSignalLevel, lowLatitude=:lowLatitude, lowLongitude=:lowLongitude, signalArea=:signalArea, security=:security, vendor=:vendor";
     
         $stmt = $this->connection->prepare($query);
 
@@ -31,7 +35,11 @@ class AccessPoint {
         $this->signalLevel = htmlspecialchars(strip_tags($this->signalLevel));
         $this->latitude = htmlspecialchars(strip_tags($this->latitude));
         $this->longitude = htmlspecialchars(strip_tags($this->longitude));
+        $this->lowSignalLevel = htmlspecialchars(strip_tags($this->lowSignalLevel));
+        $this->lowLatitude = htmlspecialchars(strip_tags($this->lowLatitude));
+        $this->lowLongitude = htmlspecialchars(strip_tags($this->lowLongitude));
         $this->security = htmlspecialchars(strip_tags($this->security));
+        $this->signalArea = htmlspecialchars(strip_tags($this->signalLevel));
         $this->vendor = htmlspecialchars(strip_tags($this->vendor));
 
         //Assign the value
@@ -41,6 +49,10 @@ class AccessPoint {
         $stmt->bindParam(":signalLevel", $this->signalLevel);
         $stmt->bindParam(":latitude", $this->latitude);
         $stmt->bindParam(":longitude", $this->longitude);
+        $stmt->bindParam(":lowSignalLevel", $this->lowSignalLevel);
+        $stmt->bindParam(":lowLatitude", $this->lowLatitude);
+        $stmt->bindParam(":lowLongitude", $this->lowLongitude);
+        $stmt->bindParam(":signalArea", $this->signalArea);
         $stmt->bindParam(":security", $this->security);
         $stmt->bindParam(":vendor", $this->vendor);
 

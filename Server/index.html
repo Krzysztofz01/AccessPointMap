@@ -118,6 +118,8 @@
                         }
 
                         markers = new google.maps.Marker({
+                            //https://developers.google.com/maps/documentation/javascript/markers
+                            //Dodatkowe parametry Markera
                             position: {lat: parseFloat(element.latitude), lng: parseFloat(element.longitude)},
                             map: map,
                             label: element.ssid + " (" + element.bssid + ")"
