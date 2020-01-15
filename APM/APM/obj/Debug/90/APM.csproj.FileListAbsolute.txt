@@ -522,7 +522,6 @@ D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Android.Sup
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Android.Support.VersionedParcelable.dll
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Android.Support.ViewPager.dll
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Essentials.dll
-D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Essentials.dll.mdb
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\typemap.jm.arm64-v8a.s
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\typemap.jm.armeabi-v7a.s
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\typemap.jm.x86.s
@@ -651,4 +650,5 @@ D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\_ConvertResourcesCases.stamp
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\_GenerateJavaStubs.stamp
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\_GeneratePackageManagerJava.stamp
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\_ResolveLibraryProjectImports.stamp
-D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\SetupDependenciesForDesigner.stamp
+D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\_VerifyXamarinAndroidSupportVersions.stamp
+D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Essentials.pdb
