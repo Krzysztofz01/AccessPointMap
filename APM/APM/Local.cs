@@ -2,6 +2,7 @@
 using System.IO;
 using Xamarin.Essentials;
 using Newtonsoft.Json;
+using Android.OS;
 
 namespace APM
 {
@@ -12,15 +13,32 @@ namespace APM
 
         public static void saveToFile(List<AccessPoint> accessPoints)
         {
-            StreamWriter writer = new StreamWriter(filePath);
+            StreamWriter writer = new StreamWriter(filePath, true);
+            System.Diagnostics.Debug.WriteLine(filePath);
 
-            using(writer)
+            using (writer)
             {
-                foreach(var ap in accessPoints)
-                {
-                    writer.WriteLine(JsonConvert.SerializeObject(ap));
-                }
+                writer.WriteLine(JsonConvert.SerializeObject(accessPoints));
             }
+
+            using (var streamReader = new StreamReader(filePath))
+            {
+                string content = streamReader.ReadToEnd();
+                System.Diagnostics.Debug.WriteLine(content);
+            }
+
+        }
+
+        public static void saveToSdCard(List<AccessPoint> accessPoints)
+        {
+            var sdCardPath = Environment.ExternalStorageDirectory.Path;
+            var sdCardFilePath = Path.Combine(sdCardPath, "Accesspoints.json");
+
+            using (StreamWriter writer = new StreamWriter(sdCardFilePath, true))
+            {
+                writer.WriteLine(JsonConvert.SerializeObject(accessPoints));
+            }
+
         }
     }
 }

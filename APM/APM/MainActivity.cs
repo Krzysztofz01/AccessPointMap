@@ -23,6 +23,12 @@ namespace APM
 
         private GeolocationRequest request;
         private WifiManager wifiManager;
+        private string[] permissions = new string[]
+        {
+            Android.Manifest.Permission.AccessFineLocation,
+            Android.Manifest.Permission.WriteExternalStorage,
+            Android.Manifest.Permission.ReadExternalStorage
+        };
 
         public IList<ScanResult> scanResultArray;
 
@@ -31,7 +37,7 @@ namespace APM
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+            Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
@@ -54,15 +60,14 @@ namespace APM
 
             wifiManager = (WifiManager)GetSystemService(WifiService);
 
-            //Enable wifi if disabled
             if (!wifiManager.IsWifiEnabled)
             {
                 Toast.MakeText(this, "Wifi is disabled!", ToastLength.Long).Show();
                 wifiManager.SetWifiEnabled(true);
             }
 
-            //Ask for permission (location)
-            ActivityCompat.RequestPermissions(this, new string[] { Android.Manifest.Permission.AccessFineLocation }, 0);
+            //Permission check
+            ActivityCompat.RequestPermissions(this, permissions, 0);
         }
 
         private async void UploadButton_Click(object sender, System.EventArgs e)
@@ -70,10 +75,10 @@ namespace APM
             scanLoop = false;
             if (saveLocal.Checked)
             {
-                Local.saveToFile(AccessPoint.AccessPointContainer);
+                Local.saveToSdCard(AccessPoint.AccessPointContainer);
             }
 
-            ApiHelper api = new ApiHelper();
+            /*ApiHelper api = new ApiHelper();
             //Debug
             System.Diagnostics.Debug.WriteLine("Get data from database");
             AccessPoint.AccessPointKnown = await api.getData();
@@ -82,7 +87,7 @@ namespace APM
             //Debug
             System.Diagnostics.Debug.WriteLine("Main sending method");
             await api.send(AccessPoint.AccessPointContainer);
-            uploadStatus.Text = "Upload process finished!";
+            uploadStatus.Text = "Upload process finished!";*/
         }
      
         private async void ScanButton_Click(object sender, System.EventArgs e)
