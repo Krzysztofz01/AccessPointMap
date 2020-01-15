@@ -652,3 +652,4 @@ D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\_GeneratePackageManagerJava.
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\_ResolveLibraryProjectImports.stamp
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\_VerifyXamarinAndroidSupportVersions.stamp
 D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\android\assets\Xamarin.Essentials.pdb
+D:\newapm\Accesspointmap\APM\APM\obj\Debug\90\stamp\SetupDependenciesForDesigner.stamp

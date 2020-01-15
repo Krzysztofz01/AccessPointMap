@@ -52,4 +52,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send data to API"
+        android:layout_gravity="center"/>
+    <CheckBox
+        android:id="@+id/sendToApi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:layout_gravity="center"/>
 </LinearLayout>

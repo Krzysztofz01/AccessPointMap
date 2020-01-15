@@ -20,6 +20,7 @@ namespace APM
         private TextView scanStatus;
         private TextView uploadStatus;
         private CheckBox saveLocal;
+        private CheckBox sendToApi;
 
         private GeolocationRequest request;
         private WifiManager wifiManager;
@@ -58,6 +59,9 @@ namespace APM
             saveLocal = FindViewById<CheckBox>(Resource.Id.saveLocal);
             saveLocal.Checked = true;
 
+            sendToApi = FindViewById<CheckBox>(Resource.Id.sendToApi);
+            sendToApi.Checked = true;
+
             wifiManager = (WifiManager)GetSystemService(WifiService);
 
             if (!wifiManager.IsWifiEnabled)
@@ -76,18 +80,23 @@ namespace APM
             if (saveLocal.Checked)
             {
                 Local.saveToSdCard(AccessPoint.AccessPointContainer);
+                Toast.MakeText(this, "Data saved to local storage", ToastLength.Long).Show();
             }
 
-            /*ApiHelper api = new ApiHelper();
-            //Debug
-            System.Diagnostics.Debug.WriteLine("Get data from database");
-            AccessPoint.AccessPointKnown = await api.getData();
-            System.Diagnostics.Debug.WriteLine(AccessPoint.AccessPointKnown.Count);
+            if (sendToApi.Checked)
+            {
+                ApiHelper api = new ApiHelper();
+                //Debug
+                System.Diagnostics.Debug.WriteLine("Get data from database");
+                AccessPoint.AccessPointKnown = await api.getData();
+                System.Diagnostics.Debug.WriteLine(AccessPoint.AccessPointKnown.Count);
 
-            //Debug
-            System.Diagnostics.Debug.WriteLine("Main sending method");
-            await api.send(AccessPoint.AccessPointContainer);
-            uploadStatus.Text = "Upload process finished!";*/
+                //Debug
+                System.Diagnostics.Debug.WriteLine("Main sending method");
+                await api.send(AccessPoint.AccessPointContainer);
+                uploadStatus.Text = "Upload process finished!";
+                Toast.MakeText(this, "Data send to API", ToastLength.Long).Show();
+            }
         }
      
         private async void ScanButton_Click(object sender, System.EventArgs e)
