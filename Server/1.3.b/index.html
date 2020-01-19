@@ -6,14 +6,15 @@
 
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-        <lnik rel="stylesheet" href="style/style.css">
+        <link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style/style.css">
         
         <title>Access Point Map</title>
     </head>
     <body>
         <div class="container">
             <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-light my-3">
+            <nav class="navbar navbar-expand-lg navbar-light my-3 navbar-bgcolor">
                 <a class="navbar-brand" href="#">AccessPointMap</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -31,25 +32,25 @@
             <!-- Map object-->
             <div class="row my-2" id="mapArea">
                 <div class="col">
-                    <div id="map" style="width: 100%; height:650px;"></div>
+                    <div id="map" class="violet-border" style="width: 100%; height:650px;"></div>
                 </div>
             </div>
 
             <!-- Charts -->
-            <div class="row my-2" id="charts">
-                <div class="col text-center">
+            <div class="row my-2 mx-0" id="charts">
+                <div class="col text-center violet-border">
                     <p class="h3">Security</p>
                     <canvas id="securityChart"></canvas>
                 </div>
-                <div class="col text-center">
+                <div class="col text-center violet-border">
                     <p class="h3">Brands</p>
                     <canvas id="brandChart"></canvas>
                 </div>
             </div>
         
             <!-- Informations-->
-            <div class="row my-2" id-"info">
-                <div class="col text-center">
+            <div class="row my-2 mx-0" id-"info">
+                <div class="col text-center violet-border">
                     <p class="h3">Informations</p>
                     <p class="text-justify">
                         Projekt wykonał Krzysztof Zoń, uczeń CKZiU nr.2 ,,Mechanik" w Raciborzu. Projekt powstał w celu nauki
@@ -74,7 +75,7 @@
                 });
 
                 //Adding markers
-                let markers = [];
+               /* let markers = [];
                 for(let i=0; i<LIMIT; i++) {
                     markers = new google.maps.Marker({
                     //https://developers.google.com/maps/documentation/javascript/markers
@@ -83,25 +84,38 @@
                     map: map,
                     label: ""
                     }); 
-                }
+                } */
 
                 //Security Chart
                 let securityChart = document.getElementById("securityChart").getContext('2d');
                 let securityChartObject = new Chart(securityChart, {
                     type: 'bar',
                     data: {
-                        labels: ["red", "blue", "green"],
+                        labels: ["red", "blue", "green", "cos"],
                         datasets: [{
                             label: '# czego',
-                            data: [12, 54, 7],
-                            backgroundColor: ["rgb(0, 0, 255)", "rgb(255, 0, 0)", "rgb(0, 255, 0)"],
+                            data: [12, 54, 7, 30],
+                            backgroundColor: ["#7f50ad", "#532c7a", "#472966", "#33174f"],
                         }]
                     },
                     options: {
+                        legend: {
+                            labels: {
+                                fontColor: "#532c7a"
+                            }
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero: true
+                                    display: false
+                                },
+                                gridLines: {
+                                    display: false
+                                }
+                            }],
+                            xAxes: [{
+                                gridLines: {
+                                    display: false
                                 }
                             }]
                         }
@@ -113,18 +127,31 @@
                 let brandChartObject = new Chart(brandChart, {
                     type: 'bar',
                     data: {
-                        labels: ["red", "blue", "green"],
+                        labels: ["red", "blue", "green", "cos"],
                         datasets: [{
                             label: '# czego',
-                            data: [12, 54, 7],
-                            backgroundColor: ["rgb(0, 0, 255)", "rgb(255, 0, 0)", "rgb(0, 255, 0)"],
+                            data: [12, 54, 7, 30],
+                            backgroundColor: ["#7f50ad", "#532c7a", "#472966", "#33174f"],
                         }]
                     },
                     options: {
+                        legend: {
+                            labels: {
+                                fontColor: "#532c7a"
+                            }
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero: true
+                                    display: false
+                                },
+                                gridLines: {
+                                    display: false
+                                }
+                            }],
+                            xAxes: [{
+                                gridLines: {
+                                    display: false
                                 }
                             }]
                         }

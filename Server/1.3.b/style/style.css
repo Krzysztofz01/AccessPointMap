@@ -1,0 +1,26 @@
+body {
+    background-color: #141212 !important;
+    font-family: 'Barlow', sans-serif !important;
+}
+
+p {
+    color: #532c7a !important;
+}
+
+.navbar-bgcolor {
+    background-color: #532c7a !important;
+}
+
+.violet-border {
+    border-style: solid;
+    border-color: #532c7a;
+    border-width: 1px;
+}
+
+.text-color-grey {
+    color: #141212 !important;
+}
+
+.text-color-violet {
+    color: #260845 !important;
+}
