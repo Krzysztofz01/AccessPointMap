@@ -17,11 +17,11 @@
                 <form action="app/fileHandler.php" method="post" enctype="multipart/form-data">
                     <div class="input-group">
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="jsonFile" aria-describedby="jsonFile">
+                            <input type="file" accept=".json" class="custom-file-input" id="jsonFile" name="jsonFile" aria-describedby="jsonFile">
                             <label class="custom-file-label" for="jsonFile">Choose file</label>
                         </div>
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="submit" id="uploadFile">Upload</button>
+                            <button class="btn btn-outline-secondary" type="submit" id="uploadFile" name="submit">Upload</button>
                     </div>
                 </form>
         </div>

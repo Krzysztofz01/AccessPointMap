@@ -33,6 +33,7 @@
                         <a class="nav-item nav-link" href="#charts">Statistics</a>
                         <a class="nav-item nav-link" href="#">Advanced Search</a>
                         <a class="nav-item nav-link" href="#info">Information</a>
+                        <a class="nav-item nav-link" href="https://github.com/Krzysztofz01/AccessPointMap">Github</a>
                     </div>
                 </div>
             </nav>
@@ -94,16 +95,8 @@
                 });
 
                 //Adding markers
-               /* let markers = [];
-                for(let i=0; i<LIMIT; i++) {
-                    markers = new google.maps.Marker({
-                    //https://developers.google.com/maps/documentation/javascript/markers
-                    //Dodatkowe parametry Markera
-                    position: {lat: parseFloat(element.latitude), lng: parseFloat(element.longitude)},
-                    map: map,
-                    label: ""
-                    }); 
-                } */
+                let markers = [];
+                <?php $view->getJavaScriptData($view->javaScriptData); ?>
 
                 //Security Chart
                 let securityChart = document.getElementById("securityChart").getContext('2d');
@@ -114,14 +107,12 @@
                         datasets: [{
                             label: 'Count',
                             data: <?php $view->getSecurityChart("value"); ?>,
-                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f"],
+                            backgroundColor: ["#7f50ad", "#6c4295", "#59347e", "#462567"],
                         }]
                     },
                     options: {
                         legend: {
-                            labels: {
-                                fontColor: "#532c7a"
-                            }
+                            display: false
                         },
                         scales: {
                             yAxes: [{
@@ -150,14 +141,12 @@
                         datasets: [{
                             label: 'Count',
                             data: <?php $view->getBrandsChart("value"); ?>,
-                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f"],
+                            backgroundColor: ["#7f50ad", "#6c4295", "#59347e", "#462567", "#33174f"],
                         }]
                     },
                     options: {
                         legend: {
-                            labels: {
-                                fontColor: "#532c7a"
-                            }
+                            display: false
                         },
                         scales: {
                             yAxes: [{
@@ -171,6 +160,12 @@
                             xAxes: [{
                                 gridLines: {
                                     display: false
+                                },
+                                ticks: {
+                                    autoskip: false,
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    fontSize: 10
                                 }
                             }]
                         }
@@ -182,18 +177,16 @@
                 let areaChartObject = new Chart(areaChart, {
                     type: 'bar',
                     data: {
-                        labels: [] <?php //$view->getAreaChart("name"); ?>,
+                        labels: [] <?php $view->getAreaChart("name"); ?>,
                         datasets: [{
                             label: 'km^2',
-                            data: [] <?php //$view->getAreaChart("value"); ?>,
-                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f", "#33174f"],
+                            data: [] <?php $view->getAreaChart("value"); ?>,
+                            backgroundColor: ["#7f50ad", "#6c4295", "#59347e", "#462567", "#33174f"],
                         }]
                     },
                     options: {
                         legend: {
-                            labels: {
-                                fontColor: "#532c7a"
-                            }
+                            display: false
                         },
                         scales: {
                             yAxes: [{
@@ -222,14 +215,12 @@
                         datasets: [{
                             label: 'Count',
                             data: <?php $view->getFreqChart("value"); ?>,
-                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f", "#33174f"],
+                            backgroundColor: ["#7f50ad", "#6c4295", "#59347e", "#462567", "#33174f"],
                         }]
                     },
                     options: {
                         legend: {
-                            labels: {
-                                fontColor: "#532c7a"
-                            }
+                            display: false
                         },
                         scales: {
                             yAxes: [{

@@ -1,19 +1,36 @@
 <?php
 
-if(isset($_FILES['jsonFile'])) {
-    $fileError = array();
-    $fileName = $_FILES['jsonFile']['name'];
-    $fileTmp = $_FILES['jsonFile']['tmp_name'];
-    $fileSize = $_FILES['jsonFile']['size'];
-    $fileExt = strtolower(end(explode('.', $fileName)));
+if(isset($_POST["submit"])) {
+    if(isset($_FILES['jsonFile'])) {
+        $fileError = array();
+        $fileName = $_FILES['jsonFile']['name'];
+        $fileTmp = $_FILES['jsonFile']['tmp_name'];
+        $fileSize = $_FILES['jsonFile']['size'];
+        $fileExt = $_FILES['jsonFile']['type'];
 
-    if($fileExt != "json") {
-        $fileError[] = "Extension error!";
-    }
+        //Check if the file type is JSON
+        if($fileExt != "application/json") {
+            $fileError[] = "Extension error!";
+        }
 
-    if($fileSize > 8388608) {
-        $fileError[] = "Size error!";
+        //Check if file size is smaller than 8MB
+        if($fileSize > 8388608) {
+            $fileError[] = "Size error!";
+        }
+
+        if(empty($fileError)) {
+            /*echo("<script>alert('DZIALA');window.location.replace('../admin.php');</script>");
+            die();*/
+            move_uploaded_file($fileTmp, "../json/".$fileName);
+            var_dump($fileName);
+            //rename(    "../json/".date("Y-m-d H:i:s").".json")
+        }
     }
+}
+
+
+
+/*
 
     if(empty($fileError)) {
         move_uploaded_file($fileTmp, "json/".$fileName);
@@ -46,4 +63,6 @@ if(isset($_FILES['jsonFile'])) {
 
     unset($_FILES['jsonFile']);
 }
+
+*/
 ?>

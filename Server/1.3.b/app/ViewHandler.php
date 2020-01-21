@@ -23,10 +23,23 @@ class ViewHandler {
         $this->data = json_decode(curl_exec($ch), true)["records"];
         curl_close($ch);
 
+        $this->generateJavaScriptData($this->data);
         $this->generateSecurityChart($this->data);
         $this->generateBrandsChart($this->data);
         $this->generateAreaChart($this->data);
         $this->generateFreqChart($this->data);
+
+        unset($this->data);
+    }
+
+    private function generateJavaScriptData($dataSet) {
+        $this->javaScriptData = array();
+        
+        for($i=0; $i < count($dataSet); $i++) {
+            array_push($this->javaScriptData, array("latitude" => $dataSet[$i]["latitude"],
+                                                    "longitude" => $dataSet[$i]["longitude"],
+                                                    "ssid" => $dataSet[$i]["ssid"]));
+        }
     }
 
     private function generateSecurityChart($dataSet) {
@@ -159,5 +172,15 @@ class ViewHandler {
                     $this->freqChartData[3][$dataType] . "', '" .
                     $this->freqChartData[4][$dataType] . "']");
     }
+
+    public function getJavaScriptData($dataContainer) {
+        for($i=0; $i < count($dataContainer); $i++) {
+            echo("markers = new google.maps.Marker({".
+                "position: {lat: parseFloat(". $dataContainer[$i]["latitude"] ."), lng: parseFloat(". $dataContainer[$i]["longitude"] .")},".
+                "map: map,".
+                "label: '". $dataContainer[$i]["ssid"] ."'});". PHP_EOL);
+        }
+    }
+
 }
 ?>
