@@ -1,3 +1,10 @@
+<?php
+    require_once("app/ViewHandler.php");
+
+    //Creating a new ViewHandler
+    $view = new ViewHandler();
+?>
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -5,9 +12,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style/style.css">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
         
         <title>Access Point Map</title>
     </head>
@@ -38,13 +46,24 @@
 
             <!-- Charts -->
             <div class="row my-2 mx-0" id="charts">
-                <div class="col text-center violet-border">
+                <div class="col-lg-6 col-md-12 text-center violet-border">
                     <p class="h3">Security</p>
                     <canvas id="securityChart"></canvas>
                 </div>
-                <div class="col text-center violet-border">
+                <div class="col-lg-6 col-md-12 text-center violet-border">
                     <p class="h3">Brands</p>
                     <canvas id="brandChart"></canvas>
+                </div>
+            </div>
+
+            <div class="row my-2 mx-0" id="charts">
+                <div class="col-lg-6 col-md-12 text-center violet-border">
+                    <p class="h3">Area</p>
+                    <canvas id="areaChart"></canvas>
+                </div>
+                <div class="col-lg-6 col-md-12 text-center violet-border">
+                    <p class="h3">Frequency</p>
+                    <canvas id="freqChart"></canvas>
                 </div>
             </div>
         
@@ -91,11 +110,11 @@
                 let securityChartObject = new Chart(securityChart, {
                     type: 'bar',
                     data: {
-                        labels: ["red", "blue", "green", "cos"],
+                        labels: <?php $view->getSecurityChart("name"); ?>,
                         datasets: [{
-                            label: '# czego',
-                            data: [12, 54, 7, 30],
-                            backgroundColor: ["#7f50ad", "#532c7a", "#472966", "#33174f"],
+                            label: 'Count',
+                            data: <?php $view->getSecurityChart("value"); ?>,
+                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f"],
                         }]
                     },
                     options: {
@@ -127,11 +146,83 @@
                 let brandChartObject = new Chart(brandChart, {
                     type: 'bar',
                     data: {
-                        labels: ["red", "blue", "green", "cos"],
+                        labels: <?php $view->getBrandsChart("name"); ?>,
                         datasets: [{
-                            label: '# czego',
-                            data: [12, 54, 7, 30],
-                            backgroundColor: ["#7f50ad", "#532c7a", "#472966", "#33174f"],
+                            label: 'Count',
+                            data: <?php $view->getBrandsChart("value"); ?>,
+                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f"],
+                        }]
+                    },
+                    options: {
+                        legend: {
+                            labels: {
+                                fontColor: "#532c7a"
+                            }
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    display: false
+                                },
+                                gridLines: {
+                                    display: false
+                                }
+                            }],
+                            xAxes: [{
+                                gridLines: {
+                                    display: false
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                //Area Chart
+                let areaChart = document.getElementById("areaChart").getContext('2d');
+                let areaChartObject = new Chart(areaChart, {
+                    type: 'bar',
+                    data: {
+                        labels: [] <?php //$view->getAreaChart("name"); ?>,
+                        datasets: [{
+                            label: 'km^2',
+                            data: [] <?php //$view->getAreaChart("value"); ?>,
+                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f", "#33174f"],
+                        }]
+                    },
+                    options: {
+                        legend: {
+                            labels: {
+                                fontColor: "#532c7a"
+                            }
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    display: false
+                                },
+                                gridLines: {
+                                    display: false
+                                }
+                            }],
+                            xAxes: [{
+                                gridLines: {
+                                    display: false
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                //Freq Chart
+                let freqChart = document.getElementById("freqChart").getContext('2d');
+                let freqChartObject = new Chart(freqChart, {
+                    type: 'bar',
+                    data: {
+                        labels: <?php $view->getFreqChart("name"); ?>,
+                        datasets: [{
+                            label: 'Count',
+                            data: <?php $view->getFreqChart("value"); ?>,
+                            backgroundColor: ["#7f50ad", "#33174f", "#33174f", "#33174f", "#33174f"],
                         }]
                     },
                     options: {

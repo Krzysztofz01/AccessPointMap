@@ -19,6 +19,7 @@
     if($num>0) {
         $accessPointArray = array();
         $accessPointArray["records"] = array();
+        $accessPointArray["message"] = array();
 
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             extract($row);
@@ -31,12 +32,18 @@
                 "signalLevel" => $signalLevel,
                 "latitude" => $latitude,
                 "longitude" => $longitude,
+                "lowSignalLevel" => $lowSignalLevel,
+                "lowLatitude" => $lowLatitude,
+                "lowLongitude" => $lowLongitude,
+                "signalArea" => $signalArea,
                 "security" => $security,
                 "vendor" => $vendor
             );
 
             array_push($accessPointArray["records"], $accessPointItem);
         }
+
+        array_push($accessPointArray["message"], "Items found in database");
 
         //Data encoded to JSON, OK
         http_response_code(200);

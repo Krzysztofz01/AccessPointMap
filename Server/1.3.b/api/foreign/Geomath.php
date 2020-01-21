@@ -1,35 +1,16 @@
 <?php
-class GeoMath {	
-    
-    private static function degToRad($deg) {
-		return $deg * pi() / 180.0;
+class Geomath {
+	public static function getDistance($lat1, $long1, $lat2, $long2) {
+		$p = 0.017453292519943295; //  PI : 180
+		$a = 0.5 - cos(($lat2 - $lat1) * $p)/2 + 
+		cos($lat1 * $p) * cos($lat2 * $p) * 
+		(1 - cos(($long2 - $long1) * $p))/2;
+
+		return 12742 * asin(sqrt($a));
 	}
-	
-	private static function radToDeg($rad) {
-		return $rad / pi() * 180;
-	}
-	
-    public static function getDistance($latitudeOne, $longitudeOne, $latitudeTwo, $longitudeTwo) {
-        if(($latitudeOne == $latitudeTwo) && ($longitudeOne==$longitudeTwo)) {
-			return 0;
-        } else {
-			$theta = longitudeOne - longitudeTwo;
-			
-			$distance = sin(degToRad(latitudeOne)) * sin(degToRad(latitudeTwo)) + cos(degToRad(latitudeOne)) * cos(degToRad(latitudeTwo)) * cos(degToRad(theta));
-			$distance = acos(distance);
-			$distance = radToDeg(distance);
-			$distance = distance * 60 * 1.1515;
-			
-			return distance * 1.609344;
-		}
-	}
-	
-	public static function areaByRadius($radius) {
-		return pow($radius, 2) * pi();
-	}
-	
-	public static function areaByGeoloc($latitudeOne, $longitudeOne, $latitudeTwo, $longitudeTwo) {
-		return pow(getDistance(latitudeOne, longitudeOne, latitudeTwo, longitudeTwo), 2) * pi();
+
+	public static function getArea($lat1, $long1, $lat2, $long2) {
+		return 3.1415 * pow(Geomath::getDistance($lat1, $long1, $lat2, $long2), 2);
 	}
 }
 ?>

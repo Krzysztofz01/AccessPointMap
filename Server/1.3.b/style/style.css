@@ -1,6 +1,7 @@
 body {
     background-color: #141212 !important;
     font-family: 'Barlow', sans-serif !important;
+    scroll-behavior: smooth !important;
 }
 
 p {

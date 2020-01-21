@@ -28,12 +28,12 @@ if(isset($_FILES['jsonFile'])) {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($jsonArray[i]));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($jsonArray[$i]));
 
             $response = curl_exec($ch);
 
             if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) {
-                $fileError[] = "API call error on ". i ."!";
+                $fileError[] = "API call error on ". $i ."!";
             }
 
             curl_close($ch);
