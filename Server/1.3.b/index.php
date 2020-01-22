@@ -89,8 +89,8 @@
             function initMap() {
                 //Google Map
                 let map = new google.maps.Map(document.getElementById("map"), {
-                    zoom: 8,
-                    center: {lat:  50.09, lng: 18.22},
+                    zoom: 15,
+                    center: {lat:  50.16, lng: 18.31},
                     mapTypeId: 'satellite'
                 });
 

@@ -1,68 +1,63 @@
 <?php
+session_start();
+if(isset($_SESSION['valid'])) {
+    if(isset($_POST["submit"])) {
+        if(isset($_FILES['jsonFile'])) {
+            $fileError = array();
+            $fileName = $_FILES['jsonFile']['name'];
+            $fileTmp = $_FILES['jsonFile']['tmp_name'];
+            $fileSize = $_FILES['jsonFile']['size'];
+            $fileExt = $_FILES['jsonFile']['type'];
 
-if(isset($_POST["submit"])) {
-    if(isset($_FILES['jsonFile'])) {
-        $fileError = array();
-        $fileName = $_FILES['jsonFile']['name'];
-        $fileTmp = $_FILES['jsonFile']['tmp_name'];
-        $fileSize = $_FILES['jsonFile']['size'];
-        $fileExt = $_FILES['jsonFile']['type'];
-
-        //Check if the file type is JSON
-        if($fileExt != "application/json") {
-            $fileError[] = "Extension error!";
-        }
-
-        //Check if file size is smaller than 8MB
-        if($fileSize > 8388608) {
-            $fileError[] = "Size error!";
-        }
-
-        if(empty($fileError)) {
-            /*echo("<script>alert('DZIALA');window.location.replace('../admin.php');</script>");
-            die();*/
-            move_uploaded_file($fileTmp, "../json/".$fileName);
-            var_dump($fileName);
-            //rename(    "../json/".date("Y-m-d H:i:s").".json")
-        }
-    }
-}
-
-
-
-/*
-
-    if(empty($fileError)) {
-        move_uploaded_file($fileTmp, "json/".$fileName);
-
-        $jsonString = file_get_contents("json/".$fileName);
-
-        $jsonArray = json_decode($jsonString, true);
-
-        for($i = 0; $i < sizeof($jsonArray); $i++) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, "../api/request/add.php");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($jsonArray[$i]));
-
-            $response = curl_exec($ch);
-
-            if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) {
-                $fileError[] = "API call error on ". $i ."!";
+            //Check if the file type is JSON
+            if($fileExt != "application/json") {
+                $fileError[] = "Extension error!";
             }
 
-            curl_close($ch);
-        }
+            //Check if file size is smaller than 8MB
+            if($fileSize > 8388608) {
+                $fileError[] = "Size error!";
+            }
 
-        if(empty($fileError)) {
-            unlink("json/".$fileName);
+            if(empty($fileError)) {
+                move_uploaded_file($fileTmp, "../json/".$fileName);
+                $jsonString = file_get_contents("../json/".$fileName);
+                $jsonArray = json_decode($jsonString, true);
+                define("apiCall", "http://localhost/accesspointmap/server/1.3.b/api/request/add.php");
+                
+                for($i=0; $i < count($jsonArray); $i++) {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, apiCall);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    //curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($jsonArray[$i]));
+
+                    $response = curl_exec($ch);
+
+                    if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) {
+                        $fileError[] = "API call error on ". $i ."!";
+                    }
+
+                    curl_close($ch);
+                }
+
+                rename("../json/".$fileName, "../json/". strval(date("YmdHis") .".json"));
+                unset($_FILES['jsonFile']);
+
+                if(empty($fileError)) {
+                    echo("<script>alert('OK!');window.location.replace('../admin.php');</script>");
+                }
+                else {
+                    echo("<script>alert('". print_r($fileError) ."');window.location.replace('../admin.php');</script>");
+                }
+                die();  
+            }
         }
     }
-
-    unset($_FILES['jsonFile']);
 }
-
-*/
+else {
+    header('Location: ../index.php');
+    die(); 
+}
 ?>

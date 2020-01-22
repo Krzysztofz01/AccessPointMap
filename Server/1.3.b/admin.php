@@ -1,3 +1,26 @@
+<?php
+    ob_start();
+    session_start();
+
+    define("login", 'admin');
+    define("password", 'admin');
+
+    if(isset($_POST['adminLogin'])) {
+        if(($_POST['login'] == login) && ($_POST['pass'] == password)) {
+            $_SESSION['valid'] = true;
+        } 
+    }
+
+    if(isset($_POST['adminLogout'])) {
+        session_start();
+        unset($_SESSION);
+        unset($_POST['adminLogin'], $_POST['login'], $_POST['pass'], $_POST['adminLogout']);
+        session_destroy();
+        header('Location: admin.php');
+    }
+?>
+
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -13,17 +36,39 @@
     </head>
     <body>
         <div class="container my-2">
-            <div class="col-12">
-                <form action="app/fileHandler.php" method="post" enctype="multipart/form-data">
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" accept=".json" class="custom-file-input" id="jsonFile" name="jsonFile" aria-describedby="jsonFile">
-                            <label class="custom-file-label" for="jsonFile">Choose file</label>
-                        </div>
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="submit" id="uploadFile" name="submit">Upload</button>
-                    </div>
-                </form>
+            <div class="col-12 my-4">
+                <?php
+                    if(isset($_SESSION['valid'])) {
+                        echo('<form action="app/fileHandler.php" method="post" enctype="multipart/form-data">
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input type="file" accept=".json" class="custom-file-input" id="jsonFile" name="jsonFile" aria-describedby="jsonFile">
+                                        <label class="custom-file-label" for="jsonFile">Choose file</label>
+                                    </div>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="submit" id="uploadFile" name="submit">Upload</button>
+                                </div>
+                            </form>');
+                        echo('<form action="admin.php" method="post" enctype="multipart/form-data">
+                                <button type="submit" class="btn btn-primary" name="adminLogout">Logout</button>
+                            </form>');
+                    }
+                    else {
+                        echo('<form action="admin.php" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="login">Logins</label>
+                                    <input type="login" class="form-control" id="login" aria-describedby="emailHelp" placeholder="Enter login" name="login">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pass">Password</label>
+                                    <input type="password" class="form-control" id="pass" placeholder="Password" name="pass">
+                                </div>
+                                    <button type="submit" class="btn btn-primary" name="adminLogin">Submit</button>
+                            </form>');
+                    }
+
+                    
+                ?>
         </div>
             </div>
         </div>
