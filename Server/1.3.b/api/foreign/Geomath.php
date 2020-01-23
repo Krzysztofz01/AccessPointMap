@@ -6,7 +6,7 @@ class Geomath {
 		cos($lat1 * $p) * cos($lat2 * $p) * 
 		(1 - cos(($long2 - $long1) * $p))/2;
 
-		return 12742 * asin(sqrt($a));
+		return intval((12742 * asin(sqrt($a))) * 1000);
 	}
 
 	public static function getArea($lat1, $long1, $lat2, $long2) {

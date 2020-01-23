@@ -14,15 +14,20 @@ class SearchEngine {
         curl_setopt($ch, CURLOPT_POST, true);
         $this->data = json_decode(curl_exec($ch), true)["records"];
         curl_close($ch);
-          
-        switch($type) {
-            case 'record': {
-                $this->record = $data[$index];
-                unset($this->data);
-            } break;
-            case 'database': {
-                unset($this->record);
-            } break;
+         
+        if($index < count($this->data)) {
+            switch($type) {
+                case 'record': {
+                    $this->record = $this->data[$index];
+                    unset($this->data);
+                } break;
+                case 'database': {
+                    unset($this->record);
+                } break;
+            }
+        }
+        else {
+            $this->data = null;
         }
     }
 

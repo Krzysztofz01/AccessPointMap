@@ -38,6 +38,7 @@ class ViewHandler {
         for($i=0; $i < count($dataSet); $i++) {
             array_push($this->javaScriptData, array("latitude" => $dataSet[$i]["latitude"],
                                                     "longitude" => $dataSet[$i]["longitude"],
+                                                    "id" => $dataSet[$i]["id"],
                                                     "ssid" => $dataSet[$i]["ssid"]));
         }
     }
@@ -173,14 +174,27 @@ class ViewHandler {
                     $this->freqChartData[4][$dataType] . "']");
     }
 
-    public function getJavaScriptData($dataContainer) {
+    /*public function getJavaScriptData($dataContainer) {
         for($i=0; $i < count($dataContainer); $i++) {
             echo("markers = new google.maps.Marker({".
                 "position: {lat: parseFloat(". $dataContainer[$i]["latitude"] ."), lng: parseFloat(". $dataContainer[$i]["longitude"] .")},".
                 "map: map,".
                 "label: '". $dataContainer[$i]["ssid"] ."'});". PHP_EOL);
         }
-    }
+    }*/
 
+    public function getJavaScriptData($dataContainer) {
+        for($i=0; $i < count($dataContainer); $i++) {
+            echo("tmpMark = new google.maps.Marker({".
+                "position: {lat: parseFloat(". $dataContainer[$i]["latitude"] ."), lng: parseFloat(". $dataContainer[$i]["longitude"] .")},".
+                "map: map,".
+                "label: {text: '". $dataContainer[$i]["ssid"] ."', color: 'white'}});". PHP_EOL);
+            echo("google.maps.event.addListener(tmpMark, 'click', function() {
+                window.location.replace('accesspoint.php?id=". $dataContainer[$i]["id"] ."');
+            });". PHP_EOL);
+
+            echo("markers = tmpMark;". PHP_EOL);
+        }
+    }
 }
 ?>
