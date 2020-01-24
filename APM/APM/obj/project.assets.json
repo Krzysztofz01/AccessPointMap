@@ -5256,11 +5256,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\newapm\\Accesspointmap\\APM\\APM\\APM.csproj",
+      "projectUniqueName": "D:\\xampp\\htdocs\\accesspointmap\\APM\\APM\\APM.csproj",
       "projectName": "APM",
-      "projectPath": "D:\\newapm\\Accesspointmap\\APM\\APM\\APM.csproj",
+      "projectPath": "D:\\xampp\\htdocs\\accesspointmap\\APM\\APM\\APM.csproj",
       "packagesPath": "C:\\Users\\User1\\.nuget\\packages\\",
-      "outputPath": "D:\\newapm\\Accesspointmap\\APM\\APM\\obj\\",
+      "outputPath": "D:\\xampp\\htdocs\\accesspointmap\\APM\\APM\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [

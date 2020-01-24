@@ -5,8 +5,7 @@ namespace APM
     class AccessPoint
     {
         public static List<AccessPoint> AccessPointContainer = new List<AccessPoint>();
-        public static List<AccessPoint> AccessPointKnown = new List<AccessPoint>();
-
+        
         public string bssid { get; set; }
         public string ssid { get; set; }
         public int freq { get; set; }

@@ -86,13 +86,9 @@ namespace APM
             if (sendToApi.Checked)
             {
                 ApiHelper api = new ApiHelper();
+       
                 //Debug
-                System.Diagnostics.Debug.WriteLine("Get data from database");
-                AccessPoint.AccessPointKnown = await api.getData();
-                System.Diagnostics.Debug.WriteLine(AccessPoint.AccessPointKnown.Count);
-
-                //Debug
-                System.Diagnostics.Debug.WriteLine("Main sending method");
+                System.Diagnostics.Debug.WriteLine("Sending to API");
                 await api.send(AccessPoint.AccessPointContainer);
                 uploadStatus.Text = "Upload process finished!";
                 Toast.MakeText(this, "Data send to API", ToastLength.Long).Show();
@@ -121,10 +117,10 @@ namespace APM
                 accessPointCount.Text = AccessPoint.AccessPointContainer.Count.ToString();
             }
         }
-        
+
         private async Task startScan()
         {
-            //get current location
+            //Get current location
             request = new GeolocationRequest(GeolocationAccuracy.Best);
             var location = await Geolocation.GetLocationAsync(request);
 
@@ -135,7 +131,7 @@ namespace APM
             for(int i=0; i<scanResultArray.Count; i++)
             {
                 //debug
-                System.Diagnostics.Debug.WriteLine(scanResultArray[i].Bssid + " " + scanResultArray[i].Level);
+                System.Diagnostics.Debug.WriteLine(scanResultArray[i].Ssid + " " + scanResultArray[i].Level);
 
                 exist = false;
                 for(int l=0; l<AccessPoint.AccessPointContainer.Count; l++)
@@ -149,13 +145,13 @@ namespace APM
                             AccessPoint.AccessPointContainer[l].latitude = location.Latitude;
                             AccessPoint.AccessPointContainer[l].longitude = location.Longitude;
                         }
-
-                        if(scanResultArray[i].Level < AccessPoint.AccessPointContainer[l].lowSignalLevel)
+                        else if(scanResultArray[i].Level < AccessPoint.AccessPointContainer[l].lowSignalLevel)
                         {
                             AccessPoint.AccessPointContainer[l].lowSignalLevel = scanResultArray[i].Level;
                             AccessPoint.AccessPointContainer[l].lowLatitude = location.Latitude;
                             AccessPoint.AccessPointContainer[l].lowLongitude = location.Longitude;
                         }
+                        break;
                     }
                 }
 

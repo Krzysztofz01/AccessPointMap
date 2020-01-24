@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace APM
 {
@@ -26,19 +25,10 @@ namespace APM
 
         public async Task send(List<AccessPoint> accessPoints)
         {
-            System.Diagnostics.Debug.WriteLine("send");
             for (int i=0; i<accessPoints.Count; i++)
-            {
-                if(alreadyKnown(accessPoints[i].bssid))
-                {
-                    System.Diagnostics.Debug.WriteLine("updata");
-                    await update(accessPoints[i]);   
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("add");
+            {   
+                    System.Diagnostics.Debug.WriteLine("Send");
                     await addNew(accessPoints[i]);
-                }
             }
         }
 
@@ -52,57 +42,6 @@ namespace APM
             }
 
             return true;
-        }
-
-        private async Task<bool> update(AccessPoint accessPoint)
-        {
-            var response = await client.PostAsJsonAsync(updataExisting, new {
-            bssid = accessPoint.bssid,
-            signalLevel = accessPoint.signalLevel,
-            latitude = accessPoint.latitude,
-            longitude = accessPoint.longitude});
-            
-            if(!response.IsSuccessStatusCode)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public async Task<List<AccessPoint>> getData()
-        {
-            List<AccessPoint> output = new List<AccessPoint>();
-            var response = await client.GetAsync(read);
-
-            if(response.IsSuccessStatusCode)
-            {
-                string jsonString = await response.Content.ReadAsStringAsync();
-                var jsonArray = JsonConvert.DeserializeObject<dynamic>(jsonString);
-
-                foreach(var package in jsonArray.records)
-                {
-                    output.Add(new AccessPoint(
-                        package.bssid.ToObject<string>(),
-                        package.signalLevel.ToObject<int>()));
-                }
-                return output;
-            }
-            return null;
-        }
-
-        private bool alreadyKnown(string bssid)
-        {
-            bool result = false;
-
-            for(int i=0; i<AccessPoint.AccessPointKnown.Count; i++)
-            {
-                if(bssid == AccessPoint.AccessPointKnown[i].bssid)
-                {
-                    result = true;
-                }
-            }
-            return result;
-        }
+        }   
     }
 }
