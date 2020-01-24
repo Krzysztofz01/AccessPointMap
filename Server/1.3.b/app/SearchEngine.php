@@ -15,28 +15,41 @@ class SearchEngine {
         $this->data = json_decode(curl_exec($ch), true)["records"];
         curl_close($ch);
          
-        if($index < count($this->data)) {
+        if(($this->data != null) && is_array($this->data)) {
             switch($type) {
-                case 'record': {
-                    $this->record = $this->data[$index];
+                case "record": {
+                    for($i=0; $i < count($this->data); $i++) {
+                        if($this->data[$i]['id'] == $index) {
+                            $this->record = $this->data[$i];
+                            break;
+                        }
+                    }
                     unset($this->data);
                 } break;
-                case 'database': {
+                case "database": {
                     unset($this->record);
-                } break;
+                }
             }
-        }
-        else {
-            $this->data = null;
         }
     }
 
     public function getRecord() {
-        return $this->record;
+        if(isset($this->record)) {
+            return $this->record;
+        }
+        else {
+            return null;
+        }
+        
     }
 
     public function getAllRecords() {
-        return $this->data;
+        if(isset($this->data)) {
+            return $this->data;
+        }
+        else {
+            return null;
+        }
     } 
 }
 ?>

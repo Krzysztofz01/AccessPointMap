@@ -39,7 +39,7 @@ class AccessPoint {
         $this->lowLatitude = htmlspecialchars(strip_tags($this->lowLatitude));
         $this->lowLongitude = htmlspecialchars(strip_tags($this->lowLongitude));
         $this->security = htmlspecialchars(strip_tags($this->security));
-        $this->signalArea = htmlspecialchars(strip_tags($this->signalLevel));
+        $this->signalArea = htmlspecialchars(strip_tags($this->signalArea));
         $this->vendor = htmlspecialchars(strip_tags($this->vendor));
 
         //Assign the value

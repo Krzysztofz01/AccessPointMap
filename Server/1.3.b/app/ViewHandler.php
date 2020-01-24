@@ -5,6 +5,9 @@ class ViewHandler {
     //Container with data from API Read call
     private $data = null;
 
+    //Check bool
+    private $dataDelivered = null;
+
     //GoogleMaps API data for markers
     public $javaScriptData;
     
@@ -23,13 +26,23 @@ class ViewHandler {
         $this->data = json_decode(curl_exec($ch), true)["records"];
         curl_close($ch);
 
-        $this->generateJavaScriptData($this->data);
-        $this->generateSecurityChart($this->data);
-        $this->generateBrandsChart($this->data);
-        $this->generateAreaChart($this->data);
-        $this->generateFreqChart($this->data);
+        if(($this->data != null) && is_array($this->data)) {
+            $dataDelivered = true;
+            $this->generateJavaScriptData($this->data);
+            $this->generateSecurityChart($this->data);
+            $this->generateBrandsChart($this->data);
+            $this->generateAreaChart($this->data);
+            $this->generateFreqChart($this->data);
+        }
+        else {
+            $dataDelivered = false;
+        }
 
         unset($this->data);
+    }
+
+    public function check() {
+        return $this->dataDelivered;
     }
 
     private function generateJavaScriptData($dataSet) {

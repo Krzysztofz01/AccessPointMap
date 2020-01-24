@@ -177,10 +177,10 @@
                 let areaChartObject = new Chart(areaChart, {
                     type: 'bar',
                     data: {
-                        labels: [] <?php $view->getAreaChart("name"); ?>,
+                        labels: <?php $view->getAreaChart("name"); ?>,
                         datasets: [{
-                            label: 'km^2',
-                            data: [] <?php $view->getAreaChart("value"); ?>,
+                            label: 'm^2',
+                            data: <?php $view->getAreaChart("value"); ?>,
                             backgroundColor: ["#7f50ad", "#6c4295", "#59347e", "#462567", "#33174f"],
                         }]
                     },
@@ -200,6 +200,12 @@
                             xAxes: [{
                                 gridLines: {
                                     display: false
+                                },
+                                ticks: {
+                                    autoskip: false,
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    fontSize: 8
                                 }
                             }]
                         }
