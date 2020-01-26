@@ -56,31 +56,58 @@ if(
     //Check if record with this BSSID exist, decision whether to add or update
     if($response["message"] != "No items found!") {
         for($i = 0; $i < count($response["records"]); $i++) {
-            if($data->bssid == $response["records"][$i]["bssid"]) {
-                //RECORD UPDATE!  
+            if($data->bssid == $response["records"][$i]["bssid"]) {  
                 $recordExist = true;
 
-                //Set the BSSID of the AccessPoint to be edited
-                $accessPoint->bssid = $data->bssid;
+                if(($data->signalLevel > $response["records"][$i]["signalLevel"]) || ($data->lowSignalLevel < $response["records"][$i]["lowSignalLevel"])) {
+                    //RECORD UPDATE!
 
-                $accessPoint->signalLevel = $data->signalLevel;
-                $accessPoint->latitude = $data->latitude;
-                $accessPoint->longitude = $data->longitude;
-                $accessPoint->lowSignalLevel = $data->lowSignalLevel;
-                $accessPoint->lowLatitude = $data->lowLatitude;
-                $accessPoint->lowLongitude = $data->lowLongitude;
-                $accessPoint->signalArea = GeoMath::getArea($data->latitude, $data->longitude, $data->lowLatitude, $data->lowLongitude);
+                    //Set the BSSID of the AccessPoint to be edited
+                    $accessPoint->bssid = $data->bssid;
+                    $updateType = null;
 
-                //Updata the AccessPoint
-                if($accessPoint->update()) {
-                    //Data sucessful edited
-                    http_response_code(200);
-                    echo json_encode(array("message" => "Object updated in database"));
-                } else {
-                    //Service unavailable
-                    http_response_code(501);
-                    echo json_encode(array("message" => "Operation failed!"));
+                    if(($data->signalLevel > $response["records"][$i]["signalLevel"]) && ($data->lowSignalLevel < $response["records"][$i]["lowSignalLevel"])) {
+                        //BOTH
+                        $updateType = "BOTH";
+
+                        $accessPoint->signalLevel = $data->signalLevel;
+                        $accessPoint->latitude = $data->latitude;
+                        $accessPoint->longitude = $data->longitude;
+                        $accessPoint->lowSignalLevel = $data->lowSignalLevel;
+                        $accessPoint->lowLatitude = $data->lowLatitude;
+                        $accessPoint->lowLongitude = $data->lowLongitude;
+                    }
+                    else if($data->signalLevel > $response["records"][$i]["signalLevel"]) {
+                        //HIGH SIGNAL
+                        $updateType = "HIGH";
+
+                        $accessPoint->signalLevel = $data->signalLevel;
+                        $accessPoint->latitude = $data->latitude;
+                        $accessPoint->longitude = $data->longitude;
+                    }
+                    else if($data->lowSignalLevel < $response["records"][$i]["lowSignalLevel"]) {
+                        //LOW SIGNAL
+                        $updateType = "LOW";
+
+                        $accessPoint->lowSignalLevel = $data->lowSignalLevel;
+                        $accessPoint->lowLatitude = $data->lowLatitude;
+                        $accessPoint->lowLongitude = $data->lowLongitude;
+                    }
+
+                    $accessPoint->signalArea = GeoMath::getArea($data->latitude, $data->longitude, $data->lowLatitude, $data->lowLongitude);
+                    
+                    //Updata the AccessPoint
+                    if($accessPoint->update($updateType)) {
+                        //Data sucessful edited
+                        http_response_code(200);
+                        echo json_encode(array("message" => "Object updated in database"));
+                    } else {
+                        //Service unavailable
+                        http_response_code(501);
+                        echo json_encode(array("message" => "Operation failed!"));
+                    }
                 }
+                break;
             }
         }
     }
