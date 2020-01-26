@@ -35,3 +35,18 @@ a {
 .text-color-violet {
     color: #260845 !important;
 }
+
+.violet-button {
+    background-color: #532c7a !important;
+    border-style: none !important;
+    color: #141212 !important;
+}
+
+.table {
+    color: #532c7a !important;
+}
+
+.table a {
+    text-decoration: none !important;
+    color: #532c7a !important;
+}
