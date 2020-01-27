@@ -31,7 +31,7 @@
                     <div class="navbar-nav">
                         <a class="nav-item nav-link" href="#mapArea">Map</a>
                         <a class="nav-item nav-link" href="#charts">Statistics</a>
-                        <a class="nav-item nav-link" href="#">Advanced Search</a>
+                        <a class="nav-item nav-link" href="search.php">Advanced Search</a>
                         <a class="nav-item nav-link" href="#info">Information</a>
                         <a class="nav-item nav-link" href="https://github.com/Krzysztofz01/AccessPointMap">Github</a>
                     </div>

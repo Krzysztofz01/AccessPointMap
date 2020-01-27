@@ -6,6 +6,9 @@ class SearchEngine {
     private $data = null;
     private $record = null;
 
+    private $tableData = null;
+    private $tableStatus = null;
+
     public function __construct($type, $index = null) {
         //Call API to get AccessPoint informations
         $ch = curl_init();
@@ -50,6 +53,97 @@ class SearchEngine {
         else {
             return null;
         }
-    } 
+    }
+    
+    public function getBrands() {
+        $brands = array();
+        for($i = 0; $i< count($this->data); $i++) {
+            if(!$this->strCt($this->data[$i]["vendor"], "errors")) {
+                if(count($brands) > 0) {
+                    $exist = false;
+                    for($j = 0; $j < count($brands); $j++) {
+                        if($this->data[$i]["vendor"] == $brands[$j]) {
+                            $exist = true;
+                            break;
+                        }
+                    }
+
+                    if(!$exist) {
+                        array_push($brands, $this->data[$i]["vendor"]);
+                    }
+                }
+                else {
+                    array_push($brands, $this->data[$i]["vendor"]);
+                }
+            }
+        }
+
+        for($k = 0; $k < count($brands); $k++) {
+            echo "<option>". $brands[$k] ."</option>". PHP_EOL;
+        }
+    }
+
+    public function generateTableData($security, $brand, $ssid, $freq) {
+        $this->tableData = array();
+
+        for($i =0; $i < count($this->data); $i++) {
+            $conditionsOk = true;
+
+            if($security != "") {
+                if(!$this->strCt($this->data[$i]["security"], $security)) {
+                    $conditionsOk = false;
+                }
+            }
+
+            if($brand != "") {
+                if($this->data[$i]["vendor"] != $brand) {
+                    $conditionsOk = false;
+                }
+            }
+
+            if($ssid != "") {
+                if(!$this->strCt($this->data[$i]["ssid"], $ssid)) {
+                    $conditionsOk = false;
+                }
+            }
+
+            if($freq != "") {
+                if($this->data[$i]["freq"] != $freq) {
+                    $conditionsOk = false;
+                }
+            }
+
+            if($conditionsOk) {
+                array_push($this->tableData, $this->data[$i]);
+            }
+        }
+
+        if(count($this->tableData) > 0) {
+            $this->tableStatus = true;
+        }
+    }
+
+    public function printTable() {
+        if($this->tableStatus) {
+            for($i = 0; $i < count($this->tableData); $i++) {
+                echo('<tr>
+                    <th scope="row">'. intval($i + 1) .'</th>
+                    <td><a href="accesspoint.php?id='. $this->tableData[$i]["id"] .'">'. $this->tableData[$i]["ssid"] .'</a></td>
+                    <td>'. $this->tableData[$i]["bssid"] .'</td>
+                    <td>'. $this->tableData[$i]["freq"] .'</td>
+                    <td>'. $this->tableData[$i]["security"] .'</td>
+                    <td>'. $this->tableData[$i]["vendor"] .'</td>
+                </tr>');
+            }      
+        }
+        
+    }
+
+    private function strCt($str, $contains) {
+        if(strpos($str, $contains) !== false) {
+            return true;
+        }
+        return false;
+    }
 }
 ?>

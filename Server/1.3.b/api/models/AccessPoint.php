@@ -73,29 +73,90 @@ class AccessPoint {
         return $stmt;
     }
 
-    public function update() {
-        //Update query
-        $query = "UPDATE " . $this->tablename . " SET signalLevel = :signalLevel, latitude = :latitude, longitude = :longitude WHERE bssid = :bssid";
+    public function update($queryType) {
+        switch($queryType) {
+            case "LOW": {
+                //Query string
+                $query = "UPDATE " . $this->tablename . " SET lowSignalLevel = :lowSignalLevel, lowLatitude = :lowLatitude, lowLongitude = :lowLongitude, signalArea = :signalArea WHERE bssid = :bssid";
+                $stmt = $this->connection->prepare($query);
 
-        $stmt = $this->connection->prepare($query);
+                //Delete html tags
+                $this->bssid=htmlspecialchars(strip_tags($this->bssid));
+                $this->lowSignalLevel=htmlspecialchars(strip_tags($this->lowSignalLevel));
+                $this->lowLatitude=htmlspecialchars(strip_tags($this->lowLatitude));
+                $this->lowLongitude=htmlspecialchars(strip_tags($this->lowLongitude));
+                $this->signalArea = htmlspecialchars(strip_tags($this->signalArea));
 
-        //Delete html tags
-        $this->bssid=htmlspecialchars(strip_tags($this->bssid));
-        $this->signalLevel=htmlspecialchars(strip_tags($this->signalLevel));
-        $this->latitude=htmlspecialchars(strip_tags($this->latitude));
-        $this->longitude=htmlspecialchars(strip_tags($this->longitude));
+                //Bind param
+                $stmt->bindParam(":bssid", $this->bssid);
+                $stmt->bindParam(":lowSignalLevel", $this->lowSignalLevel);
+                $stmt->bindParam(":lowLatitude", $this->lowLatitude);
+                $stmt->bindParam(":lowLongitude", $this->lowLongitude);
+                $stmt->bindParam(":signalArea", $this->signalArea);
 
-        //Bind param
-        $stmt->bindParam(":bssid", $this->bssid);
-        $stmt->bindParam(":signalLevel", $this->signalLevel);
-        $stmt->bindParam(":latitude", $this->latitude);
-        $stmt->bindParam(":longitude", $this->longitude);
+                //Execute query
+                if($stmt->execute()) {
+                    return true;
+                }
+                return false;
+            } break;
+            case "HIGH": {
+                //Query string
+                $query = "UPDATE " . $this->tablename . " SET signalLevel = :signalLevel, latitude = :latitude, longitude = :longitude, signalArea = :signalArea WHERE bssid = :bssid";
+                $stmt = $this->connection->prepare($query);
 
-        //execute query
-        if($stmt->execute()) {
-            return true;
+                //Delete html tags
+                $this->bssid=htmlspecialchars(strip_tags($this->bssid));
+                $this->signalLevel=htmlspecialchars(strip_tags($this->signalLevel));
+                $this->latitude=htmlspecialchars(strip_tags($this->latitude));
+                $this->longitude=htmlspecialchars(strip_tags($this->longitude));
+                $this->signalArea = htmlspecialchars(strip_tags($this->signalArea));
+
+                //Bind param
+                $stmt->bindParam(":bssid", $this->bssid);
+                $stmt->bindParam(":signalLevel", $this->signalLevel);
+                $stmt->bindParam(":latitude", $this->latitude);
+                $stmt->bindParam(":longitude", $this->longitude);
+                $stmt->bindParam(":signalArea", $this->signalArea);
+
+                //Execute query
+                if($stmt->execute()) {
+                    return true;
+                }
+                return false;
+            } break;
+            case "BOTH": {
+                //Query string
+                $query = "UPDATE " . $this->tablename . " SET signalLevel = :signalLevel, latitude = :latitude, longitude = :longitude, lowSignalLevel = :lowSignalLevel, lowLatitude = :lowLatitude, lowLongitude = :lowLongitude, signalArea = :signalArea WHERE bssid = :bssid";
+                $stmt = $this->connection->prepare($query);
+
+                //Delete html tags
+                $this->bssid=htmlspecialchars(strip_tags($this->bssid));
+                $this->signalLevel=htmlspecialchars(strip_tags($this->signalLevel));
+                $this->latitude=htmlspecialchars(strip_tags($this->latitude));
+                $this->longitude=htmlspecialchars(strip_tags($this->longitude));
+                $this->lowSignalLevel=htmlspecialchars(strip_tags($this->lowSignalLevel));
+                $this->lowLatitude=htmlspecialchars(strip_tags($this->lowLatitude));
+                $this->lowLongitude=htmlspecialchars(strip_tags($this->lowLongitude));
+                $this->signalArea = htmlspecialchars(strip_tags($this->signalArea));
+
+                //Bind param
+                $stmt->bindParam(":bssid", $this->bssid);
+                $stmt->bindParam(":signalLevel", $this->signalLevel);
+                $stmt->bindParam(":latitude", $this->latitude);
+                $stmt->bindParam(":longitude", $this->longitude);
+                $stmt->bindParam(":lowSignalLevel", $this->lowSignalLevel);
+                $stmt->bindParam(":lowLatitude", $this->lowLatitude);
+                $stmt->bindParam(":lowLongitude", $this->lowLongitude);
+                $stmt->bindParam(":signalArea", $this->signalArea);
+
+                //execute query
+                if($stmt->execute()) {
+                    return true;
+                }
+                return false;
+            } break;
         }
-        return false;
     }
 }
 ?>
