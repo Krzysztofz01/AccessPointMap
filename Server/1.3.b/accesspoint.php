@@ -6,6 +6,7 @@
         $data = $se->getRecord();
 
         $position = "{lat: parseFloat(". $data['latitude'] . "), lng: parseFloat(". $data['longitude'] .")}";
+        $radius = $se->getRadius();
 
         if($data == null) {
             header('Location: index.php');
@@ -70,9 +71,14 @@
                     mapTypeId: 'satellite'
                 });
 
-                let marker = new google.maps.Marker({
-                    position: <?php echo($position); ?>,
-                    map: map
+                let area = new google.maps.Circle({
+                    center: <?php echo($position); ?>,
+                    radius: <?php echo($radius); ?>,
+                    map: map,
+                    strokeColor: "#532c7a",
+                    strokeOpacity: 0.8,
+                    fillColor: "#532c7a",
+                    fillOpacity: 0.25
                 })
             }
         </script>
