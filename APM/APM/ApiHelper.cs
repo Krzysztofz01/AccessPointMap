@@ -11,9 +11,7 @@ namespace APM
         private static HttpClient client = new HttpClient();
 
         private const string baseAddress = "http://accesspointmap.ct8.pl/";
-        private const string add = "api/actions/add.php";
-        private const string read = "api/actions/read.php";
-        private const string updataExisting = "api/actions/update.php";
+        private const string add = "api/request/add.php";
 
         public ApiHelper()
         {

@@ -21,6 +21,8 @@ namespace APM
         private TextView uploadStatus;
         private CheckBox saveLocal;
         private CheckBox sendToApi;
+        private CheckBox bestAccuracy;
+        private CheckBox hardSave;
 
         private GeolocationRequest request;
         private WifiManager wifiManager;
@@ -62,6 +64,13 @@ namespace APM
             sendToApi = FindViewById<CheckBox>(Resource.Id.sendToApi);
             sendToApi.Checked = true;
 
+            bestAccuracy = FindViewById<CheckBox>(Resource.Id.bestAccuracy);
+            bestAccuracy.Checked = true;
+
+            hardSave = FindViewById<CheckBox>(Resource.Id.hardSave);
+            hardSave.Checked = false;
+            
+
             wifiManager = (WifiManager)GetSystemService(WifiService);
 
             if (!wifiManager.IsWifiEnabled)
@@ -72,6 +81,7 @@ namespace APM
 
             //Permission check
             ActivityCompat.RequestPermissions(this, permissions, 0);
+
         }
 
         private async void UploadButton_Click(object sender, System.EventArgs e)
@@ -79,7 +89,7 @@ namespace APM
             scanLoop = false;
             if (saveLocal.Checked)
             {
-                Local.saveToSdCard(AccessPoint.AccessPointContainer);
+                Local.saveToDeviceLight(AccessPoint.AccessPointContainer);
                 Toast.MakeText(this, "Data saved to local storage", ToastLength.Long).Show();
             }
 
@@ -110,18 +120,33 @@ namespace APM
 
             while(scanLoop)
             {
-                //Debug
-                System.Diagnostics.Debug.WriteLine("Scan..");
-
-                await startScan();
-                accessPointCount.Text = AccessPoint.AccessPointContainer.Count.ToString();
+                if(!hardSave.Checked)
+                {
+                    //Debug
+                    System.Diagnostics.Debug.WriteLine("Scan..");
+                    await startScan();
+                    accessPointCount.Text = AccessPoint.AccessPointContainer.Count.ToString();
+                }
+                else
+                {
+                    await startHardScan();
+                }
+                
             }
         }
 
         private async Task startScan()
         {
             //Get current location
-            request = new GeolocationRequest(GeolocationAccuracy.Best);
+            if(bestAccuracy.Checked)
+            {
+                request = new GeolocationRequest(GeolocationAccuracy.Best);
+            }
+            else
+            {
+                request = new GeolocationRequest(GeolocationAccuracy.High);
+            }
+            
             var location = await Geolocation.GetLocationAsync(request);
 
             wifiManager.StartScan();
@@ -169,6 +194,36 @@ namespace APM
                         location.Longitude,
                         scanResultArray[i].Capabilities));
                 }
+            }
+        }
+
+        private async Task startHardScan()
+        {
+            //Get current location
+            if (bestAccuracy.Checked)
+            {
+                request = new GeolocationRequest(GeolocationAccuracy.Best);
+            }
+            else
+            {
+                request = new GeolocationRequest(GeolocationAccuracy.High);
+            }
+
+            var location = await Geolocation.GetLocationAsync(request);
+
+            wifiManager.StartScan();
+            scanResultArray = wifiManager.ScanResults;
+
+            for(int i=0; i<scanResultArray.Count; i++)
+            {
+                Local.saveToDeviceHard(new AccessPoint(
+                scanResultArray[i].Bssid,
+                scanResultArray[i].Ssid,
+                scanResultArray[i].Frequency,
+                scanResultArray[i].Level,
+                location.Latitude,
+                location.Longitude,
+                scanResultArray[i].Capabilities));
             }
         }
 

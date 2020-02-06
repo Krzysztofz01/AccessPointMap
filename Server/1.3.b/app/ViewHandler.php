@@ -49,10 +49,18 @@ class ViewHandler {
         $this->javaScriptData = array();
         
         for($i=0; $i < count($dataSet); $i++) {
+            if(($this->strCt($dataSet[$i]["security"], "WPA")) || ($this->strCt($dataSet[$i]["security"], "WEP"))) {
+                $markerIcon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+            }
+            else {
+                $markerIcon = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+            } 
+
             array_push($this->javaScriptData, array("latitude" => $dataSet[$i]["latitude"],
                                                     "longitude" => $dataSet[$i]["longitude"],
                                                     "id" => $dataSet[$i]["id"],
-                                                    "ssid" => $dataSet[$i]["ssid"]));
+                                                    "ssid" => $dataSet[$i]["ssid"],
+                                                    "icon" => $markerIcon));
         }
     }
 
@@ -201,6 +209,7 @@ class ViewHandler {
             echo("tmpMark = new google.maps.Marker({".
                 "position: {lat: parseFloat(". $dataContainer[$i]["latitude"] ."), lng: parseFloat(". $dataContainer[$i]["longitude"] .")},".
                 "map: map,".
+                "icon: '".$dataContainer[$i]["icon"]."',".
                 "label: {text: '". $dataContainer[$i]["ssid"] ."', color: 'white'}});". PHP_EOL);
             echo("google.maps.event.addListener(tmpMark, 'click', function() {
                 window.location.replace('accesspoint.php?id=". $dataContainer[$i]["id"] ."');

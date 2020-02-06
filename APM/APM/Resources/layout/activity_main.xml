@@ -63,4 +63,26 @@
         android:layout_height="wrap_content"
         android:checked="true"
         android:layout_gravity="center"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Best accuracy"
+        android:layout_gravity="center"/>
+    <CheckBox
+        android:id="@+id/bestAccuracy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:layout_gravity="center"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hard save mode"
+        android:layout_gravity="center"/>
+    <CheckBox
+        android:id="@+id/hardSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:layout_gravity="center"/>
 </LinearLayout>

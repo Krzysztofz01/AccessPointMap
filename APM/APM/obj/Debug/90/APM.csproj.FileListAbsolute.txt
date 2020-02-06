@@ -957,3 +957,4 @@ D:\xampp\htdocs\accesspointmap\APM\APM\obj\Debug\90\stamp\_ConvertResourcesCases
 D:\xampp\htdocs\accesspointmap\APM\APM\obj\Debug\90\stamp\_GenerateJavaStubs.stamp
 D:\xampp\htdocs\accesspointmap\APM\APM\obj\Debug\90\stamp\_GeneratePackageManagerJava.stamp
 D:\xampp\htdocs\accesspointmap\APM\APM\obj\Debug\90\stamp\_ResolveLibraryProjectImports.stamp
+D:\xampp\htdocs\accesspointmap\APM\APM\obj\Debug\90\stamp\SetupDependenciesForDesigner.stamp

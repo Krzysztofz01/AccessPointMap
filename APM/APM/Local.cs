@@ -7,14 +7,26 @@ namespace APM
 {
     class Local
     {
-        private static string fileName = "Accesspoints.json";
-        private static string filePath = Path.Combine(Environment.ExternalStorageDirectory.Path, fileName);
-
-        public static void saveToSdCard(List<AccessPoint> accessPoints)
+        public static void saveToDeviceLight(List<AccessPoint> accessPoints)
         {
+            string fileName = "ApmLight" + System.DateTime.Now.ToString("HHmmss") + ".json";
+            string filePath = Path.Combine(Environment.ExternalStorageDirectory.Path, fileName);
+
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(JsonConvert.SerializeObject(accessPoints));
+            }
+
+        }
+
+        public static void saveToDeviceHard(AccessPoint accessPoint)
+        {
+            string fileName = "ApmHard.txt";
+            string filePath = Path.Combine(Environment.ExternalStorageDirectory.Path, fileName);
+
+            using (StreamWriter writer = new StreamWriter(filePath, true))
+            {
+                writer.WriteLine(JsonConvert.SerializeObject(accessPoint));
             }
 
         }
