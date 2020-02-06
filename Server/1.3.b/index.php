@@ -1,8 +1,12 @@
 <?php
     require_once("app/ViewHandler.php");
+    require_once("app/VisitorHandler.php");
 
     //Creating a new ViewHandler
     $view = new ViewHandler();
+
+    //Creating a new VisitorHandler
+    $vs = new VisitorHandler($_SERVER['HTTP_USER_AGENT']);
 ?>
 
 <!doctype html>

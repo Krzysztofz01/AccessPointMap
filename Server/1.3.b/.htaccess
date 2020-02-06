@@ -1,0 +1,5 @@
+Options -Indexes
+
+ErrorDocument 403 http://localhost/AccessPointMap/Server/1.3.b/
+ErrorDocument 404 http://localhost/AccessPointMap/Server/1.3.b/
+ErrorDocument 500 http://localhost/AccessPointMap/Server/1.3.b/
