@@ -29,6 +29,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style/style.css">
+        <link rel="icon" href="style/favicon.png">
         
         <title>Access Point Map</title>
     </head>

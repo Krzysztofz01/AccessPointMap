@@ -17,6 +17,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style/style.css">
+        <link rel="icon" href="style/favicon.png">
         
         <title>Access Point Map</title>
     </head>
@@ -62,6 +63,7 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12 text-center">
                         <button type="submit" class="btn btn-primary violet-button" name="search">Search</button>
+                        <a class="btn btn-primary violet-button ml-5" href="index.php" role="button">Back</a>
                     </div>
                 </div>
             </form>

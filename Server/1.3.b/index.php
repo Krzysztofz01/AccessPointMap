@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style/style.css">
+        <link rel="icon" href="style/favicon.png">
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
         
@@ -73,7 +74,7 @@
             </div>
         
             <!-- Informations-->
-            <div class="row my-2 mx-0" id-"info">
+            <div class="row my-2 mx-0" id="info">
                 <div class="col text-center violet-border">
                     <p class="h3">Informations</p>
                     <p class="text-justify">

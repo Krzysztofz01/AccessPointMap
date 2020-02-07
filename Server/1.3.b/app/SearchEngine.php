@@ -116,7 +116,12 @@ class SearchEngine {
             $conditionsOk = true;
 
             if($security != "") {
-                if(!$this->strCt($this->data[$i]["security"], $security)) {
+                if($security == "none / ESS") {
+                    if(($this->strCt($this->data[$i]["security"], "WPA")) || ($this->strCt($this->data[$i]["security"], "WEP"))) {
+                        $conditionsOk = false;
+                    }
+                }
+                else if(!$this->strCt($this->data[$i]["security"], $security)) {
                     $conditionsOk = false;
                 }
             }
@@ -128,7 +133,7 @@ class SearchEngine {
             }
 
             if($ssid != "") {
-                if(!$this->strCt($this->data[$i]["ssid"], $ssid)) {
+                if(!$this->strCt(strtoupper($this->data[$i]["ssid"]), strtoupper($ssid))) {
                     $conditionsOk = false;
                 }
             }
@@ -140,6 +145,9 @@ class SearchEngine {
             }
 
             if($conditionsOk) {
+                if($this->strCt($this->data[$i]["vendor"], "error")) {
+                    $this->data[$i]["vendor"] = "No info";
+                }
                 array_push($this->tableData, $this->data[$i]);
             }
         }

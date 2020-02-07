@@ -40,6 +40,7 @@ a {
     background-color: #532c7a !important;
     border-style: none !important;
     color: #141212 !important;
+    min-width: 100px !important;
 }
 
 .table {
