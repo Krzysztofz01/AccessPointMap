@@ -31,7 +31,7 @@ if(
     if($visitor->add()) {
         //Object created and placed in the database
         http_response_code(201);
-        echo json_encode(array("response" => "Object added to database"));
+        echo json_encode(array("response" => "Call successful"));
     }
     else {
         //Service unavailable
