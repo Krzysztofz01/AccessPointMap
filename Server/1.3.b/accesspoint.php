@@ -45,7 +45,7 @@
                     <p class="h3">BSSID: <?php echo($data["bssid"]); ?></p>
                     <p class="h3">Frequency: <?php echo($data["freq"]); ?></p>
                     <p class="h3">Security: <?php echo($data["security"]); ?></p>
-                    <p class="h3">Brand: <?php echo($data["vendor"]); ?></p>
+                    <p class="h3">Brand: <?php echo($se->checkBrand($data["vendor"])); ?></p>
                     <p class="h3">Strongest signal: <?php echo($data["signalLevel"]); ?></p>
                     <p class="h3">Lowest signal <?php echo($data["lowSignalLevel"]); ?></p>
                     <p class="h3">Signal area: <?php echo($data["signalArea"]); ?> m<sup>2</sup></p>

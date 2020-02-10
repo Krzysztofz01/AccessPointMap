@@ -62,14 +62,16 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12 col-md-12 text-center">
+                        <p class="h6">Leave blank to get all records</p>
                         <button type="submit" class="btn btn-primary violet-button" name="search">Search</button>
                         <a class="btn btn-primary violet-button ml-5" href="index.php" role="button">Back</a>
                     </div>
                 </div>
             </form>
-            <div class="row my-3">
+            <div class="row my-4">
                 <!-- OUTPUT -->
                 <div class="col-lg-12 col-md-12 text-center">
+                    <?php $eng->printTableSize(); ?>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>

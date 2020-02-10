@@ -7,6 +7,7 @@ class SearchEngine {
     private $record = null;
 
     private $tableData = null;
+    private $tableSize = null;
     private $tableStatus = null;
 
     public function __construct($type, $index = null) {
@@ -80,6 +81,15 @@ class SearchEngine {
             return null;
         }
     }
+
+    public function checkBrand($brand) {
+        if($this->strCt($brand, "error")) {
+            return "No info";
+        }
+        else {
+            return $brand;
+        }
+    }
     
     public function getBrands() {
         $brands = array();
@@ -104,12 +114,19 @@ class SearchEngine {
             }
         }
 
+        sort($brands);
         for($k = 0; $k < count($brands); $k++) {
             echo "<option>". $brands[$k] ."</option>". PHP_EOL;
         }
     }
 
     public function generateTableData($security, $brand, $ssid, $freq) {
+        //Clean the data
+        $security = htmlspecialchars(strip_tags($security));
+        $brand = htmlspecialchars(strip_tags($brand));
+        $ssid = htmlspecialchars(strip_tags($ssid));
+        $freq = htmlspecialchars(strip_tags($freq));
+
         $this->tableData = array();
 
         for($i =0; $i < count($this->data); $i++) {
@@ -154,6 +171,16 @@ class SearchEngine {
 
         if(count($this->tableData) > 0) {
             $this->tableStatus = true;
+            $this->tableSize = count($this->tableData);
+        }
+    }
+
+    public function printTableSize() {
+        if(($this->tableSize != null) || ($this->tableSize != 0)) {
+            echo('<p class="h5">Elements found: '. $this->tableSize .'</p>');
+        }
+        else {
+            echo("");
         }
     }
 
@@ -179,5 +206,6 @@ class SearchEngine {
         }
         return false;
     }
+
 }
 ?>
