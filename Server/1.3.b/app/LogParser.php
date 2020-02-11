@@ -72,7 +72,7 @@ class LogParser {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->accessPointContainer[$i]));
             $response = curl_exec($ch);
 
-            if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) {
+            if((curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) && (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)) {
                 $noError = false;
             }
 

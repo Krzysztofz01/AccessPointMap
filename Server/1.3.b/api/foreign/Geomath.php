@@ -17,7 +17,7 @@ class Geomath {
 	}
 		
 	public static function getArea($lat1, $lon1, $lat2, $lon2) {
-		return round(M_PI * pow(getDistance($lat1, $lon1, $lat2, $lon2), 2), 2, PHP_ROUND_HALF_UP);
+		return round(M_PI * pow(GeoMath::getDistance($lat1, $lon1, $lat2, $lon2), 2), 2, PHP_ROUND_HALF_UP);
 	}
 }
 ?>

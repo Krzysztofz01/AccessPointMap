@@ -35,7 +35,7 @@ if(isset($_SESSION['valid'])) {
 
                     $response = curl_exec($ch);
 
-                    if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) {
+                    if((curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201) && (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)) {
                         $fileError[] = "API call error on ". $i ."!";
                     }
 
@@ -46,10 +46,10 @@ if(isset($_SESSION['valid'])) {
                 unset($_FILES['jsonFile']);
 
                 if(empty($fileError)) {
-                    echo("<script>alert('OK!');window.location.replace('../admin.php');</script>");
+                    echo("<script>alert('All data uploaded successful!');window.location.replace('../admin.php');</script>");
                 }
                 else {
-                    echo("<script>alert('". print_r($fileError) ."');window.location.replace('../admin.php');</script>");
+                    echo("<script>alert('Some errors occured during the upload!');window.location.replace('../admin.php');</script>");
                 }
                 die();  
             }

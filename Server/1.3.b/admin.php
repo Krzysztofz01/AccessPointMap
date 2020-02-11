@@ -37,25 +37,55 @@
     </head>
     <body>
         <div class="container my-2">
-            <div class="col-12 my-4">
-                <?php
-                    if(isset($_SESSION['valid'])) {
-                        echo('<form action="app/fileHandler.php" method="post" enctype="multipart/form-data">
+            <?php
+            if(isset($_SESSION['valid'])) {
+                echo('
+                    <div class="row">
+                        <div class="col-12 my-4 text-center">
+                            <form action="admin.php" method="post" enctype="multipart/form-data">
+                                <button type="submit" class="btn btn-primary violet-button mx-1" name="adminLogout">Logout</button>
+                                <a class="btn btn-primary violet-button mx-1" href="https://panel.ct8.pl" role="button">Hosting</a>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 my-4">
+                            <form action="app/fileHandler.php" method="post" enctype="multipart/form-data">
                                 <div class="input-group">
                                     <div class="custom-file">
                                         <input type="file" accept=".json" class="custom-file-input" id="jsonFile" name="jsonFile" aria-describedby="jsonFile">
-                                        <label class="custom-file-label" for="jsonFile">Choose file</label>
+                                        <label class="custom-file-label" for="jsonFile">Choose json file (Light File)</label>
                                     </div>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="submit" id="uploadFile" name="submit">Upload</button>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="submit" id="uploadJsonFile" name="submit">Upload</button>
+                                    </div>
                                 </div>
-                            </form>');
-                        echo('<form action="admin.php" method="post" enctype="multipart/form-data">
-                                <button type="submit" class="btn btn-primary" name="adminLogout">Logout</button>
-                            </form>');
-                    }
-                    else {
-                        echo('<form action="admin.php" method="post" enctype="multipart/form-data">
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 my-4">
+                            <form action="app/logHandler.php" method="post" enctype="multipart/form-data">
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input type="file" accept=".json" class="custom-file-input" id="logFile" name="logFile" aria-describedby="logFile">
+                                        <label class="custom-file-label" for="logFile">Choose log file (Hard File)</label>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="submit" id="uploadLogFile" name="submit">Upload</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                ');
+            }
+            else {
+                echo('
+                    <div class="row">
+                        <div class="col-12 my-4">
+                            <form action="admin.php" method="post" enctype="multipart/form-data">
                                 <div class="form-group">
                                     <label for="login">Logins</label>
                                     <input type="login" class="form-control" id="login" aria-describedby="emailHelp" placeholder="Enter login" name="login">
@@ -65,16 +95,14 @@
                                     <input type="password" class="form-control" id="pass" placeholder="Password" name="pass">
                                 </div>
                                     <button type="submit" class="btn btn-primary" name="adminLogin">Submit</button>
-                            </form>');
-                    }
-
-                    
-                ?>
+                            </form>
+                        </div>
+                    </div>
+                ');
+            }
+            ?>     
         </div>
-            </div>
-        </div>
 
-    
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
