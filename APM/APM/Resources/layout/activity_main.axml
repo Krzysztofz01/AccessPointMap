@@ -1,55 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/colorGrey">
+
+    <TextView
+        android:id="@+id/appTitle"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textColor="@color/colorViolet"
+        android:textSize="36sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appTitle"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="45dp">/>
+
+        <TextView
+            android:id="@+id/radioGroupStoreMethodLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioGroupStoreLabel"
+            android:textSize="18sp"
+            android:textColor="@color/colorViolet"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroupStoreMethod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radioGroupStoreMethodLabel">
+
+            <RadioButton
+                android:id="@+id/localFile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radioLocal"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+
+            <RadioButton
+                android:id="@+id/apiCall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radioApi"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/radioGroupScanMethodLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radioGroupStoreMethod"
+            android:layout_marginTop="20dp"
+            android:text="@string/radioGroupScanLabel"
+            android:textSize="18sp"
+            android:textColor="@color/colorViolet"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroupScanMethod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radioGroupScanMethodLabel">
+
+            <RadioButton
+                android:id="@+id/lightMethod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radioLight"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+
+            <RadioButton
+                android:id="@+id/hardMethod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radioHard"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/radioGroupAccuracyMethodLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radioGroupScanMethod"
+            android:layout_marginTop="20dp"
+            android:text="@string/radioGroupAccuracyLabel"
+            android:textSize="18sp"
+            android:textColor="@color/colorViolet"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroupAccuracyMethod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/radioGroupAccuracyMethodLabel">
+
+            <RadioButton
+                android:id="@+id/accuracyBest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radioBest"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+
+            <RadioButton
+                android:id="@+id/accuracyHigh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/radioHigh"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+
+            <RadioButton
+                android:id="@+id/accuracyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radioMedium"
+                android:textSize="18sp"
+                android:textColor="@color/colorVioletLight"
+                android:buttonTint="@color/colorVioletLight"/>
+        </RadioGroup>
+    </RelativeLayout>
 
     <Button
-        android:id="@+id/startScan"
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonStartScan"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Scan"
-        android:layout_gravity="center"/>
-    <TextView
-        android:id="@+id/scanStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="default"
-        android:layout_gravity="center"/>
+        android:layout_above="@+id/buttonStartUpload"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorViolet"
+        android:text="@string/buttonScan"
+        android:textColor="@color/colorGrey"
+        android:textSize="24sp" />
+
     <Button
-        android:id="@+id/uploadData"
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonStartUpload"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Upload Data"
-        android:layout_gravity="center"/>
-    <TextView
-        android:id="@+id/uploadStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:layout_gravity="center"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Collected access points:"
-        android:layout_gravity="center"/>
-    <TextView
-        android:id="@+id/accessPointCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="default"
-        android:layout_gravity="center"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save data to local storage!"
-        android:layout_gravity="center"/>
-    <CheckBox
-        android:id="@+id/saveLocal"
-        android:checked="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorViolet"
+        android:text="@string/buttonUpload"
+        android:textColor="@color/colorGrey"
+        android:textSize="24sp" />
+</RelativeLayout>

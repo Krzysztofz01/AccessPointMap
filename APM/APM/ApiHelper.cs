@@ -10,7 +10,7 @@ namespace APM
     {
         private static HttpClient client = new HttpClient();
 
-        private const string baseAddress = "http://accesspointmap.ct8.pl/";
+        private const string baseAddress = "http://accesspointmap.ct8.pl";
         private const string add = "api/request/add.php";
 
         public ApiHelper()

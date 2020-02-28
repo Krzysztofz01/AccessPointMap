@@ -41,6 +41,5 @@ namespace APM
             this.longitude = longitude;
             this.security = security;
         }
-
     }
 }

@@ -14,216 +14,220 @@ namespace APM
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
-        private Button scanButton;
-        private Button uploadButton;
-        private TextView accessPointCount;
-        private TextView scanStatus;
-        private TextView uploadStatus;
-        private CheckBox saveLocal;
-        private CheckBox sendToApi;
-        private CheckBox bestAccuracy;
-        private CheckBox hardSave;
+        //Init GUI elements objects
+        private RadioGroup dataStoreMethod;
+        private RadioGroup dataScanMethod;
+        private RadioGroup geolocationAccuracy;
+        private Button buttonScan;
+        private Button buttonUpload;
 
-        private GeolocationRequest request;
+        //Init the WifiManager object
         private WifiManager wifiManager;
+
+        //Init the Geolocation handler variable
+        private GeolocationRequest locationRequest;
+
+        //Define permissions
         private string[] permissions = new string[]
         {
             Android.Manifest.Permission.AccessFineLocation,
             Android.Manifest.Permission.WriteExternalStorage,
             Android.Manifest.Permission.ReadExternalStorage
-        };
-
-        public IList<ScanResult> scanResultArray;
-
-        private bool scanLoop = false;
+        }; 
         
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            //Init the activity and view
             base.OnCreate(savedInstanceState);
             Platform.Init(this, savedInstanceState);
-            // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
-            scanButton = FindViewById<Button>(Resource.Id.startScan);
-            scanButton.Click += ScanButton_Click;
+            //Permission check (mainly for the fine location)
+            ActivityCompat.RequestPermissions(this, permissions, 0);
 
-            uploadButton = FindViewById<Button>(Resource.Id.uploadData);
-            uploadButton.Click += UploadButton_Click;
-
-            accessPointCount = FindViewById<TextView>(Resource.Id.accessPointCount);
-            accessPointCount.Text = "0";
-
-            scanStatus = FindViewById<TextView>(Resource.Id.scanStatus);
-            scanStatus.Text = scanLoop.ToString();
-
-            uploadStatus = FindViewById<TextView>(Resource.Id.uploadStatus);
-
-            saveLocal = FindViewById<CheckBox>(Resource.Id.saveLocal);
-            saveLocal.Checked = true;
-
-            sendToApi = FindViewById<CheckBox>(Resource.Id.sendToApi);
-            sendToApi.Checked = true;
-
-            bestAccuracy = FindViewById<CheckBox>(Resource.Id.bestAccuracy);
-            bestAccuracy.Checked = true;
-
-            hardSave = FindViewById<CheckBox>(Resource.Id.hardSave);
-            hardSave.Checked = false;
-            
-
+            //Set the wifiManager
             wifiManager = (WifiManager)GetSystemService(WifiService);
 
+            //Check if the WiFi is enabled
             if (!wifiManager.IsWifiEnabled)
             {
                 Toast.MakeText(this, "Wifi is disabled!", ToastLength.Long).Show();
                 wifiManager.SetWifiEnabled(true);
             }
 
-            //Permission check
-            ActivityCompat.RequestPermissions(this, permissions, 0);
+            //Assign GUI elemets to objects
+            dataStoreMethod = FindViewById<RadioGroup>(Resource.Id.radioGroupStoreMethod);
+            dataScanMethod = FindViewById<RadioGroup>(Resource.Id.radioGroupScanMethod);
+            geolocationAccuracy = FindViewById<RadioGroup>(Resource.Id.radioGroupAccuracyMethod);
+            buttonScan = FindViewById<Button>(Resource.Id.buttonStartScan);
+            buttonUpload = FindViewById<Button>(Resource.Id.buttonStartUpload);
 
+            //Assign events to Button elements
+            buttonScan.Click += buttonScanClickEvent;
+            buttonUpload.Click += buttonUploadClickEvent;
         }
 
-        private async void UploadButton_Click(object sender, System.EventArgs e)
+        private async void buttonScanClickEvent(object sender, System.EventArgs e)
         {
-            scanLoop = false;
-            if (saveLocal.Checked)
+            if(buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
             {
-                Local.saveToDeviceLight(AccessPoint.AccessPointContainer);
-                Toast.MakeText(this, "Data saved to local storage", ToastLength.Long).Show();
-            }
-
-            if (sendToApi.Checked)
-            {
-                ApiHelper api = new ApiHelper();
-       
-                //Debug
-                System.Diagnostics.Debug.WriteLine("Sending to API");
-                await api.send(AccessPoint.AccessPointContainer);
-                uploadStatus.Text = "Upload process finished!";
-                Toast.MakeText(this, "Data send to API", ToastLength.Long).Show();
-            }
-        }
-     
-        private async void ScanButton_Click(object sender, System.EventArgs e)
-        {
-            if(scanLoop)
-            {
-                scanLoop = false;
-                scanStatus.Text = scanLoop.ToString();
-            }
-            else
-            {
-                scanLoop = true;
-                scanStatus.Text = scanLoop.ToString();
-            }
-
-            while(scanLoop)
-            {
-                if(!hardSave.Checked)
-                {
-                    //Debug
-                    System.Diagnostics.Debug.WriteLine("Scan..");
-                    await startScan();
-                    accessPointCount.Text = AccessPoint.AccessPointContainer.Count.ToString();
-                }
-                else
-                {
-                    await startHardScan();
-                }
+                buttonScan.Text = Resources.GetString(Resource.String.buttonStop);
                 
-            }
-        }
-
-        private async Task startScan()
-        {
-            //Get current location
-            if(bestAccuracy.Checked)
-            {
-                request = new GeolocationRequest(GeolocationAccuracy.Best);
-            }
-            else
-            {
-                request = new GeolocationRequest(GeolocationAccuracy.High);
-            }
-            
-            var location = await Geolocation.GetLocationAsync(request);
-
-            wifiManager.StartScan();
-            scanResultArray = wifiManager.ScanResults;
-
-            bool exist = false;
-            for(int i=0; i<scanResultArray.Count; i++)
-            {
-                //debug
-                System.Diagnostics.Debug.WriteLine(scanResultArray[i].Ssid + " " + scanResultArray[i].Level);
-
-                exist = false;
-                for(int l=0; l<AccessPoint.AccessPointContainer.Count; l++)
+                //Set the geolocation accuracy
+                switch(geolocationAccuracy.CheckedRadioButtonId)
                 {
-                    if(scanResultArray[i].Bssid == AccessPoint.AccessPointContainer[l].bssid)
+                    case Resource.Id.accuracyBest: locationRequest = new GeolocationRequest(GeolocationAccuracy.Best); break;
+                    case Resource.Id.accuracyHigh: locationRequest = new GeolocationRequest(GeolocationAccuracy.High); break;
+                    case Resource.Id.accuracyMedium: locationRequest = new GeolocationRequest(GeolocationAccuracy.Medium); break;
+                    default: locationRequest = new GeolocationRequest(GeolocationAccuracy.Best); break;
+                }
+
+                if(dataScanMethod.CheckedRadioButtonId == Resource.Id.lightMethod)
+                {
+                    while(buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
                     {
-                        exist = true;
-                        if(scanResultArray[i].Level > AccessPoint.AccessPointContainer[l].signalLevel)
-                        {
-                            AccessPoint.AccessPointContainer[l].signalLevel = scanResultArray[i].Level;
-                            AccessPoint.AccessPointContainer[l].latitude = location.Latitude;
-                            AccessPoint.AccessPointContainer[l].longitude = location.Longitude;
-                        }
-                        else if(scanResultArray[i].Level < AccessPoint.AccessPointContainer[l].lowSignalLevel)
-                        {
-                            AccessPoint.AccessPointContainer[l].lowSignalLevel = scanResultArray[i].Level;
-                            AccessPoint.AccessPointContainer[l].lowLatitude = location.Latitude;
-                            AccessPoint.AccessPointContainer[l].lowLongitude = location.Longitude;
-                        }
-                        break;
+                        await lightScanMethod();
                     }
                 }
-
-                if(!exist)
+                else if(dataScanMethod.CheckedRadioButtonId == Resource.Id.hardMethod)
                 {
-                    AccessPoint.AccessPointContainer.Add(new AccessPoint(
-                        scanResultArray[i].Bssid,
-                        scanResultArray[i].Ssid,
-                        scanResultArray[i].Frequency,
-                        scanResultArray[i].Level,
-                        location.Latitude,
-                        location.Longitude,
-                        scanResultArray[i].Level,
-                        location.Latitude,
-                        location.Longitude,
-                        scanResultArray[i].Capabilities));
+                    while (buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
+                    {
+                        await hardScanMethod();
+                    }
                 }
-            }
-        }
-
-        private async Task startHardScan()
-        {
-            //Get current location
-            if (bestAccuracy.Checked)
-            {
-                request = new GeolocationRequest(GeolocationAccuracy.Best);
             }
             else
             {
-                request = new GeolocationRequest(GeolocationAccuracy.High);
+                buttonScan.Text = Resources.GetString(Resource.String.buttonScan);
             }
+        }
 
-            var location = await Geolocation.GetLocationAsync(request);
+        private async void buttonUploadClickEvent(object sender, System.EventArgs e)
+        {
+            switch(dataStoreMethod.CheckedRadioButtonId)
+            {
+                case Resource.Id.localFile: {
+                    //Use the Local class method to save data to a .JSON file
+                    Local.saveToDeviceLight(AccessPoint.AccessPointContainer);
+                    Toast.MakeText(this, "Data saved to a local file!", ToastLength.Long).Show();
+                    } break;
+                case Resource.Id.apiCall: {
+                    //Create a new ApiHelper object to send JSON data to REST API
+                    ApiHelper api = new ApiHelper();
 
+                    await api.send(AccessPoint.AccessPointContainer);
+                    Toast.MakeText(this, "Data send to API!", ToastLength.Long).Show();
+                    } break;
+                default: break;
+            }
+        }
+
+
+        private async Task lightScanMethod()
+        {
+            //Init a helper array to store scan result temporary and a boolean to check if the currently checked AP is already known
+            IList<ScanResult> scanResults = null;
+            bool alreadyKnown = false;
+
+            //Get the current location
+            Location currentLocation = await Geolocation.GetLocationAsync(locationRequest);
+
+            //Scan for near wireless networks, this method is deprecated (turning off compiler warning)
+            #pragma warning disable 618
             wifiManager.StartScan();
-            scanResultArray = wifiManager.ScanResults;
+            #pragma warning restore 618
 
-            for(int i=0; i<scanResultArray.Count; i++)
+            //Assign the results to the temp container
+            scanResults = wifiManager.ScanResults;
+
+            //Compare and perm store to static container
+            if(AccessPoint.AccessPointContainer.Count > 0)
+            {
+                foreach (ScanResult element in scanResults)
+                {
+                    alreadyKnown = false;
+                    foreach (AccessPoint known in AccessPoint.AccessPointContainer)
+                    {
+                        if(element.Bssid == known.bssid)
+                        {
+                            alreadyKnown = true;
+
+                            if(element.Level > known.signalLevel)
+                            {
+                                known.signalLevel = element.Level;
+                                known.latitude = currentLocation.Latitude;
+                                known.longitude = currentLocation.Longitude;
+                            }
+                            else if(element.Level < known.lowSignalLevel)
+                            {
+                                known.lowSignalLevel = element.Level;
+                                known.lowLatitude = currentLocation.Latitude;
+                                known.lowLongitude = currentLocation.Longitude;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    if(!alreadyKnown)
+                    {
+                        AccessPoint.AccessPointContainer.Add(new AccessPoint(
+                            element.Bssid,
+                            element.Ssid,
+                            element.Frequency,
+                            element.Level,
+                            currentLocation.Latitude,
+                            currentLocation.Longitude,
+                            element.Level,
+                            currentLocation.Latitude,
+                            currentLocation.Longitude,
+                            element.Capabilities));
+                    }
+                }
+            }
+            else
+            {
+                AccessPoint.AccessPointContainer.Add(new AccessPoint(
+                            scanResults[0].Bssid,
+                            scanResults[0].Ssid,
+                            scanResults[0].Frequency,
+                            scanResults[0].Level,
+                            currentLocation.Latitude,
+                            currentLocation.Longitude,
+                            scanResults[0].Level,
+                            currentLocation.Latitude,
+                            currentLocation.Longitude,
+                            scanResults[0].Capabilities));
+            }  
+        }
+
+        private async Task hardScanMethod()
+        {
+            //Init a helper array to store scan result temporary
+            IList<ScanResult> scanResults = null;
+       
+            //Get the current location
+            Location currentLocation = await Geolocation.GetLocationAsync(locationRequest);
+
+            //Scan for near wireless networks, this method is deprecated (turning off compiler warning)
+            #pragma warning disable 618
+            wifiManager.StartScan();
+            #pragma warning restore 618
+
+            //Assign the results to the temp container
+            scanResults = wifiManager.ScanResults;
+
+            foreach (ScanResult element in scanResults)
             {
                 Local.saveToDeviceHard(new AccessPoint(
-                scanResultArray[i].Bssid,
-                scanResultArray[i].Ssid,
-                scanResultArray[i].Frequency,
-                scanResultArray[i].Level,
-                location.Latitude,
-                location.Longitude,
-                scanResultArray[i].Capabilities));
+                    element.Bssid,
+                    element.Ssid,
+                    element.Frequency,
+                    element.Level,
+                    currentLocation.Latitude,
+                    currentLocation.Longitude,
+                    element.Capabilities));
             }
         }
 
