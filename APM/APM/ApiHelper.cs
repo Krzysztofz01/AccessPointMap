@@ -8,14 +8,13 @@ namespace APM
 {
     class ApiHelper
     {
-        private static HttpClient client = new HttpClient();
-
-        private const string baseAddress = "http://accesspointmap.ct8.pl";
+        private static HttpClient client = new HttpClient();   
         private const string add = "api/request/add.php";
+        private int errorCount = 0;
 
         public ApiHelper()
         {
-            client.BaseAddress = new Uri(baseAddress);
+            client.BaseAddress = new Uri("http://accesspointmap.ct8.pl/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -23,23 +22,15 @@ namespace APM
 
         public async Task send(List<AccessPoint> accessPoints)
         {
-            for (int i=0; i<accessPoints.Count; i++)
-            {   
-                    System.Diagnostics.Debug.WriteLine("Send");
-                    await addNew(accessPoints[i]);
+            foreach(AccessPoint element in accessPoints)
+            {
+                var response = await client.PostAsJsonAsync(add, element);
+
+                if(!response.IsSuccessStatusCode)
+                {
+                    errorCount++;
+                }
             }
         }
-
-        private async Task<bool> addNew(AccessPoint accessPoint)
-        {   
-            var response = await client.PostAsJsonAsync(add, accessPoint);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return false;
-            }
-
-            return true;
-        }   
     }
 }
