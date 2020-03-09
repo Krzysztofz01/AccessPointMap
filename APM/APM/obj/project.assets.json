@@ -4846,24 +4846,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Krzysztof\\.nuget\\packages\\": {},
-    "D:\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\User1\\.nuget\\packages\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\xampp\\htdocs\\AccessPointMap\\APM\\APM\\APM.csproj",
+      "projectUniqueName": "D:\\xampp\\htdocs\\newapm\\AccessPointMap\\APM\\APM\\APM.csproj",
       "projectName": "APM",
-      "projectPath": "D:\\xampp\\htdocs\\AccessPointMap\\APM\\APM\\APM.csproj",
-      "packagesPath": "C:\\Users\\Krzysztof\\.nuget\\packages\\",
-      "outputPath": "D:\\xampp\\htdocs\\AccessPointMap\\APM\\APM\\obj\\",
+      "projectPath": "D:\\xampp\\htdocs\\newapm\\AccessPointMap\\APM\\APM\\APM.csproj",
+      "packagesPath": "C:\\Users\\User1\\.nuget\\packages\\",
+      "outputPath": "D:\\xampp\\htdocs\\newapm\\AccessPointMap\\APM\\APM\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
-        "D:\\Microsoft\\Xamarin\\NuGet\\"
+        "C:\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\Krzysztof\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\User1\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],

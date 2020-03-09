@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace APM
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     public class MainActivity : AppCompatActivity
     {
         //Init GUI elements objects
@@ -32,11 +32,15 @@ namespace APM
         {
             Android.Manifest.Permission.AccessFineLocation,
             Android.Manifest.Permission.WriteExternalStorage,
-            Android.Manifest.Permission.ReadExternalStorage
+            Android.Manifest.Permission.ReadExternalStorage,
+            Android.Manifest.Permission.WakeLock
         }; 
         
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            //Prevent app from sleeping
+            Window.SetFlags(Android.Views.WindowManagerFlags.KeepScreenOn, Android.Views.WindowManagerFlags.KeepScreenOn);
+
             //Init the activity and view
             base.OnCreate(savedInstanceState);
             Platform.Init(this, savedInstanceState);
@@ -69,7 +73,7 @@ namespace APM
 
         private async void buttonScanClickEvent(object sender, System.EventArgs e)
         {
-            if(buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
+            if (buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
             {
                 buttonScan.Text = Resources.GetString(Resource.String.buttonStop);
                 
@@ -82,16 +86,16 @@ namespace APM
                     default: locationRequest = new GeolocationRequest(GeolocationAccuracy.Best); break;
                 }
 
-                if(dataScanMethod.CheckedRadioButtonId == Resource.Id.lightMethod)
+                if (dataScanMethod.CheckedRadioButtonId == Resource.Id.lightMethod)
                 {
-                    while(buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
+                    while (buttonScan.Text == Resources.GetString(Resource.String.buttonStop))
                     {
-                        await lightScanMethod();
+                        await lightScanMethod();                       
                     }
                 }
                 else if(dataScanMethod.CheckedRadioButtonId == Resource.Id.hardMethod)
                 {
-                    while (buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
+                    while (buttonScan.Text == Resources.GetString(Resource.String.buttonStop))
                     {
                         await hardScanMethod();
                     }
