@@ -1,8 +1,7 @@
 const Joi = require('@hapi/joi');
 
-//Add validation with schema
 const addValidation = (data) => {
-    const schema = Joi.object({
+    const schema = Joi.array().items({
         bssid: Joi.string().max(25).required(),
         ssid: Joi.string().max(40).required(),
         freq: Joi.number().required(),
@@ -12,7 +11,7 @@ const addValidation = (data) => {
         lowSignalLevel: Joi.number().required(),
         lowLatitude: Joi.number().required(),
         lowLongitude: Joi.number().required(),
-        security: Joi.string().max(65).required()
+        security: Joi.string().max(65).required()    
     });
     return schema.validate(data);
 };

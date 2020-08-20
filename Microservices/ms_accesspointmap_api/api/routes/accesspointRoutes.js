@@ -6,6 +6,7 @@ const { authWrite, authRead } = require('../auth/accesspointAuth.js');
 router.post('/add', authWrite, controller.add);
 router.get('/read', authRead, controller.readAll);
 router.get('/read/id/:id', authRead, controller.readById);
-router.get('/read/bssid/:bssid', authRead, controller.readByBssid);
+//Need to check !
+router.get('/search', authRead, controller.search);
 
 module.exports = router;

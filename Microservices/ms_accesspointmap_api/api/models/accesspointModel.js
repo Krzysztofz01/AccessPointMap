@@ -118,31 +118,70 @@ AccessPoint.readById = async (id, result) => {
     });
 };
 
-//Access point get one element by bssid method
-AccessPoint.readByBssid = async (bssid, result) => {
-    mysql.query("SELECT * FROM accesspoints WHERE bssid = ? LIMIT 1", bssid, async (err, res) => {
+//Access point get all elements with specific parameters (used by the frontend server search engine)
+AccessPoint.search = async (security, brand, ssid, freq, result) => {
+    let query = "SELECT * FROM accesspoints WHERE ";
+    let multipleParams = false;
+
+    if(security) {
+        if(multipleParams) {
+            query += "AND security like '%" + security + "%' ";
+        } else {
+            multipleParams = true;
+            query += "security like '%" + security + "%' ";
+        }
+    }
+
+    if(brand) {
+        if(multipleParams) {
+            query += "AND vendor = '" + brand + "' ";
+        } else {
+            multipleParams = true;
+            query += "vendor = '" + brand + "' ";
+        }
+    }
+
+    if(ssid) {
+        if(multipleParams) {
+            query += "AND ssid = '" + ssid + "' ";
+        } else {
+            multipleParams = true;
+            query += "ssid = '" + ssid + "' ";
+        }
+    }
+
+    if(freq) {
+        if(multipleParams) {
+            query += "AND freq = " + freq + " ";
+        } else {
+            multipleParams = true;
+            query += "freq = " + freq + " ";
+        }
+    }
+
+    if(!multipleParams) { query = "SELECT * FROM accesspoints"; }
+
+    console.log(query);
+    mysql.query(query, async (err, res) => {
         if(err) {
             result({
                 code: 500,
-                info: selectErr
+                info: err
             }, null);
             return;
         }
         
         if(res.length) {
-            result(null, res[0]);
+            result(null, res);
             return;
         }
 
         result({
             code: 404,
-            info: "No access point found with given bssid."
+            info: "No access point found with given parameters."
         }, null);
     });
 };
-
-//Access point get all elements with specific parameters (used by the frontend server search engine)
-AccessPoint.searchEngine = async () => null;
 
 //Calculate signal area by given two latitudes and longitudes
 AccessPoint.calculateArea = (lat1, lon1, lat2, lon2) => {
