@@ -12,9 +12,9 @@ const AccessPoint = function(accesspoint) {
     this.lowSignalLevel = accesspoint.lowSignalLevel,
     this.lowLatitude = accesspoint.lowLatitude,
     this.lowLongitude = accesspoint.lowLongitude,
-    this.signalArea = accesspoint.signalArea,
+    this.signalArea = null,
     this.security = accesspoint.security,
-    this.vendor = accesspoint.vendor
+    this.vendor = null
 };
 
 //Access point add to database method
@@ -31,7 +31,13 @@ AccessPoint.add = async (newAccessPoint, result) => {
    
         if(!selectRes.length) {
             //Access point with that bssid does not exist, craating a new record
-            newAccessPoint.signalArea = AccessPoint.calculateArea(newAccessPoint.latitude, newAccessPoint.longitude, newAccessPoint.lowLatitude, newAccessPoint.lowLongitude);
+            newAccessPoint.signalArea = 3;
+            const a = 0.5 - Math.cos((newAccessPoint.lowLatitude - newAccessPoint.latitude) * 0.01745) / 2 +
+                    Math.cos(newAccessPoint.latitude * 0.01745) * Math.cos(newAccessPoint.lowLatitude * 0.01745) *
+                    (1 - Math.cos((newAccessPoint.lowLongitude - newAccessPoint.longitude) * 0.01745)) / 2;
+            const calculatedArea = (12742 * Math.asin(Math.sqrt(a))) * 1000;
+
+            if(calculatedArea > newAccessPoint.signalArea) { newAccessPoint.signalArea = calculatedArea; }
 
             //Connect to MACVendor API to get the Vendor name
             newAccessPoint.vendor = await AccessPoint.getVendor(newAccessPoint.bssid);
@@ -64,8 +70,14 @@ AccessPoint.add = async (newAccessPoint, result) => {
             }
 
             //Calculate new signal area
-            newAccessPoint.signalArea = AccessPoint.calculateArea(newAccessPoint.latitude, newAccessPoint.longitude, newAccessPoint.lowLatitude, newAccessPoint.lowLongitude);
-            
+            newAccessPoint.signalArea = 3;
+            const a = 0.5 - Math.cos((newAccessPoint.lowLatitude - newAccessPoint.latitude) * 0.01745) / 2 +
+                    Math.cos(newAccessPoint.latitude * 0.01745) * Math.cos(newAccessPoint.lowLatitude * 0.01745) *
+                    (1 - Math.cos((newAccessPoint.lowLongitude - newAccessPoint.longitude) * 0.01745)) / 2;
+            const calculatedArea = (12742 * Math.asin(Math.sqrt(a))) * 1000;
+
+            if(calculatedArea > newAccessPoint.signalArea) { newAccessPoint.signalArea = calculatedArea; }
+
             //Update record in database with new data
             mysql.query("UPDATE accesspoints SET ? WHERE bssid = ?", [newAccessPoint, newAccessPoint.bssid], async (updateErr, updateRes) => {
                 if(updateErr) {
@@ -119,6 +131,8 @@ AccessPoint.readById = async (id, result) => {
 };
 
 //Access point get all elements with specific parameters (used by the frontend server search engine)
+
+//SQL INJECTION FIX str.replace
 AccessPoint.search = async (security, brand, ssid, freq, result) => {
     let query = "SELECT * FROM accesspoints WHERE ";
     let multipleParams = false;
@@ -143,10 +157,10 @@ AccessPoint.search = async (security, brand, ssid, freq, result) => {
 
     if(ssid) {
         if(multipleParams) {
-            query += "AND ssid = '" + ssid + "' ";
+            query += "AND ssid = '%" + ssid + "%' ";
         } else {
             multipleParams = true;
-            query += "ssid = '" + ssid + "' ";
+            query += "ssid = '%" + ssid + "%' ";
         }
     }
 
@@ -181,25 +195,6 @@ AccessPoint.search = async (security, brand, ssid, freq, result) => {
             info: "No access point found with given parameters."
         }, null);
     });
-};
-
-//Calculate signal area by given two latitudes and longitudes
-AccessPoint.calculateArea = (lat1, lon1, lat2, lon2) => {
-    const PI = 3.1415;
-
-    let latDistance = (lat2 - lat1) * PI / 180.0;
-    let lonDistance = (lon2 - lon1) * PI / 180.0;
-
-    lat1 = (lat1) * PI / 180.0;
-    lat2 = (lat2) * PI / 180.0;
-
-    let a = Math.pow(Math.sin(latDistance / 2), 2) +
-            Math.pow(Math.sin(lonDistance / 2), 2) *
-            Math.cos(lat1) * Math.cos(lat2);
-    let c = 2 * Math.asin(Math.sqrt(a));
-
-    let distance = Math.round((((6371 * c * 1000) + Number.EPSILON) * 100) / 100)
-    return Math.round(PI * Math.pow(distance, 2));
 };
 
 //Connect to the MACVendor API to send a bssid and get the vendor name

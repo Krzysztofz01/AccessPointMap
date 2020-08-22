@@ -19,32 +19,21 @@ exports.accesspoint = async (req, res) => {
     
     if(!data.message) {
         //Render the access point view
-        
-        //Calculate the rest of the imporant data (signal radius). In the futre the rest API will
-        //handle this operation, to relieve the front end server.
-        data.signalRadius = 3;
-        () => {
-            const P = 0.01745;
-            let a = 0.5 - Math.cos((dataJson.lowLatitude - dataJson.latitude) * P) / 2 +
-                    Math.cos(dataJson.latitude * P) * Math.cos(dataJson.lowLatitude * P) *
-                    (1 - Math.cos((dataJson.lowLongitude - dataJson.longitude) * P)) / 2;
-    
-            let output = (12742 * Math.asin(Math.sqrt(a))) * 1000;
-    
-            if(output > 3) {
-                dataJson.signalRadius = output;
-            }
-        };
-
         res.render('accesspoint', data);
-
     } else {
         //Render the error view
         res.render('error', data);
     }
-}
+};
 
 // FINISH
+
+//str.replace 
+// dane do dropdownów, str replace w js ejs 
 exports.search = async (req, res) => {
-    res.send("search");
+    if(req.query.security || req.query.brand || req.query.ssid || req.query.freq) {
+        const dataResponse = await fetch(env.default.dataApiUrl + "/search?security=" + req.query.security + "&brand=" + req.query.brand + "&ssid=" + req.query.ssid + "&freq=" + req.query.freq)
+    } else {
+        res.send("search", { status: "blank", data: null });
+    }
 };

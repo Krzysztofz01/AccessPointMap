@@ -20,9 +20,7 @@ exports.add = async (req, res) => {
             lowSignalLevel: accessPoint.lowSignalLevel,
             lowLatitude: accessPoint.lowLatitude,
             lowLongitude: accessPoint.lowLongitude,
-            signalArea: accessPoint.signalArea,
-            security: accessPoint.security,
-            vendor: accessPoint.vendor
+            security: accessPoint.security
         });
 
         //Calling the models add method
@@ -62,12 +60,6 @@ exports.readById = async (req, res) => {
 //Search by params route controller
 exports.search = async (req, res) => {
     //Calling the models search method
-    console.log(req.query.security);
-    console.log(req.query.brand);
-    console.log(req.query.ssid);
-    console.log(req.query.freq);
-    console.log("===========");
-
     await AccessPoint.search(req.query.security, req.query.brand, req.query.ssid, req.query.freq, (err, data) => {
         if(err) {
             res.status(err.code || 500).send({ message: err.info || err.message || "Some error occurred while retrieving records." });
