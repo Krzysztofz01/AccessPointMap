@@ -28,6 +28,8 @@ namespace ms_accesspointmap_api
         {
             //Connection string dependency injection
             services.AddDbContext<AccessPointMapContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AccessPointMap")));
+            services.AddScoped<IAccesspointsRepository, AccesspointsRepository>();
+            services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddControllers();
         }
 

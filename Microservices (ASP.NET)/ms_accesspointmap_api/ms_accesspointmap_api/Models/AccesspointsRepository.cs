@@ -24,7 +24,7 @@ namespace ms_accesspointmap_api.Models
             if(context.Accesspoints.Any(element => element.Bssid == accesspoint.Bssid))
             {
                 //Assign the existing accesspoint to a variable
-                Accesspoints existingAccesspoint = context.Accesspoints.FirstOrDefault(element => element.Bssid == accesspoint.Bssid);
+                var existingAccesspoint = context.Accesspoints.FirstOrDefault(element => element.Bssid == accesspoint.Bssid);
 
                 //Check if the lowSignal strength is weaker, if yes update data
                 if(accesspoint.LowSignalLevel < existingAccesspoint.LowSignalLevel)
@@ -107,11 +107,6 @@ namespace ms_accesspointmap_api.Models
             }
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Accesspoints> GetAccesspointById(int id)
         {
             return await context.Accesspoints.FirstOrDefaultAsync(accesspoint => accesspoint.Id == id);
@@ -130,11 +125,32 @@ namespace ms_accesspointmap_api.Models
         public async Task<IEnumerable<Accesspoints>> SearchAccesspoints(string ssid=null, int freq=0, string brand=null, string security=null)
         {
             return await context.Accesspoints.Where(element =>
-                (element.Ssid.ToUpper() == ssid.ToUpper() || ssid == null) &&
-                (element.Frequency == freq || freq == 0) &&
-                (element.Brand.ToUpper().Contains(brand.ToUpper()) || brand == null) &&
-                (element.SecurityData.ToUpper().Contains(security.ToUpper()) || security == null)
-            ).ToListAsync();       
+                (element.Ssid.ToUpper().Contains((ssid != null) ? ssid.ToUpper() : element.Ssid.ToUpper())) &&
+                (element.Frequency == ((freq != 0) ? freq : element.Frequency)) &&
+                (element.Brand.ToUpper().Contains((brand != null) ? brand.ToUpper() : element.Brand.ToUpper())) &&
+                (element.SecurityData.ToUpper().Contains((security != null) ? security.ToUpper() : element.SecurityData.ToUpper()))
+            ).ToListAsync(); 
+        }
+
+        //IDisposable
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    context.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

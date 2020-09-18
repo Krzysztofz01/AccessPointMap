@@ -6,6 +6,7 @@ namespace ms_accesspointmap_api.Models
 {
     public partial class Accesspoints
     {
+        [Key]
         public int Id { get; set; }
         [Required(ErrorMessage = "Please enter the BSSID")]
         public string Bssid { get; set; }

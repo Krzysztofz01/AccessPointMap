@@ -19,9 +19,9 @@ namespace ms_accesspointmap_api.Models
             throw new NotImplementedException();
         }
 
-        public string login(string login, string password)
+        public async Task<string> login(string login, string password)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

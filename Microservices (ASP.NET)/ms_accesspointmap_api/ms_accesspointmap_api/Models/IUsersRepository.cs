@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ms_accesspointmap_api.Models
 {
-    interface IUsersRepository : IDisposable
+    public interface IUsersRepository : IDisposable
     {
-        string login(string login, string password);
+        Task<string> login(string login, string password);
     }
 }

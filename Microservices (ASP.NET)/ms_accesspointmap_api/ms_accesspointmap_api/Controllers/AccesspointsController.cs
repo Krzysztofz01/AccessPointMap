@@ -15,11 +15,6 @@ namespace ms_accesspointmap_api.Controllers
     {
         private IAccesspointsRepository accesspointsRepository;
 
-        public AccesspointsController()
-        {
-            this.accesspointsRepository = new AccesspointsRepository(new AccessPointMapContext());
-        }
-
         public AccesspointsController(IAccesspointsRepository accesspointsRepository)
         {
             this.accesspointsRepository = accesspointsRepository;
@@ -39,8 +34,8 @@ namespace ms_accesspointmap_api.Controllers
             return Ok(accesspoints);
         }
 
-        // GET: projects/accesspointmap/api/Accesspoints/5
-        [HttpGet("{id}")]
+        // GET: projects/accesspointmap/api/Accesspoints/id/5
+        [HttpGet("id/{id}")]
         public async Task<ActionResult<Accesspoints>> GetAccesspoints(int id)
         {
             var accesspoint = await accesspointsRepository.GetAccesspointById(id);
@@ -72,8 +67,8 @@ namespace ms_accesspointmap_api.Controllers
         }
 
         // GET: projects/accesspointmap/api/Accesspoints/search
-        [HttpGet("search/ssid={ssid}&frequency={frequency}&brand={brand}&security={security}")]
-        public async Task<ActionResult<IEnumerable<Accesspoints>>> GetAccesspoints(string ssid, int freq, string brand, string security)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Accesspoints>>> GetAccesspoints([FromQuery] string ssid = null, [FromQuery] int freq = 0, [FromQuery] string brand = null, [FromQuery] string security = null)
         {
             var accesspoints = await accesspointsRepository.SearchAccesspoints(ssid, freq, brand, security);
             
