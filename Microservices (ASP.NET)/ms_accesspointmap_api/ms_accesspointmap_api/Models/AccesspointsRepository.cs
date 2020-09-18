@@ -18,7 +18,7 @@ namespace ms_accesspointmap_api.Models
             this.context = context;
         }
 
-        public async void CreateOrUpdate(Accesspoints accesspoint)
+        public async Task CreateOrUpdate(Accesspoints accesspoint)
         {
             //Check if accesspoint with specific BSSID exists in the database, if not we create a new record but if the element is already stored we update the existing one
             if(context.Accesspoints.Any(element => element.Bssid == accesspoint.Bssid))
@@ -92,7 +92,9 @@ namespace ms_accesspointmap_api.Models
                         accesspoint.Brand = response;
                     }
                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                 catch (HttpRequestException e)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
                     accesspoint.Brand = "No brand info";
                 }
@@ -101,7 +103,7 @@ namespace ms_accesspointmap_api.Models
                 accesspoint.DeviceType = "default";
 
                 //Add the object to the database
-                context.Accesspoints.Add(accesspoint);
+                await context.Accesspoints.AddAsync(accesspoint);
             }
         }
 
@@ -110,25 +112,29 @@ namespace ms_accesspointmap_api.Models
             throw new NotImplementedException();
         }
 
-        public Accesspoints GetAccesspointById(int id)
+        public async Task<Accesspoints> GetAccesspointById(int id)
         {
-            return context.Accesspoints.FirstOrDefault(accesspoint => accesspoint.Id == id);
+            return await context.Accesspoints.FirstOrDefaultAsync(accesspoint => accesspoint.Id == id);
         }
 
-        public IEnumerable<Accesspoints> GetAccesspoints()
+        public async Task<IEnumerable<Accesspoints>> GetAccesspoints()
         {
-            //Should those methods by async?
-            return context.Accesspoints.ToList();
+            return await context.Accesspoints.ToListAsync();
         }
 
-        public void Save()
+        public async Task<int> Save()
         {
-            context.SaveChanges();
+            return await context.SaveChangesAsync();
         }
 
-        public IEnumerable<Accesspoints> SearchAccesspoints(string ssid="", int freq=0, string brand="", string security="")
+        public async Task<IEnumerable<Accesspoints>> SearchAccesspoints(string ssid=null, int freq=0, string brand=null, string security=null)
         {
-            throw new NotImplementedException();
+            return await context.Accesspoints.Where(element =>
+                (element.Ssid.ToUpper() == ssid.ToUpper() || ssid == null) &&
+                (element.Frequency == freq || freq == 0) &&
+                (element.Brand.ToUpper().Contains(brand.ToUpper()) || brand == null) &&
+                (element.SecurityData.ToUpper().Contains(security.ToUpper()) || security == null)
+            ).ToListAsync();       
         }
     }
 }

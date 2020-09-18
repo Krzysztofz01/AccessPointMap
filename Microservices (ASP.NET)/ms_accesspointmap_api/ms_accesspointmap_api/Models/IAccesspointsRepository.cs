@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace ms_accesspointmap_api.Models
 {
-    interface IAccesspointsRepository : IDisposable
+    public interface IAccesspointsRepository : IDisposable
     {
-        IEnumerable<Accesspoints> GetAccesspoints();
-        IEnumerable<Accesspoints> SearchAccesspoints(string ssid, int freq, string brand, string security);
-        Accesspoints GetAccesspointById(int id);
-        void CreateOrUpdate(Accesspoints accesspoint);
-        void Save();
+        Task<IEnumerable<Accesspoints>> GetAccesspoints();
+        Task<IEnumerable<Accesspoints>> SearchAccesspoints(string ssid, int freq, string brand, string security);
+        Task<Accesspoints> GetAccesspointById(int id);
+        Task CreateOrUpdate(Accesspoints accesspoint);
+        Task<int> Save();
     }
 }

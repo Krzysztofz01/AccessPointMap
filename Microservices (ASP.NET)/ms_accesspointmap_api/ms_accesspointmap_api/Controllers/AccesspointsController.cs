@@ -13,97 +13,76 @@ namespace ms_accesspointmap_api.Controllers
     [ApiController]
     public class AccesspointsController : ControllerBase
     {
-        private readonly AccessPointMapContext _context;
+        private IAccesspointsRepository accesspointsRepository;
 
-        public AccesspointsController(AccessPointMapContext context)
+        public AccesspointsController()
         {
-            _context = context;
+            this.accesspointsRepository = new AccesspointsRepository(new AccessPointMapContext());
         }
 
-        // GET: api/Accesspoints
+        public AccesspointsController(IAccesspointsRepository accesspointsRepository)
+        {
+            this.accesspointsRepository = accesspointsRepository;
+        }
+
+        // GET: projects/accesspointmap/api/Accesspoints
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Accesspoints>>> GetAccesspoints()
         {
-            return await _context.Accesspoints.ToListAsync();
+            var accesspoints = await accesspointsRepository.GetAccesspoints();
+
+            if(!accesspoints.Any())
+            {
+                return NotFound();
+                
+            }
+            return Ok(accesspoints);
         }
 
-        // GET: api/Accesspoints/5
+        // GET: projects/accesspointmap/api/Accesspoints/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Accesspoints>> GetAccesspoints(int id)
         {
-            var accesspoints = await _context.Accesspoints.FindAsync(id);
+            var accesspoint = await accesspointsRepository.GetAccesspointById(id);
 
-            if (accesspoints == null)
+            if (accesspoint == null)
             {
                 return NotFound();
             }
 
-            return accesspoints;
-        }
-
-        // PUT: api/Accesspoints/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccesspoints(int id, Accesspoints accesspoints)
-        {
-            if (id != accesspoints.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(accesspoints).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AccesspointsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(accesspoint);
         }
 
         // POST: api/Accesspoints
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Accesspoints>> PostAccesspoints(Accesspoints accesspoints)
+        public async Task<ActionResult> PostAccesspoints(List<Accesspoints> accesspoints)
         {
-            _context.Accesspoints.Add(accesspoints);
-            await _context.SaveChangesAsync();
+            foreach(Accesspoints element in accesspoints)
+            {
+                if(ModelState.IsValid)
+                {
+                    await accesspointsRepository.CreateOrUpdate(element);
+                }
+            }
 
-            return CreatedAtAction("GetAccesspoints", new { id = accesspoints.Id }, accesspoints);
+            int rowsAffected = await accesspointsRepository.Save();
+            return Ok(new { rowsAffected });
         }
 
-        // DELETE: api/Accesspoints/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Accesspoints>> DeleteAccesspoints(int id)
+        // GET: projects/accesspointmap/api/Accesspoints/search
+        [HttpGet("search/ssid={ssid}&frequency={frequency}&brand={brand}&security={security}")]
+        public async Task<ActionResult<IEnumerable<Accesspoints>>> GetAccesspoints(string ssid, int freq, string brand, string security)
         {
-            var accesspoints = await _context.Accesspoints.FindAsync(id);
-            if (accesspoints == null)
+            var accesspoints = await accesspointsRepository.SearchAccesspoints(ssid, freq, brand, security);
+            
+            if(!accesspoints.Any())
             {
                 return NotFound();
             }
 
-            _context.Accesspoints.Remove(accesspoints);
-            await _context.SaveChangesAsync();
-
-            return accesspoints;
-        }
-
-        private bool AccesspointsExists(int id)
-        {
-            return _context.Accesspoints.Any(e => e.Id == id);
+            return Ok(accesspoints);
         }
     }
 }
