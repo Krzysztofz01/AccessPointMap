@@ -14,14 +14,35 @@ namespace ms_accesspointmap_api.Models
             this.context = context;
         }
 
-        public void Dispose()
+        public async Task<string> Login(string login, string password)
         {
-            throw new NotImplementedException();
+            var user = context.Users.SingleOrDefault(element => element.Login == login);
+
+            if(user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password)) return null;
+            
+            return "Token";
+   
         }
 
-        public async Task<string> login(string login, string password)
+        //IDisposable
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
         {
-            return null;
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    context.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

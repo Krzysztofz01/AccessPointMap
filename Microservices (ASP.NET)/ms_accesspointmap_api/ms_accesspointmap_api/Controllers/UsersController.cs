@@ -26,7 +26,10 @@ namespace ms_accesspointmap_api.Controllers
         [HttpPost]
         public async Task<ActionResult<Users>> PostUsers(Users users)
         {
-            return null;
+            var token = await usersRepository.Login(users.Login, users.Password);
+            if(token == null) return NotFound();
+            
+            return Ok(new { token });
         }
     }
 }

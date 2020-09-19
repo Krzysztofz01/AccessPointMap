@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "G+7Hkk9/D7/13uq/XJwqJnVa3ZWwNJB0+7njDP6zTpuJS5ZdoZSLYS1cd0W3k7UbfGSmt4DnLOOHXdMv6Hn2KA==",
+  "dgSpecHash": "26b09f6u2IdtEgElWLAtIkFPdKrzHCayGeeLqW8R8cs7rU64b/pS7hSSwljQaXs4UdlqTp+3sv28pV7igKCQbg==",
   "success": true,
   "projectFilePath": "D:\\Projekty\\AccessPointMap\\Microservices (ASP.NET)\\ms_accesspointmap_api\\ms_accesspointmap_api\\ms_accesspointmap_api.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\User1\\.nuget\\packages\\bcrypt.net-next\\4.0.0\\bcrypt.net-next.4.0.0.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.aspnetcore.razor\\2.2.0\\microsoft.aspnetcore.razor.2.2.0.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.aspnetcore.razor.language\\3.1.0\\microsoft.aspnetcore.razor.language.3.1.0.nupkg.sha512",
