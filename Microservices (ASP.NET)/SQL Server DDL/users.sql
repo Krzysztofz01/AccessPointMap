@@ -1,7 +1,7 @@
 CREATE TABLE users (
     [id] int NOT NULL PRIMARY KEY IDENTITY(1, 1),
     [login] VARCHAR(50) NOT NULL UNIQUE,
-    [password] BINARY(50) NOT NULL,
+    [password] VARCHAR(60) NOT NULL,
     [tokenExpiration] INT NOT NULL,
     [writePermission] BIT NOT NULL,
     [readPermission] BIT NOT NULL,
