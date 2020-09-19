@@ -9,7 +9,7 @@ using ms_accesspointmap_api.Models;
 
 namespace ms_accesspointmap_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("projects/accesspointmap/auth")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -26,7 +26,7 @@ namespace ms_accesspointmap_api.Controllers
         [HttpPost]
         public async Task<ActionResult<Users>> PostUsers(Users users)
         {
-            var token = await usersRepository.Login(users.Login, users.Password);
+            var token = await usersRepository.Login(users.Login, users.Password, Request.HttpContext.Connection.RemoteIpAddress.ToString());
             if(token == null) return NotFound();
             
             return Ok(new { token });

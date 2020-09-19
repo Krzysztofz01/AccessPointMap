@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,7 @@ namespace ms_accesspointmap_api.Controllers
         // POST: api/Accesspoints
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> PostAccesspoints(List<Accesspoints> accesspoints)
         {
@@ -63,7 +65,7 @@ namespace ms_accesspointmap_api.Controllers
             }
 
             int rowsAffected = await accesspointsRepository.Save();
-            return Ok(new { rowsAffected });
+            return Ok(new { rowsPosted = accesspoints.Count, rowsAffected });
         }
 
         // GET: projects/accesspointmap/api/Accesspoints/search

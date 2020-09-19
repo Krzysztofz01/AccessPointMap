@@ -25,6 +25,7 @@ namespace ms_accesspointmap_api.Models
             {
                 //Assign the existing accesspoint to a variable
                 var existingAccesspoint = context.Accesspoints.FirstOrDefault(element => element.Bssid == accesspoint.Bssid);
+                bool locationChanged = false;
 
                 //Check if the lowSignal strength is weaker, if yes update data
                 if(accesspoint.LowSignalLevel < existingAccesspoint.LowSignalLevel)
@@ -32,6 +33,7 @@ namespace ms_accesspointmap_api.Models
                     existingAccesspoint.LowLatitude = accesspoint.LowLatitude;
                     existingAccesspoint.LowLongitude = accesspoint.LowLongitude;
                     existingAccesspoint.LowSignalLevel = accesspoint.LowSignalLevel;
+                    locationChanged = true;
                 }
 
                 //Check if the highSignal strength is stronger, if yes update data
@@ -40,26 +42,32 @@ namespace ms_accesspointmap_api.Models
                     existingAccesspoint.HighLatitude = accesspoint.HighLatitude;
                     existingAccesspoint.HighLongitude = accesspoint.HighLongitude;
                     existingAccesspoint.HighSignalLevel = accesspoint.HighSignalLevel;
+                    locationChanged = true;
                 }
 
-                //Calculate the signal radius and the signal area
-                double latitudeDistance = (existingAccesspoint.LowLatitude - existingAccesspoint.HighLatitude) * Math.PI / 180.0;
-                double longitudeDistance = (existingAccesspoint.LowLongitude - existingAccesspoint.HighLongitude) * Math.PI / 180.0;
+                if(locationChanged)
+                {
+                    //Calculate the signal radius and the signal area
+                    double latitudeDistance = (existingAccesspoint.LowLatitude - existingAccesspoint.HighLatitude) * Math.PI / 180.0;
+                    double longitudeDistance = (existingAccesspoint.LowLongitude - existingAccesspoint.HighLongitude) * Math.PI / 180.0;
 
-                double lowLatitudeRadian = existingAccesspoint.LowLatitude * Math.PI / 180.0;
-                double highLatitudeRadian = existingAccesspoint.HighLatitude * Math.PI / 180.0;
+                    double lowLatitudeRadian = existingAccesspoint.LowLatitude * Math.PI / 180.0;
+                    double highLatitudeRadian = existingAccesspoint.HighLatitude * Math.PI / 180.0;
 
-                double a = Math.Pow(Math.Sin(latitudeDistance / 2.0), 2.0) +
-                           Math.Pow(Math.Sin(longitudeDistance / 2.0), 2.0) *
-                           Math.Cos(lowLatitudeRadian) * Math.Cos(highLatitudeRadian);
+                    double a = Math.Pow(Math.Sin(latitudeDistance / 2.0), 2.0) +
+                               Math.Pow(Math.Sin(longitudeDistance / 2.0), 2.0) *
+                               Math.Cos(lowLatitudeRadian) * Math.Cos(highLatitudeRadian);
 
-                double c = 2.0 * Math.Asin(Math.Sqrt(a));
+                    double c = 2.0 * Math.Asin(Math.Sqrt(a));
 
-                existingAccesspoint.SignalRadius = Math.Round((6371.0 * c) * 1000.0, 2);
-                existingAccesspoint.SignalArea = Math.Round(Math.PI * Math.Pow(existingAccesspoint.SignalRadius, 2), 2);
+                    existingAccesspoint.SignalRadius = Math.Round((6371.0 * c) * 1000.0, 2);
+                    existingAccesspoint.SignalArea = Math.Round(Math.PI * Math.Pow(existingAccesspoint.SignalRadius, 2), 2);
 
-                //Update the object in database
-                context.Entry(existingAccesspoint).State = EntityState.Modified;
+                    existingAccesspoint.UpdateDate = DateTime.Now;
+
+                    //Update the object in database
+                    context.Entry(existingAccesspoint).State = EntityState.Modified;
+                }
             }
             else
             {
@@ -92,9 +100,7 @@ namespace ms_accesspointmap_api.Models
                         accesspoint.Brand = response;
                     }
                 }
-#pragma warning disable CS0168 // Variable is declared but never used
-                catch (HttpRequestException e)
-#pragma warning restore CS0168 // Variable is declared but never used
+                catch (HttpRequestException)
                 {
                     accesspoint.Brand = "No brand info";
                 }

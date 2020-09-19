@@ -25,6 +25,7 @@
       "ms_accesspointmap_api/1.0.0": {
         "dependencies": {
           "BCrypt.Net-Next": "4.0.0",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "3.1.8",
           "Microsoft.EntityFrameworkCore.SqlServer": "3.1.8",
           "Microsoft.EntityFrameworkCore.Sqlite": "3.1.8",
           "Microsoft.EntityFrameworkCore.Tools": "3.1.8",
@@ -305,6 +306,20 @@
         },
         "compile": {
           "lib/netstandard2.1/BCrypt.Net-Next.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.JwtBearer/3.1.8": {
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "5.5.0"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "assemblyVersion": "3.1.8.0",
+            "fileVersion": "3.100.820.42106"
+          }
+        },
+        "compile": {
+          "lib/netcoreapp3.1/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {}
         }
       },
       "Microsoft.AspNetCore.Html.Abstractions/2.2.0": {
@@ -3959,6 +3974,13 @@
       "sha512": "sha512-1rjyVK+/YJnCElALjVNt/aUPIIRoFocFZzblsiFo2giA3WVYExk/E5UT6i4RqEHwIwEwoQHt02I1llaEIQ59eQ==",
       "path": "bcrypt.net-next/4.0.0",
       "hashPath": "bcrypt.net-next.4.0.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.JwtBearer/3.1.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-sAXFFgsSEYd6PTFCzBKYBlXnb+ncclrQPMyMzARELxBv94Onqtr/JTWKih+NUr/3xR5BAs1xE6boao0Us6xcPA==",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/3.1.8",
+      "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.3.1.8.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Html.Abstractions/2.2.0": {
       "type": "package",

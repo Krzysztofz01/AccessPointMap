@@ -7,6 +7,6 @@ namespace ms_accesspointmap_api.Models
 {
     public interface IUsersRepository : IDisposable
     {
-        Task<string> Login(string login, string password);
+        Task<string> Login(string login, string password, string ipAddress);
     }
 }
