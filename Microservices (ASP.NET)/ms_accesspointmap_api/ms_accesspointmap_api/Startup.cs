@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,14 @@ namespace ms_accesspointmap_api
             //Register repositories
             services.AddScoped<IAccesspointsRepository, AccesspointsRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
+
+            //CORS
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+            }));
 
             //JsonWebToken Configuration
             var jwtSection = Configuration.GetSection("JWTSettings");
@@ -72,6 +81,8 @@ namespace ms_accesspointmap_api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("MyPolicy");
 
             app.UseRouting();
 
