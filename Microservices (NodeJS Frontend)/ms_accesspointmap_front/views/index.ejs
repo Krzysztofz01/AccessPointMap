@@ -15,7 +15,7 @@
         <title>Access Point Map</title>
     </head>
     <body>
-        <div class="container">
+        <div class="container" id="main">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg navbar-light my-3 navbar-bgcolor">
                 <a class="navbar-brand" href="#">AccessPointMap</a>
@@ -26,7 +26,7 @@
                     <div class="navbar-nav">
                         <a class="nav-item nav-link" href="#mapArea">Map</a>
                         <a class="nav-item nav-link" href="#charts">Statistics</a>
-                        <a class="nav-item nav-link" href="search.php">Advanced Search</a>
+                        <a class="nav-item nav-link" href="/projects/accesspointmap/search">Advanced Search</a>
                         <a class="nav-item nav-link" href="#info">Information</a>
                         <a class="nav-item nav-link" href="https://github.com/Krzysztofz01/AccessPointMap">Github</a>
                     </div>
@@ -80,24 +80,7 @@
         </div>
 
         <!-- Script's -->
-        <script>
-            function initMap() {
-                //Google Map
-                const map = new google.maps.Map(document.getElementById("map"), {
-                    zoom: 15,
-                    center: {lat:  50.16, lng: 18.31},
-                    mapTypeId: 'satellite'
-                });
-                
-                insertData(map, {
-                    securityChart: document.getElementById("securityChart").getContext('2d'),
-                    brandChart: document.getElementById("brandChart").getContext('2d'),
-                    areaChart: document.getElementById("areaChart").getContext('2d'),
-                    freqChart: document.getElementById("freqChart").getContext('2d')
-                });
-            }
-        </script>
-        
+        <script>function initMap() { insertData(); }</script>        
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
