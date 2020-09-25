@@ -81,10 +81,10 @@ namespace ms_accesspointmap_api.Models
                 double a = Math.Pow(Math.Sin(latitudeDistance / 2.0), 2.0) +
                            Math.Pow(Math.Sin(longitudeDistance / 2.0), 2.0) *
                            Math.Cos(lowLatitudeRadian) * Math.Cos(highLatitudeRadian);
+                
+                double c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-                double c = 2.0 * Math.Asin(Math.Sqrt(a));
-
-                accesspoint.SignalRadius = Math.Round((6371.0 * c) * 1000.0, 2);
+                accesspoint.SignalRadius = Math.Round(6371000.0 * c);
                 accesspoint.SignalArea = Math.Round(Math.PI * Math.Pow(accesspoint.SignalRadius, 2), 2);
 
                 //Call the https://macvendors.com API to get the brand name bassed on the MAC address
