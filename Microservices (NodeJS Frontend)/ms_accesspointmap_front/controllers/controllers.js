@@ -1,6 +1,4 @@
 const axios = require('axios');
-const { render } = require('ejs');
-const { param } = require('../routes/routes');
 const accessPointApiUrl = "http://localhost:54805/projects/accesspointmap/api/AccessPoints/id/";
 const searchApiUrl = "http://localhost:54805/projects/accesspointmap/api/AccessPoints/search"
 
@@ -35,21 +33,29 @@ exports.accesspoint = async (req, res) => {
 //Search system view
 exports.search = async (req, res) => {
     if((req.query.ssid == null) && (req.query.freq == null) && (req.query.brand == null) && (req.query.security == null)) {
-        //Deafult view
-        return res.render('search');
+        return res.render('searchBlank');
     } else {
-        //Multiple params dont work, need to fix it
-        const params = {
-            ssid: (req.query.ssid == null) ? "" : req.query.ssid,
-            freq: (req.query.freq == null) ? "" : req.query.freq,
-            brand: (req.query.brand == null) ? "" : req.query.brand,
-            security: (req.query.security == null) ? "" : req.query.security
-        };
+        const params = {};
+        if(req.query.ssid.length) params.ssid = req.query.ssid;
+        if(req.query.freq.length) params.freq = req.query.freq;
+        if(req.query.brand.length) params.brand = req.query.brand;
+        if(req.query.security.length) params.security = req.query.security;
 
         axios.get(searchApiUrl, {
-            params: params
+            params: (Object.keys(params).length > 0) ? params : {}
         })
-        .then(response => { console.log(response.data)/*return render('search', response.data);*/ })
-        .catch(error => { return render('error', { message: "Some errors occured while retriving data!", error: error }); });
+        .then(response => { 
+            const tableElements = [];
+            for(var i=0; i<response.data.length; i++) {
+                tableElements.push(`<tr><th>${i+1}</th><td class="accessPointUrl" id="${response.data[i].id}">${response.data[i].ssid}</td><td>${response.data[i].bssid}</td><td>${response.data[i].frequency}</td><td>${response.data[i].securityData}</td><td>${response.data[i].brand}</td></tr>`);
+            }
+
+            return res.render('search', { elements: tableElements });
+        })
+        .catch(error => {
+            if(error.errno != null && error.errno == "ECONNREFUSED") return res.render('error', { message: "Service unavailable, try again later!", error: error });
+            if(error.response.status != null && error.response.status == 404) return res.render('searchBlank');  
+            return res.render('error', { message: "Some errors occured!", error: error });
+        });
     }
 };

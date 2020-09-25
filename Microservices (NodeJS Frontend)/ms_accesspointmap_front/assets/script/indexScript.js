@@ -1,7 +1,7 @@
 const insertData = () => {
     //Communication URL's
     const apiUrl = "http://localhost:54805/projects/accesspointmap/api/Accesspoints";
-    const accesspointUrl = "http://localhost:3000/projects/accesspointmap/accesspoint";
+    const accesspointUrl = window.location.href + "accesspoint";
 
     //Chart data objects/arrays
     const securityChartData = { WPA2: 0, WPA: 0, WEP: 0, none: 0 };
