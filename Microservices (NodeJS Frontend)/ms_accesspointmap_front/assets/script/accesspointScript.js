@@ -9,9 +9,13 @@ const insertData = (latitude, longitude, radius) => {
         center: { lat: latitude, lng: longitude },
         radius: (radius < 10) ? 10 : parseFloat(radius),
         map: map,
-        strokeColor: "#532c7a",
+        strokeColor: "#84c69b",
         strokeOpacity: 0.8,
-        fillColor: "#532c7a",
+        fillColor: "#84c69b",
         fillOpacity: 0.25
+    });
+
+    document.getElementById('backButton').addEventListener('click', () => {
+        window.history.go(-1); return false;
     });
 };

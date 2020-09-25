@@ -20,7 +20,7 @@ const insertData = () => {
     };
 
     //Chart color
-    const color = "#7f50ad";
+    const color = "#84c69b";
 
     //Creating the map object and assign the HTML element
     const map = new google.maps.Map(document.getElementById("map"), {
@@ -69,7 +69,10 @@ const insertData = () => {
                 },
                 options: {
                     legend: {
-                        display: false
+                        display: false,
+                        labels: {
+                            fontColor: '#2f8886'
+                        }
                     },
                     scales: {
                         yAxes: [{
@@ -101,7 +104,10 @@ const insertData = () => {
                 },
                 options: {
                     legend: {
-                        display: false
+                        display: false,
+                        labels: {
+                            fontColor: '#2f8886'
+                        }
                     },
                     scales: {
                         yAxes: [{
@@ -133,7 +139,10 @@ const insertData = () => {
                 },
                 options: {
                     legend: {
-                        display: false
+                        display: false,
+                        labels: {
+                            fontColor: '#2f8886'
+                        }
                     },
                     scales: {
                         yAxes: [{
@@ -165,7 +174,10 @@ const insertData = () => {
                 },
                 options: {
                     legend: {
-                        display: false
+                        display: false,
+                        labels: {
+                            fontColor: '#2f8886'
+                        }
                     },
                     scales: {
                         yAxes: [{
@@ -278,7 +290,10 @@ const insertData = () => {
                     },
                     options: {
                         legend: {
-                            display: false
+                            display: false,
+                            labels: {
+                                fontColor: '#2f8886'
+                            }
                         },
                         scales: {
                             yAxes: [{
@@ -310,7 +325,10 @@ const insertData = () => {
                     },
                     options: {
                         legend: {
-                            display: false
+                            display: false,
+                            labels: {
+                                fontColor: '#2f8886'
+                            }
                         },
                         scales: {
                             yAxes: [{
@@ -342,7 +360,10 @@ const insertData = () => {
                     },
                     options: {
                         legend: {
-                            display: false
+                            display: false,
+                            labels: {
+                                fontColor: '#2f8886'
+                            }
                         },
                         scales: {
                             yAxes: [{
@@ -374,7 +395,10 @@ const insertData = () => {
                     },
                     options: {
                         legend: {
-                            display: false
+                            display: false,
+                            labels: {
+                                fontColor: '#2f8886'
+                            }
                         },
                         scales: {
                             yAxes: [{

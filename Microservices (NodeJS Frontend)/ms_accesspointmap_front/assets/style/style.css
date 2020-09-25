@@ -1,12 +1,15 @@
 body {
-    /*background-color: #141212 !important; */
-    background-color: #fff;
+    background-color: #1a2f4b;
     font-family: 'Barlow', sans-serif !important;
     scroll-behavior: smooth !important;
 }
 
+.h3 {
+   color: #2f8886 !important; 
+}
+
 p {
-    color: #532c7a !important;
+    color: #84c69b !important;
 }
 
 a {
@@ -14,18 +17,18 @@ a {
 }
 
 .navbar-bgcolor {
-    background-color: #532c7a !important;
+    background-color: #2f8886 !important;
     font-size: 20px !important;
 }
 
 .violet-background {
-    background-color: #532c7a !important;
+    background-color: #2f8886 !important;
     font-size: 20px !important;
 }
 
 .violet-border {
     border-style: solid;
-    border-color: #532c7a;
+    border-color: #28475c;
     border-width: 1px;
 }
 
@@ -38,17 +41,27 @@ a {
 }
 
 .violet-button {
-    background-color: #532c7a !important;
+    background-color: #2f8886 !important;
     border-style: none !important;
-    color: #141212 !important;
+    color: #1a2f4b !important;
     min-width: 100px !important;
 }
 
 .table {
-    color: #532c7a !important;
+    color: #84c69b !important;
 }
 
 .table a {
     text-decoration: none !important;
     color: #532c7a !important;
+}
+
+.accessPointUrl {
+    color: #2f8886 !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#backButton {
+    cursor: pointer;
 }

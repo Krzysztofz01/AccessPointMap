@@ -15,7 +15,6 @@ const search = () => {
 
 const elements = document.getElementsByClassName('accessPointUrl');
 for(let item of elements) {
-    console.log(item);
     item.addEventListener('click', () => addHref(item.id));
 }
 
