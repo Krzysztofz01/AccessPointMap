@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "nly+eR953f9O+2n0r362x7juDRC/0YSW/cQe9Ab4y91tolVRMl3P4N5emMVFx6RTqfpYr0vWC6SkKHsNImY8LQ==",
+  "dgSpecHash": "fVNk1HSAUj5QvZ3DMcTF92t6bINMitv/UNSMMoEXhFB6H6X5IwgWeNsFEmGZrvcXGOxKK3XAmZ68H5JqlmP2Kw==",
   "success": true,
   "projectFilePath": "D:\\Projekty\\AccessPointMap\\Microservices (ASP.NET)\\ms_accesspointmap_api\\ms_accesspointmap_api\\ms_accesspointmap_api.csproj",
   "expectedPackageFiles": [
@@ -51,6 +51,7 @@
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.identitymodel.tokens\\5.5.0\\microsoft.identitymodel.tokens.5.5.0.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.netcore.platforms\\2.1.2\\microsoft.netcore.platforms.2.1.2.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\User1\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.10.9\\microsoft.visualstudio.azure.containers.tools.targets.1.10.9.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration\\3.1.4\\microsoft.visualstudio.web.codegeneration.3.1.4.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration.contracts\\3.1.4\\microsoft.visualstudio.web.codegeneration.contracts.3.1.4.nupkg.sha512",
     "C:\\Users\\User1\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration.core\\3.1.4\\microsoft.visualstudio.web.codegeneration.core.3.1.4.nupkg.sha512",
