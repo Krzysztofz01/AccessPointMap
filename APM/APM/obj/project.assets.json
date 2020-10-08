@@ -4852,11 +4852,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\xampp\\htdocs\\newapm\\AccessPointMap\\APM\\APM\\APM.csproj",
+      "projectUniqueName": "D:\\Projekty\\AccessPointMap\\APM\\APM\\APM.csproj",
       "projectName": "APM",
-      "projectPath": "D:\\xampp\\htdocs\\newapm\\AccessPointMap\\APM\\APM\\APM.csproj",
+      "projectPath": "D:\\Projekty\\AccessPointMap\\APM\\APM\\APM.csproj",
       "packagesPath": "C:\\Users\\User1\\.nuget\\packages\\",
-      "outputPath": "D:\\xampp\\htdocs\\newapm\\AccessPointMap\\APM\\APM\\obj\\",
+      "outputPath": "D:\\Projekty\\AccessPointMap\\APM\\APM\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [

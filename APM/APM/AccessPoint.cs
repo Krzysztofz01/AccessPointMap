@@ -8,38 +8,38 @@ namespace APM
         
         public string bssid { get; set; }
         public string ssid { get; set; }
-        public int freq { get; set; }
-        public int signalLevel { get; set; }
-        public double latitude { get; set; }
-        public double longitude { get; set; }
+        public int frequency { get; set; }
+        public int highSignalLevel { get; set; }
+        public double highLatitude { get; set; }
+        public double highLongitude { get; set; }
         public int lowSignalLevel { get; set; }
         public double lowLatitude { get; set; }
         public double lowLongitude { get; set; }
-        public string security { get; set; }
+        public string securityData { get; set; }
 
         public AccessPoint(string bssid, string ssid, int freq, int signalLevel, double latitude, double longitude, int lowSignalLevel, double lowLatitude, double lowLongitude, string security)
         {
             this.bssid = bssid;
             this.ssid = ssid;
-            this.freq = freq;
-            this.signalLevel = signalLevel;
-            this.latitude = latitude;
-            this.longitude = longitude;
+            this.frequency = freq;
+            this.highSignalLevel = signalLevel;
+            this.highLatitude = latitude;
+            this.highLongitude = longitude;
             this.lowSignalLevel = lowSignalLevel;
             this.lowLatitude = lowLatitude;
             this.lowLongitude = lowLongitude;
-            this.security = security;
+            this.securityData = security;
         }
 
         public AccessPoint(string bssid, string ssid, int freq, int signalLevel, double latitude, double longitude, string security)
         {
             this.bssid = bssid;
             this.ssid = ssid;
-            this.freq = freq;
-            this.signalLevel = signalLevel;
-            this.latitude = latitude;
-            this.longitude = longitude;
-            this.security = security;
+            this.frequency = freq;
+            this.highSignalLevel = signalLevel;
+            this.highLatitude = latitude;
+            this.highLongitude = longitude;
+            this.securityData = security;
         }
     }
 }

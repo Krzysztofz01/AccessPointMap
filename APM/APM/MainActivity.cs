@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Android.Support.V4.App;
 using Xamarin.Essentials;
 using System.Threading.Tasks;
+using Android.Content;
 
 namespace APM
 {
@@ -109,7 +110,7 @@ namespace APM
 
         private async void buttonUploadClickEvent(object sender, System.EventArgs e)
         {
-            switch(dataStoreMethod.CheckedRadioButtonId)
+            /*switch(dataStoreMethod.CheckedRadioButtonId)
             {
                 case Resource.Id.localFile: {
                     //Use the Local class method to save data to a .JSON file
@@ -120,11 +121,25 @@ namespace APM
                     //Create a new ApiHelper object to send JSON data to REST API
                     ApiHelper api = new ApiHelper();
 
-                    await api.send(AccessPoint.AccessPointContainer);
-                    Toast.MakeText(this, "Data send to API!", ToastLength.Long).Show();
+
+                    //TODO: LOGIN AND PASSWORD FORM HERE
+                    string login = "";
+                    string password = "";
+
+                    if(await api.send(AccessPoint.AccessPointContainer, login, password))
+                    {
+                        Toast.MakeText(this, "Data successful posted!", ToastLength.Long).Show();
+                    }
+                    else
+                    {
+                        Toast.MakeText(this, "Some errors occured while posting data!", ToastLength.Long).Show();
+                    }                 
                     } break;
                 default: break;
             }
+            */
+            buttonScan.Text = Resources.GetString(Resource.String.buttonScan);
+            StartActivity(new Intent(this, typeof(UploadActivity)));
         }
 
 
@@ -157,11 +172,11 @@ namespace APM
                         {
                             alreadyKnown = true;
 
-                            if(element.Level > known.signalLevel)
+                            if(element.Level > known.highSignalLevel)
                             {
-                                known.signalLevel = element.Level;
-                                known.latitude = currentLocation.Latitude;
-                                known.longitude = currentLocation.Longitude;
+                                known.highSignalLevel = element.Level;
+                                known.highLatitude = currentLocation.Latitude;
+                                known.highLongitude = currentLocation.Longitude;
                             }
                             else if(element.Level < known.lowSignalLevel)
                             {
