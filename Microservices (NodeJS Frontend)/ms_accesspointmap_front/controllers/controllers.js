@@ -1,9 +1,10 @@
 const axios = require('axios');
 const accessPointApiUrl = "http://localhost:54805/projects/accesspointmap/api/AccessPoints/id/";
 const searchApiUrl = "http://localhost:54805/projects/accesspointmap/api/AccessPoints/search"
+const allAccessPointsApiUrl = "http://localhost:54805/projects/accesspointmap/api/Accesspoints";
 
 //Index view
-exports.index = async (req, res) => { return res.render('index'); };
+exports.index = async (req, res) => { return res.render('index', { apiUrl: allAccessPointsApiUrl }); };
 
 //Single accesspoint view
 exports.accesspoint = async (req, res) => {

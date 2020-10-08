@@ -1,6 +1,5 @@
-const insertData = () => {
+const insertData = (apiUrl) => {
     //Communication URL's
-    const apiUrl = "http://localhost:54805/projects/accesspointmap/api/Accesspoints";
     const accesspointUrl = window.location.href + "accesspoint";
 
     //Chart data objects/arrays
