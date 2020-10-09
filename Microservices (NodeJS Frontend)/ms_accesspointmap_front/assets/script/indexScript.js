@@ -29,7 +29,7 @@ const insertData = (apiUrl) => {
     });
 
     //if local storage is disabled fetch data without cacheing, otherwise cache the response
-    if((typeof(Storage) !== "undefined") && (localStorage.responseCache != null)) {
+    if((typeof(Storage) !== "undefined") && (localStorage.responseCache.timestamp != null)) {
         const cache = JSON.parse(localStorage.responseCache);
         const time = new Date().getTime();
 

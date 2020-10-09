@@ -1,7 +1,9 @@
 const axios = require('axios');
-const accessPointApiUrl = "http://localhost:54805/projects/accesspointmap/api/AccessPoints/id/";
-const searchApiUrl = "http://localhost:54805/projects/accesspointmap/api/AccessPoints/search"
-const allAccessPointsApiUrl = "http://localhost:54805/projects/accesspointmap/api/Accesspoints";
+const env = require('../config/env');
+
+const accessPointApiUrl = env.default.apiUrl + "projects/accesspointmap/api/AccessPoints/id/";
+const searchApiUrl = env.default.apiUrl + "projects/accesspointmap/api/AccessPoints/search"
+const allAccessPointsApiUrl = env.default.apiUrl + "projects/accesspointmap/api/Accesspoints";
 
 //Index view
 exports.index = async (req, res) => { return res.render('index', { apiUrl: allAccessPointsApiUrl }); };
