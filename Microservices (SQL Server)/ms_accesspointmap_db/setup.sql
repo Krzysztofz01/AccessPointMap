@@ -41,6 +41,6 @@ CREATE TABLE users (
 GO
 
 INSERT INTO users (login, password, tokenExpiration, writePermission, readPermission, lastLoginIp)
-VALUES ('root', 'root', 5, 1, 1, '::1');
+VALUES ('root', '', 5, 1, 1, '::1');
 
 GO
