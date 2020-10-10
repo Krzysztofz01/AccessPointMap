@@ -9,6 +9,7 @@ using Android.Support.V4.App;
 using Xamarin.Essentials;
 using System.Threading.Tasks;
 using Android.Content;
+using APM.Services;
 
 namespace APM
 {
@@ -17,7 +18,6 @@ namespace APM
     {
         //Init GUI elements objects
         private RadioGroup dataStoreMethod;
-        private RadioGroup dataScanMethod;
         private RadioGroup geolocationAccuracy;
         private Button buttonScan;
         private Button buttonUpload;
@@ -62,7 +62,6 @@ namespace APM
 
             //Assign GUI elemets to objects
             dataStoreMethod = FindViewById<RadioGroup>(Resource.Id.radioGroupStoreMethod);
-            dataScanMethod = FindViewById<RadioGroup>(Resource.Id.radioGroupScanMethod);
             geolocationAccuracy = FindViewById<RadioGroup>(Resource.Id.radioGroupAccuracyMethod);
             buttonScan = FindViewById<Button>(Resource.Id.buttonStartScan);
             buttonUpload = FindViewById<Button>(Resource.Id.buttonStartUpload);
@@ -77,30 +76,17 @@ namespace APM
             if (buttonScan.Text == Resources.GetString(Resource.String.buttonScan))
             {
                 buttonScan.Text = Resources.GetString(Resource.String.buttonStop);
-                
+
                 //Set the geolocation accuracy
-                switch(geolocationAccuracy.CheckedRadioButtonId)
+                switch (geolocationAccuracy.CheckedRadioButtonId)
                 {
                     case Resource.Id.accuracyBest: locationRequest = new GeolocationRequest(GeolocationAccuracy.Best); break;
                     case Resource.Id.accuracyHigh: locationRequest = new GeolocationRequest(GeolocationAccuracy.High); break;
                     case Resource.Id.accuracyMedium: locationRequest = new GeolocationRequest(GeolocationAccuracy.Medium); break;
                     default: locationRequest = new GeolocationRequest(GeolocationAccuracy.Best); break;
                 }
-
-                if (dataScanMethod.CheckedRadioButtonId == Resource.Id.lightMethod)
-                {
-                    while (buttonScan.Text == Resources.GetString(Resource.String.buttonStop))
-                    {
-                        await lightScanMethod();                       
-                    }
-                }
-                else if(dataScanMethod.CheckedRadioButtonId == Resource.Id.hardMethod)
-                {
-                    while (buttonScan.Text == Resources.GetString(Resource.String.buttonStop))
-                    {
-                        await hardScanMethod();
-                    }
-                }
+                
+                await lightScanMethod();                       
             }
             else
             {
@@ -110,38 +96,18 @@ namespace APM
 
         private async void buttonUploadClickEvent(object sender, System.EventArgs e)
         {
-            /*switch(dataStoreMethod.CheckedRadioButtonId)
-            {
-                case Resource.Id.localFile: {
-                    //Use the Local class method to save data to a .JSON file
-                    Local.saveToDeviceLight(AccessPoint.AccessPointContainer);
-                    Toast.MakeText(this, "Data saved to a local file!", ToastLength.Long).Show();
-                    } break;
-                case Resource.Id.apiCall: {
-                    //Create a new ApiHelper object to send JSON data to REST API
-                    ApiHelper api = new ApiHelper();
-
-
-                    //TODO: LOGIN AND PASSWORD FORM HERE
-                    string login = "";
-                    string password = "";
-
-                    if(await api.send(AccessPoint.AccessPointContainer, login, password))
-                    {
-                        Toast.MakeText(this, "Data successful posted!", ToastLength.Long).Show();
-                    }
-                    else
-                    {
-                        Toast.MakeText(this, "Some errors occured while posting data!", ToastLength.Long).Show();
-                    }                 
-                    } break;
-                default: break;
-            }
-            */
             buttonScan.Text = Resources.GetString(Resource.String.buttonScan);
-            StartActivity(new Intent(this, typeof(UploadActivity)));
+            switch (dataStoreMethod.CheckedRadioButtonId)
+            {
+                case Resource.Id.localFile: 
+                    {
+                        var storageService = new StorageService();
+                        await storageService.SaveJson(AccessPoint.AccessPointContainer);
+                        Toast.MakeText(this, "Data storaged in local drive!", ToastLength.Long).Show();
+                    } break;
+                case Resource.Id.apiCall: StartActivity(new Intent(this, typeof(UploadActivity))); break;
+            }  
         }
-
 
         private async Task lightScanMethod()
         {
@@ -219,35 +185,6 @@ namespace APM
                             currentLocation.Longitude,
                             scanResults[0].Capabilities));
             }  
-        }
-
-        private async Task hardScanMethod()
-        {
-            //Init a helper array to store scan result temporary
-            IList<ScanResult> scanResults = null;
-       
-            //Get the current location
-            Location currentLocation = await Geolocation.GetLocationAsync(locationRequest);
-
-            //Scan for near wireless networks, this method is deprecated (turning off compiler warning)
-            #pragma warning disable 618
-            wifiManager.StartScan();
-            #pragma warning restore 618
-
-            //Assign the results to the temp container
-            scanResults = wifiManager.ScanResults;
-
-            foreach (ScanResult element in scanResults)
-            {
-                Local.saveToDeviceHard(new AccessPoint(
-                    element.Bssid,
-                    element.Ssid,
-                    element.Frequency,
-                    element.Level,
-                    currentLocation.Latitude,
-                    currentLocation.Longitude,
-                    element.Capabilities));
-            }
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)

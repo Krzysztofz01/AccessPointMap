@@ -58,46 +58,10 @@
         </RadioGroup>
 
         <TextView
-            android:id="@+id/radioGroupScanMethodLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/radioGroupStoreMethod"
-            android:layout_marginTop="20dp"
-            android:text="@string/radioGroupScanLabel"
-            android:textSize="18sp"
-            android:textColor="@color/colorViolet"/>
-
-        <RadioGroup
-            android:id="@+id/radioGroupScanMethod"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/radioGroupScanMethodLabel">
-
-            <RadioButton
-                android:id="@+id/lightMethod"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/radioLight"
-                android:textSize="18sp"
-                android:textColor="@color/colorVioletLight"
-                android:buttonTint="@color/colorVioletLight"/>
-
-            <RadioButton
-                android:id="@+id/hardMethod"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/radioHard"
-                android:textSize="18sp"
-                android:textColor="@color/colorVioletLight"
-                android:buttonTint="@color/colorVioletLight"/>
-        </RadioGroup>
-
-        <TextView
             android:id="@+id/radioGroupAccuracyMethodLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radioGroupScanMethod"
+            android:layout_below="@+id/radioGroupStoreMethod"
             android:layout_marginTop="20dp"
             android:text="@string/radioGroupAccuracyLabel"
             android:textSize="18sp"

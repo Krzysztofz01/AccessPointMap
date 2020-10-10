@@ -3487,49 +3487,49 @@ namespace APM
 			public const int group_divider = 2131230809;
 			
 			// aapt resource value: 0x7F08005A
-			public const int hardMethod = 2131230810;
+			public const int home = 2131230810;
 			
 			// aapt resource value: 0x7F08005B
-			public const int home = 2131230811;
+			public const int homeAsUp = 2131230811;
 			
 			// aapt resource value: 0x7F08005C
-			public const int homeAsUp = 2131230812;
+			public const int icon = 2131230812;
 			
 			// aapt resource value: 0x7F08005D
-			public const int icon = 2131230813;
+			public const int icon1 = 2131230813;
 			
 			// aapt resource value: 0x7F08005E
-			public const int icon1 = 2131230814;
+			public const int icon_group = 2131230814;
 			
 			// aapt resource value: 0x7F08005F
-			public const int icon_group = 2131230815;
+			public const int ifRoom = 2131230815;
 			
 			// aapt resource value: 0x7F080060
-			public const int ifRoom = 2131230816;
+			public const int image = 2131230816;
 			
 			// aapt resource value: 0x7F080061
-			public const int image = 2131230817;
+			public const int info = 2131230817;
 			
 			// aapt resource value: 0x7F080062
-			public const int info = 2131230818;
+			public const int inputLogin = 2131230818;
 			
 			// aapt resource value: 0x7F080063
-			public const int italic = 2131230819;
+			public const int inputPassword = 2131230819;
 			
 			// aapt resource value: 0x7F080064
-			public const int item_touch_helper_previous_elevation = 2131230820;
+			public const int italic = 2131230820;
 			
 			// aapt resource value: 0x7F080065
-			public const int labeled = 2131230821;
+			public const int item_touch_helper_previous_elevation = 2131230821;
 			
 			// aapt resource value: 0x7F080066
-			public const int largeLabel = 2131230822;
+			public const int labeled = 2131230822;
 			
 			// aapt resource value: 0x7F080067
-			public const int left = 2131230823;
+			public const int largeLabel = 2131230823;
 			
 			// aapt resource value: 0x7F080068
-			public const int lightMethod = 2131230824;
+			public const int left = 2131230824;
 			
 			// aapt resource value: 0x7F080069
 			public const int line1 = 2131230825;
@@ -3547,91 +3547,91 @@ namespace APM
 			public const int localFile = 2131230829;
 			
 			// aapt resource value: 0x7F08006E
-			public const int mask = 2131230830;
+			public const int loginLabel = 2131230830;
 			
 			// aapt resource value: 0x7F08006F
-			public const int masked = 2131230831;
+			public const int mask = 2131230831;
 			
 			// aapt resource value: 0x7F080070
-			public const int message = 2131230832;
+			public const int masked = 2131230832;
+			
+			// aapt resource value: 0x7F080071
+			public const int message = 2131230833;
 			
 			// aapt resource value: 0x7F080004
 			public const int META = 2131230724;
 			
-			// aapt resource value: 0x7F080071
-			public const int middle = 2131230833;
-			
 			// aapt resource value: 0x7F080072
-			public const int mini = 2131230834;
+			public const int middle = 2131230834;
 			
 			// aapt resource value: 0x7F080073
-			public const int mtrl_child_content_container = 2131230835;
+			public const int mini = 2131230835;
 			
 			// aapt resource value: 0x7F080074
-			public const int mtrl_internal_children_alpha_tag = 2131230836;
+			public const int mtrl_child_content_container = 2131230836;
 			
 			// aapt resource value: 0x7F080075
-			public const int multiply = 2131230837;
+			public const int mtrl_internal_children_alpha_tag = 2131230837;
 			
 			// aapt resource value: 0x7F080076
-			public const int navigation_header_container = 2131230838;
+			public const int multiply = 2131230838;
 			
 			// aapt resource value: 0x7F080077
-			public const int never = 2131230839;
+			public const int navigation_header_container = 2131230839;
 			
 			// aapt resource value: 0x7F080078
-			public const int none = 2131230840;
+			public const int never = 2131230840;
 			
 			// aapt resource value: 0x7F080079
-			public const int normal = 2131230841;
+			public const int none = 2131230841;
 			
 			// aapt resource value: 0x7F08007A
-			public const int notification_background = 2131230842;
+			public const int normal = 2131230842;
 			
 			// aapt resource value: 0x7F08007B
-			public const int notification_main_column = 2131230843;
+			public const int notification_background = 2131230843;
 			
 			// aapt resource value: 0x7F08007C
-			public const int notification_main_column_container = 2131230844;
+			public const int notification_main_column = 2131230844;
 			
 			// aapt resource value: 0x7F08007D
-			public const int outline = 2131230845;
+			public const int notification_main_column_container = 2131230845;
 			
 			// aapt resource value: 0x7F08007E
-			public const int parallax = 2131230846;
+			public const int outline = 2131230846;
 			
 			// aapt resource value: 0x7F08007F
-			public const int parentPanel = 2131230847;
+			public const int parallax = 2131230847;
 			
 			// aapt resource value: 0x7F080080
-			public const int parent_matrix = 2131230848;
+			public const int parentPanel = 2131230848;
 			
 			// aapt resource value: 0x7F080081
-			public const int pin = 2131230849;
+			public const int parent_matrix = 2131230849;
 			
 			// aapt resource value: 0x7F080082
-			public const int progress = 2131230850;
+			public const int passwordLabel = 2131230850;
 			
 			// aapt resource value: 0x7F080083
-			public const int progress_circular = 2131230851;
+			public const int pin = 2131230851;
 			
 			// aapt resource value: 0x7F080084
-			public const int progress_horizontal = 2131230852;
+			public const int progress = 2131230852;
 			
 			// aapt resource value: 0x7F080085
-			public const int radio = 2131230853;
+			public const int progress_circular = 2131230853;
 			
 			// aapt resource value: 0x7F080086
-			public const int radioGroupAccuracyMethod = 2131230854;
+			public const int progress_horizontal = 2131230854;
 			
 			// aapt resource value: 0x7F080087
-			public const int radioGroupAccuracyMethodLabel = 2131230855;
+			public const int radio = 2131230855;
 			
 			// aapt resource value: 0x7F080088
-			public const int radioGroupScanMethod = 2131230856;
+			public const int radioGroupAccuracyMethod = 2131230856;
 			
 			// aapt resource value: 0x7F080089
-			public const int radioGroupScanMethodLabel = 2131230857;
+			public const int radioGroupAccuracyMethodLabel = 2131230857;
 			
 			// aapt resource value: 0x7F08008A
 			public const int radioGroupStoreMethod = 2131230858;

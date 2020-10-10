@@ -69,5 +69,5 @@
         android:background="@color/colorViolet"
         android:text="LOG IN AND UPLOAD"
         android:textColor="@color/colorGrey"
-        android:textSize="24sp" />
+        android:textSize="24sp"/>
 </RelativeLayout>

@@ -13,5 +13,5 @@
   <string name="radioMedium">Medium</string>
   <string name="buttonScan">SCAN</string>
   <string name="buttonStop">STOP</string>
-  <string name="buttonUpload">UPLOAD</string>
+  <string name="buttonUpload">STORE DATA</string>
 </resources>
