@@ -40,68 +40,62 @@ namespace ms_accesspointmap_api.Controllers
         [HttpDelete("user/{id}")]
         public async Task<ActionResult> DeleteUsers(int id)
         {
-            await userRepository.Delete(id);
-            int rowsAffected = await userRepository.SaveChanges();
-
-            if(rowsAffected < 1)
+            if(await userRepository.Delete(id))
             {
-                return BadRequest();
+                return Ok();
             }
-            return Ok();
+            return NotFound();
         }
 
         [HttpPost("user/activation")]
         public async Task<ActionResult> ActivateUsers(Activation activation)
         {
-            await userRepository.Activate(activation.Id, activation.Activate);
-            int rowsAffected = await userRepository.SaveChanges();
-
-            if(rowsAffected < 1)
+            if(await userRepository.Activate(activation.Id, activation.Activate))
             {
-                return BadRequest();
+                return Ok();
             }
-            return Ok();
+            return NotFound();
         }
 
         [HttpPut("user")]
         public async Task<ActionResult> PutUsers(Users user)
         {
-            await userRepository.Update(user);
-            int rowsAffected = await userRepository.SaveChanges();
-
-            if(rowsAffected < 1)
+            if(await userRepository.Update(user))
             {
-                return BadRequest();
+                return Ok();
             }
-            return Ok();
+            return NotFound();
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> LoginUsers(LoginForm loginForm)
         {
-            var token = await userRepository.Login(loginForm.Email, loginForm.Password);
+            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            var loginStatus = await userRepository.Login(loginForm.Email, loginForm.Password, ipAddress);
 
-            if(token == null)
+            if(!loginStatus.Contains("ERROR:"))
             {
-                return Unauthorized();
+                return Ok(new { bearerToken = loginStatus });
             }
-            return Ok(new { token });
+            else
+            {
+                switch(loginStatus)
+                {
+                    case "ERROR:EMAIL": return NotFound(); break;
+                    case "ERROR:PASSWORD": return Forbid(); break;
+                    case "ERROR:ACTIVE": return Forbid(); break;
+                    default: return BadRequest(); break;
+                }
+            }
         }
 
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUsers(Users user)
         {
-            bool created = await userRepository.Register(user);
-            if(created)
+            if(await userRepository.Register(user))
             {
-                int rowsAffected = await userRepository.SaveChanges();
-                if(rowsAffected < 1)
-                {
-                    return BadRequest();
-                }
                 return Ok();
             }
-
             return BadRequest();
         }
     }

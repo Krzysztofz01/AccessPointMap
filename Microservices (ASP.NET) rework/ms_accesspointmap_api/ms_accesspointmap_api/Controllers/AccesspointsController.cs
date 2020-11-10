@@ -32,8 +32,7 @@ namespace ms_accesspointmap_api.Controllers
             {
                 return NotFound();
             }
-
-            return accesspoint;
+            return Ok(accesspoint);
         }
 
         [HttpGet("search")]
@@ -44,48 +43,50 @@ namespace ms_accesspointmap_api.Controllers
             {
                 return NotFound();
             }
-
             return Ok(accesspoints);
         }
 
         [HttpPost]
         public async Task<ActionResult> PostAccesspoints(List<Accesspoints> accesspoints)
         {
-            await accessPointsRepository.AddOrUpdate(accesspoints);
-            int rowsAffected = await accessPointsRepository.SaveChanges();
-
-            return Ok(new { rowsPosted = accesspoints.Count, rowsAffected });
+            int rowsAffected = await accessPointsRepository.AddOrUpdate(accesspoints);
+            return Ok(new { rowsPosted = accesspoints.Count, rowsAffected});
         }
 
         [HttpPost("visibility")]
         public async Task<ActionResult> VisibilityAccesspoints(Visibility visibility)
         {
-            await accessPointsRepository.ChangeVisibility(visibility.Id, visibility.Visible);
-            int rowsAffected = await accessPointsRepository.SaveChanges();
-
-            return Ok();
+            if(await accessPointsRepository.ChangeVisibility(visibility.Id, visibility.Visible))
+            {
+                return Ok();
+            }
+            return NotFound();
         }
 
         [HttpPost("merge")]
-        public async Task<ActionResult> MergeAccesspoints(List<GuestAccesspoints> accesspoints)
+        public async Task<ActionResult> MergeAccesspoints(List<int> accesspointsId)
         {
-            await accessPointsRepository.Merge(accesspoints);
-            int rowsAffected = await accessPointsRepository.SaveChanges();
+            if(await accessPointsRepository.Merge(accesspointsId))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
 
-            return Ok(new { rowsPosted = accesspoints.Count, rowsAffected });
+        [HttpGet("brands")]
+        public async Task<ActionResult<IEnumerable<string>>> GetBrands()
+        {
+            return Ok(await accessPointsRepository.GetBrandList());
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<Accesspoints>> DeleteAccesspoints(int id)
         {
-            await accessPointsRepository.Delete(id);
-            int rowsAffected = await accessPointsRepository.SaveChanges();
-
-            if(rowsAffected < 1)
+            if(await accessPointsRepository.Delete(id))
             {
-                return BadRequest();
+                return Ok();
             }
-            return Ok();
+            return NotFound();
         }
     }
 

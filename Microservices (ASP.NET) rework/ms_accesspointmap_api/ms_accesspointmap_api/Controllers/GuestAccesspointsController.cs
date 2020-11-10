@@ -32,30 +32,25 @@ namespace ms_accesspointmap_api.Controllers
             {
                 return NotFound();
             }
-
             return Ok(accesspoint);
         }
 
         [HttpPost]
         public async Task<ActionResult> PostGuestAccesspoints(List<GuestAccesspoints> accesspoints)
         {
-            await guestAccesspointsRepository.AddOrUpdate(accesspoints);
-            int rowsAffected = await guestAccesspointsRepository.SaveChanges();
-
-            return Ok(new { rowsPosted = accesspoints.Count, rowsAffected });
+            //Post limit here
+            int rowsAffected = await guestAccesspointsRepository.Add(accesspoints);
+            return Ok(new { rowsAffected });
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<GuestAccesspoints>> DeleteGuestAccesspoints(int id)
         {
-            await guestAccesspointsRepository.Delete(id);
-            int rowsAffected = await guestAccesspointsRepository.SaveChanges();
-            
-            if (rowsAffected < 1)
+            if(await guestAccesspointsRepository.Delete(id))
             {
-                return BadRequest();
+                return Ok();
             }
-            return Ok();
+            return NotFound();
         }
     }
 }

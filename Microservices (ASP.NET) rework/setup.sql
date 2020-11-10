@@ -16,6 +16,7 @@ CREATE TABLE Accesspoints (
     [SignalRadius] FLOAT NOT NULL,
     [SignalArea] FLOAT NOT NULL,
     [SecurityData] VARCHAR(65) NOT NULL,
+    [SecurityDataRaw] VARCHAR(65) NOT NULL,
     [Brand] VARCHAR(60) DEFAULT 'No brand info',
     [DeviceType] VARCHAR(50) NOT NULL,
     [Display] BIT DEFAULT 1,
@@ -39,7 +40,7 @@ CREATE TABLE GuestAccesspoints (
     [LowLatitude] FLOAT NOT NULL,
     [SignalRadius] FLOAT NOT NULL,
     [SignalArea] FLOAT NOT NULL,
-    [SecurityData] VARCHAR(65) NOT NULL,
+    [SecurityDataRaw] VARCHAR(65) NOT NULL,
     [DeviceType] VARCHAR(50) NOT NULL,
     [PostedBy] VARCHAR(60) NOT NULL,
     [CreateDate] DATETIME2(6) DEFAULT GETDATE()

@@ -1,5 +1,5 @@
-﻿using ms_accesspointmap_api.Models;
-using System;
+﻿using Microsoft.EntityFrameworkCore;
+using ms_accesspointmap_api.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,9 +10,8 @@ namespace ms_accesspointmap_api.Repositories
     {
         Task<IEnumerable<GuestAccesspoints>> GetAll();
         Task<GuestAccesspoints> GetById(int id);
-        Task AddOrUpdate(List<GuestAccesspoints> accesspoints);
-        Task Delete(int id);
-        Task<int> SaveChanges();
+        Task<int> Add(List<GuestAccesspoints> accesspoints);
+        Task<bool> Delete(int id);
     }
 
     public class GuestAccesspointsRepository : IGuestAccesspointsRepository
@@ -25,34 +24,39 @@ namespace ms_accesspointmap_api.Repositories
             this.context = context;
         }
 
-        public Task AddOrUpdate(GuestAccesspoints accesspoints)
+        public async Task<int> Add(List<GuestAccesspoints> accesspoints)
         {
-            throw new NotImplementedException();
+            foreach(var accesspoint in accesspoints)
+            {
+                context.GuestAccesspoints.Add(accesspoint);
+            }
+
+            return await context.SaveChangesAsync();
         }
 
-        public Task AddOrUpdate(List<GuestAccesspoints> accesspoints)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            var accesspoint = context.GuestAccesspoints.Where(accesspoint => accesspoint.Id == id).First();
+            if(accesspoint != null)
+            {
+                context.Entry(accesspoint).State = EntityState.Deleted;
+                if(await context.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
 
-        public Task Delete(int id)
+        public async Task<IEnumerable<GuestAccesspoints>> GetAll()
         {
-            throw new NotImplementedException();
+            return await context.GuestAccesspoints.ToListAsync();
         }
 
-        public Task<IEnumerable<GuestAccesspoints>> GetAll()
+        public async Task<GuestAccesspoints> GetById(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<GuestAccesspoints> GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> SaveChanges()
-        {
-            throw new NotImplementedException();
+            return await context.GuestAccesspoints.Where(element => element.Id == id).FirstAsync();
         }
     }
 }

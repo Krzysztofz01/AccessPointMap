@@ -29,7 +29,7 @@ namespace ms_accesspointmap_api.Models
             modelBuilder.Entity<Accesspoints>(entity =>
             {
                 entity.HasIndex(e => e.Bssid)
-                    .HasName("UQ__Accesspo__2AD8EB7FAE4AC3B0")
+                    .HasName("UQ__Accesspo__2AD8EB7F26EB63FB")
                     .IsUnique();
 
                 entity.Property(e => e.Brand)
@@ -63,6 +63,11 @@ namespace ms_accesspointmap_api.Models
                     .HasMaxLength(65)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SecurityDataRaw)
+                    .IsRequired()
+                    .HasMaxLength(65)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Ssid)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -76,7 +81,7 @@ namespace ms_accesspointmap_api.Models
             modelBuilder.Entity<GuestAccesspoints>(entity =>
             {
                 entity.HasIndex(e => e.Bssid)
-                    .HasName("UQ__GuestAcc__2AD8EB7FD3DE0F36")
+                    .HasName("UQ__GuestAcc__2AD8EB7FBD283DE0")
                     .IsUnique();
 
                 entity.Property(e => e.Bssid)
@@ -98,7 +103,7 @@ namespace ms_accesspointmap_api.Models
                     .HasMaxLength(60)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SecurityData)
+                entity.Property(e => e.SecurityDataRaw)
                     .IsRequired()
                     .HasMaxLength(65)
                     .IsUnicode(false);
@@ -134,7 +139,7 @@ namespace ms_accesspointmap_api.Models
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Login)
-                    .HasName("UQ__Users__5E55825BB137904A")
+                    .HasName("UQ__Users__5E55825B9CBED1FA")
                     .IsUnique();
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((0))");

@@ -1,4 +1,6 @@
-﻿using ms_accesspointmap_api.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ms_accesspointmap_api.Models;
+using ms_accesspointmap_api.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,69 +10,140 @@ namespace ms_accesspointmap_api.Repositories
 {
     public interface IUserRepository
     {
-        Task<string> Login(string email, string password);
+        Task<string> Login(string email, string password, string ipAddress);
         Task<bool> Register(Users user);
-        Task Update(Users user);
-        Task Activate(int id, bool activate);
+        Task<bool> Update(Users user);
+        Task<bool> Activate(int id, bool activate);
         Task<IEnumerable<Users>> GetAll();
         Task<Users> GetById(int id);
-        Task Delete(int id);
-        Task<int> SaveChanges();
+        Task<bool> Delete(int id);
     }
 
     public class UsersRepository : IUserRepository
     {
         private AccessPointMapContext context;
+        private readonly IAuthenticationService authenticationService;
 
         public UsersRepository(
-            AccessPointMapContext context)
+            AccessPointMapContext context,
+            IAuthenticationService authenticationService)
         {
             this.context = context;
+            this.authenticationService = authenticationService;
         }
 
-        public Task Activate(int id, bool activate)
+        public async Task<bool> Activate(int id, bool activate)
         {
-            throw new NotImplementedException();
+            var user = context.Users.Where(element => element.Id == id).First();
+            if(user != null)
+            {
+                user.Active = true;
+                context.Entry(user).State = EntityState.Modified;       
+                if(await context.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
 
-        public Task Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            var user = context.Users.Where(element => element.Id == id).First();
+            if (user != null)
+            {
+                context.Entry(user).State = EntityState.Deleted;
+                if (await context.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
 
-        public Task<IEnumerable<Users>> GetAll()
+        public async Task<IEnumerable<Users>> GetAll()
         {
-            throw new NotImplementedException();
+            return await context.Users.ToListAsync();
         }
 
-        public Task<Users> GetById(int id)
+        public async Task<Users> GetById(int id)
         {
-            throw new NotImplementedException();
+            return await context.Users.Where(element => element.Id == id).FirstAsync();
         }
 
-        public Task<string> Login(string email, string password)
+        public async Task<string> Login(string email, string password, string ipAddress)
         {
-            throw new NotImplementedException();
+            var user = context.Users.Where(element => element.Email == email).First();
+            if(user != null)
+            {
+                if(BCrypt.Net.BCrypt.Verify(password, user.Password))
+                {
+                    if(user.Active == true)
+                    {
+                        user.LastLoginDate = DateTime.Now;
+                        user.LastLoginIp = (ipAddress != null) ? ipAddress : "";
+                        context.Entry(user).State = EntityState.Modified;
+
+                        await context.SaveChangesAsync();
+                        return authenticationService.GenerateToken(user);
+                    }
+                    return "ERROR:ACTIVE";
+                }
+                return "ERROR:PASSWORD";
+            }
+            return "ERROR:EMAIL";
         }
 
-        public Task Register(Users user)
+        public async Task<bool> Update(Users user)
         {
-            throw new NotImplementedException();
+            var existingUser = context.Users.First(element => element.Id == user.Id);
+            if(existingUser != null)
+            {
+                if (user.WritePermission != existingUser.WritePermission) existingUser.WritePermission = user.WritePermission;
+                if (user.ReadPermission != existingUser.ReadPermission) existingUser.ReadPermission = user.ReadPermission;
+                if (user.AdminPermission != existingUser.AdminPermission) existingUser.AdminPermission = user.AdminPermission;
+                if (!string.IsNullOrEmpty(user.Email))
+                {
+                    var usersWithGivenEmail = context.Users.First(element => element.Email == user.Email);
+                    if(usersWithGivenEmail == null)
+                    {
+                        existingUser.Email = user.Email;
+                    }
+                }
+
+                context.Entry(existingUser).State = EntityState.Modified;
+                if(await context.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
 
-        public Task<int> SaveChanges()
+        public async Task<bool> Register(Users user)
         {
-            throw new NotImplementedException();
-        }
+            if(context.Users.First(element => element.Email == user.Email || element.Login == user.Login) == null)
+            {
+                user.TokenExpiration = 5;
+                user.WritePermission = false;
+                user.ReadPermission = false;
+                user.AdminPermission = false;
+                user.Active = false;
 
-        public Task Update(Users user)
-        {
-            throw new NotImplementedException();
-        }
+                var salt = BCrypt.Net.BCrypt.GenerateSalt(3);
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
 
-        Task<bool> IUserRepository.Register(Users user)
-        {
-            throw new NotImplementedException();
+                context.Users.Add(user);
+                if(await context.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace ms_accesspointmap_api.Models
         public double SignalRadius { get; set; }
         public double SignalArea { get; set; }
         public string SecurityData { get; set; }
+        public string SecurityDataRaw { get; set; }
         public string Brand { get; set; }
         public string DeviceType { get; set; }
         public bool? Display { get; set; }

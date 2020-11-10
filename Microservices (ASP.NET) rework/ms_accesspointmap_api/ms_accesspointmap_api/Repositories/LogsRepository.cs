@@ -9,12 +9,14 @@ namespace ms_accesspointmap_api.Repositories
     public interface ILogsRepository
     {
         Task<IEnumerable<Logs>> GetAll();
-        Task<IEnumerable<Logs>> Search(int id, string status, string endpoint, DateTime dateTime);
-        Task Add(Logs log);
-        Task<int> SaveChanges();
+        Task<IEnumerable<Logs>> GetAllFromLastDays(int days);
+        Task LogMasterAccessPointAdd();
+        Task LogGuestAccessPointAdd();
+        Task LogUserRegistration();
+        Task LogUserActivation();
     }
 
-    public class LogsRepository : ILogsRepository
+    public class LogsRepository
     {
         private AccessPointMapContext context;
 
@@ -22,26 +24,6 @@ namespace ms_accesspointmap_api.Repositories
             AccessPointMapContext context)
         {
             this.context = context;
-        }
-
-        public Task Add(Logs log)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Logs>> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> SaveChanges()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Logs>> Search(int id, string status, string endpoint, DateTime dateTime)
-        {
-            throw new NotImplementedException();
         }
     }
 }
