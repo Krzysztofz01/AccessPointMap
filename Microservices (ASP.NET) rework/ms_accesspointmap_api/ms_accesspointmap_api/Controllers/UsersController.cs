@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ms_accesspointmap_api.Models;
 using ms_accesspointmap_api.Repositories;
@@ -19,12 +20,14 @@ namespace ms_accesspointmap_api.Controllers
             this.userRepository = userRepository;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("user")]
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
             return Ok(await userRepository.GetAll());
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("user/{id}")]
         public async Task<ActionResult<Users>> GetUsers(int id)
         {
@@ -37,6 +40,7 @@ namespace ms_accesspointmap_api.Controllers
             return Ok(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("user/{id}")]
         public async Task<ActionResult> DeleteUsers(int id)
         {
@@ -47,6 +51,7 @@ namespace ms_accesspointmap_api.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("user/activation")]
         public async Task<ActionResult> ActivateUsers(Activation activation)
         {
@@ -57,6 +62,7 @@ namespace ms_accesspointmap_api.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("user")]
         public async Task<ActionResult> PutUsers(Users user)
         {
@@ -81,10 +87,10 @@ namespace ms_accesspointmap_api.Controllers
             {
                 switch(loginStatus)
                 {
-                    case "ERROR:EMAIL": return NotFound(); break;
-                    case "ERROR:PASSWORD": return Forbid(); break;
-                    case "ERROR:ACTIVE": return Forbid(); break;
-                    default: return BadRequest(); break;
+                    case "ERROR:EMAIL": return NotFound();
+                    case "ERROR:PASSWORD": return Forbid();
+                    case "ERROR:ACTIVE": return Forbid();
+                    default: return BadRequest();
                 }
             }
         }

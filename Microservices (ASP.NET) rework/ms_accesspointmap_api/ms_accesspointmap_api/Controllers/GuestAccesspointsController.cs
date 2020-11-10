@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ms_accesspointmap_api.Models;
 using ms_accesspointmap_api.Repositories;
@@ -18,12 +19,14 @@ namespace ms_accesspointmap_api.Controllers
             this.guestAccesspointsRepository = guestAccesspointsRepository;
         }
 
+        [Authorize(Roles = "Read,ReadWrite,Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GuestAccesspoints>>> GetGuestAccesspoints()
         {
             return Ok(await guestAccesspointsRepository.GetAll());
         }
 
+        [Authorize(Roles = "Read,ReadWrite,Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<GuestAccesspoints>> GetGuestAccesspoints(int id)
         {
@@ -35,6 +38,7 @@ namespace ms_accesspointmap_api.Controllers
             return Ok(accesspoint);
         }
 
+        [Authorize(Roles = "Write,ReadWrite,Admin")]
         [HttpPost]
         public async Task<ActionResult> PostGuestAccesspoints(List<GuestAccesspoints> accesspoints)
         {
@@ -43,6 +47,7 @@ namespace ms_accesspointmap_api.Controllers
             return Ok(new { rowsAffected });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<GuestAccesspoints>> DeleteGuestAccesspoints(int id)
         {

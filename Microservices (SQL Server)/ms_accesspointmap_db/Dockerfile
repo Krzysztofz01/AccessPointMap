@@ -3,10 +3,10 @@ FROM mcr.microsoft.com/mssql/server
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=Mypassword123
 
-COPY ./setup.sql .
-COPY ./entrypoint.sh .
+COPY setup.sql setup.sql
+COPY setup_database.sh setup_database.sh
+COPY entrypoint.sh entrypoint.sh
 
 EXPOSE 1433
 
-ENTRYPOINT [ "/bin/bash", "entrypoint.sh" ]
-CMD [ "/opt/mssql/bin/sqlservr" ]
+CMD /bin/bash ./entrypoint.sh

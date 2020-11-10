@@ -24,11 +24,13 @@ namespace ms_accesspointmap_api.Repositories
     {
         private AccessPointMapContext context;
         private readonly IBrandRepository brandRepository;
+        private readonly ILogsRepository logsRepository;
         private readonly IGuestAccesspointsRepository guestAccesspointsRepository;
 
         public AccessPointsRepository(
             AccessPointMapContext context,
             IBrandRepository brandRepository,
+            ILogsRepository logsRepository,
             IGuestAccesspointsRepository guestAccesspointsRepository)
         {
             this.context = context;

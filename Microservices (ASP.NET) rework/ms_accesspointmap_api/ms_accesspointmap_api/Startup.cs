@@ -16,14 +16,13 @@ namespace ms_accesspointmap_api
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             //Database 
@@ -64,7 +63,6 @@ namespace ms_accesspointmap_api
             services.AddScoped<IAccessPointsRepository, AccessPointsRepository>();
             services.AddScoped<IBrandRepository, BrandRepository>();
             services.AddScoped<IGuestAccesspointsRepository, GuestAccesspointsRepository>();
-            //services.AddScoped<ILogsRepository, LogsRepository>();
             services.AddScoped<IUserRepository, UsersRepository>();
 
             //Services
@@ -74,7 +72,6 @@ namespace ms_accesspointmap_api
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
