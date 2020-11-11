@@ -1,0 +1,97 @@
+using AccessPointMapWebApi.DatabaseContext;
+using AccessPointMapWebApi.Repositories;
+using AccessPointMapWebApi.Services;
+using AccessPointMapWebApi.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+namespace AccessPointMapWebApi
+{
+    public class Startup
+    {
+        public IConfiguration Configuration { get; }
+
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //Database 
+            services.AddDbContext<AccessPointMapContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("AccessPointMap")));
+
+            //Repositories
+            services.AddScoped<IAccessPointRepository, AccessPointRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<IGuestAccesspointRepository, GuestAccesspointRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            //Services
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IGeocalculationService, GeocalculationService>();
+
+            //Cross-Origin Resource Sharing
+            services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
+            {
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            }));
+
+            //JWT Authentication
+            var JsonWebTokenSection = Configuration.GetSection("JsonWebTokenSettings");
+            services.Configure<JsonWebTokenSettings>(JsonWebTokenSection);
+
+            var JsonWebTokenConfig = JsonWebTokenSection.Get<JsonWebTokenSettings>();
+            var key = Encoding.ASCII.GetBytes(JsonWebTokenConfig.Secret);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            //Controllers
+            services.AddControllers();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseCors("DefaultPolicy");
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+    }
+}
