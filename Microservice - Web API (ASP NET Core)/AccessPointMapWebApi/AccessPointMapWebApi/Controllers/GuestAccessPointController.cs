@@ -1,5 +1,6 @@
 ﻿using AccessPointMapWebApi.Models;
 using AccessPointMapWebApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<GuestAccesspoint>>> GetAllGuestAccesspoints()
         {
             return Ok(await guestAccesspointRepository.GetAll());
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<GuestAccesspoint>> GetGuestAccesspointById(int id)
         {
             var accesspoint = await guestAccesspointRepository.GetById(id);
@@ -36,6 +39,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Write,Admin")]
         public async Task<ActionResult> AddGuestAccesspoints(List<GuestAccesspoint> accesspoints)
         {
             int rowsAffected = await guestAccesspointRepository.Add(accesspoints);
@@ -43,6 +47,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<GuestAccesspoint>> DeleteGuestAccesspoint(int id)
         {
             if (await guestAccesspointRepository.Delete(id))

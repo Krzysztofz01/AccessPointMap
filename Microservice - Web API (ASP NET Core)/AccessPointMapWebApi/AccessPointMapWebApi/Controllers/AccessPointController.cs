@@ -1,5 +1,6 @@
 ﻿using AccessPointMapWebApi.Models;
 using AccessPointMapWebApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<IEnumerable<Accesspoint>>> GetAllAccesspoints()
         {
             return Ok(await accessPointRepository.GetAll());
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<Accesspoint>> GetAccesspointById(int id)
         {
             var accesspoint = await accessPointRepository.GetById(id);
@@ -36,6 +39,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet("search")]
+        [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<IEnumerable<Accesspoint>>> SearchAccesspoints([FromQuery] string ssid = null, [FromQuery] int freq = 0, [FromQuery] string brand = null, [FromQuery] string security = null)
         {
             var accesspoints = await accessPointRepository.SearchByParams(ssid, freq, brand, security);
@@ -47,6 +51,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateAccesspoints(List<Accesspoint> accesspoints)
         {
             int rowsAffected = await accessPointRepository.AddOrUpdate(accesspoints);
@@ -54,6 +59,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpPost("visibility")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DisplayAccesspoint(AccessPointDisplayDto displayDto)
         {
             if (await accessPointRepository.ChangeVisibility(displayDto.Id, displayDto.Display))
@@ -64,6 +70,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpPost("merge")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> MergeAccesspoints(List<int> accesspointsId)
         {
             if (await accessPointRepository.Merge(accesspointsId))
@@ -74,12 +81,14 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet("brands")]
+        [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<IEnumerable<string>>> GetBrands()
         {
             return Ok(await accessPointRepository.GetBrandList());
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Accesspoint>> DeleteAccesspoint(int id)
         {
             if (await accessPointRepository.Delete(id))

@@ -1,5 +1,6 @@
 ﻿using AccessPointMapWebApi.Models;
 using AccessPointMapWebApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet("user")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return Ok(await userRepository.GetAll());
         }
 
         [HttpGet("user/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> GetUsers(int id)
         {
             var user = await userRepository.GetById(id);
@@ -37,6 +40,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpDelete("user/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteUsers(int id)
         {
             if (await userRepository.Delete(id))
@@ -47,6 +51,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpPost("user/activation")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> ActivateUsers(UserActivationDto activation)
         {
             if (await userRepository.Activate(activation.Id, activation.Active))
@@ -57,6 +62,7 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpPut("user")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> PutUsers(User user)
         {
             if (await userRepository.Update(user))

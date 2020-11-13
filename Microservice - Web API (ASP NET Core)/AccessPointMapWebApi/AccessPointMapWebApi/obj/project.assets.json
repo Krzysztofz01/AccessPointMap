@@ -5864,11 +5864,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projekty\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi.csproj",
+      "projectUniqueName": "D:\\Projekty\\AccessPointMap\\Microservice - Web API (ASP NET Core)\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi.csproj",
       "projectName": "AccessPointMapWebApi",
-      "projectPath": "D:\\Projekty\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi.csproj",
+      "projectPath": "D:\\Projekty\\AccessPointMap\\Microservice - Web API (ASP NET Core)\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi.csproj",
       "packagesPath": "C:\\Users\\User1\\.nuget\\packages\\",
-      "outputPath": "D:\\Projekty\\AccessPointMapWebApi\\AccessPointMapWebApi\\AccessPointMapWebApi\\obj\\",
+      "outputPath": "D:\\Projekty\\AccessPointMap\\Microservice - Web API (ASP NET Core)\\AccessPointMapWebApi\\AccessPointMapWebApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\",
