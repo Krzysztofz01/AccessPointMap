@@ -1,6 +1,0 @@
-D:\xampp\htdocs\accesspointmap\APM\APM\obj\Debug\90\android\assets\Mono.Android.pdb
-D:\xampp\htdocs\newapm\AccessPointMap\APM\APM\obj\Debug\90\android\assets\Mono.Android.dll
-D:\xampp\htdocs\newapm\AccessPointMap\APM\APM\obj\Debug\90\android\bin\classes.dex
-D:\Projekty\AccessPointMap\APM\APM\obj\Debug\90\android\assets\Mono.Android.dll
-D:\Projekty\AccessPointMap\APM\APM\obj\Debug\90\android\src\mono\android\support\v7\app\ActionBar_OnMenuVisibilityListenerImplementor.java
-D:\Projekty\AccessPointMap\APM\APM\obj\Debug\90\android\typemaps.arm64-v8a.o
