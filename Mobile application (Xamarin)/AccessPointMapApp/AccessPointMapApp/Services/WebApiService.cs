@@ -17,9 +17,9 @@ namespace AccessPointMapApp.Services
 
         private static HttpClient Client;
         private SerializationService serializationService;
-        private readonly string AuthEndpointUrl = "projects/accesspointmap/api/auth";
-        private readonly string MasterPostEndpointUrl = "projects/accesspointmap/api/master";
-        private readonly string QueuePostEndpointUrl = "projects/accesspointmap/api/queue";
+        private readonly string AuthEndpointUrl = "/projects/accesspointmap/api/auth/login";
+        private readonly string MasterPostEndpointUrl = "/projects/accesspointmap/api/accesspoints/master";
+        private readonly string QueuePostEndpointUrl = "/projects/accesspointmap/api/accesspoints/queue";
 
         public WebApiService()
         {
@@ -32,23 +32,24 @@ namespace AccessPointMapApp.Services
             serializationService = new SerializationService();
         }
 
-        public async Task<string> AuthRequest(string login, string password)
+        public async Task<bool> AuthRequest(string login, string password)
         {
-            var stringContent = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("Login", login),
-                new KeyValuePair<string, string>("Password", password)
-            });
+            var credentialsJson = serializationService.SerializeAuthCredentials(login, password);
+            var data = new StringContent(credentialsJson, Encoding.UTF8, "application/json");
 
-            var authResponse = await Client.PostAsync(AuthEndpointUrl, stringContent);
+            var authResponse = await Client.PostAsync(AuthEndpointUrl, data);
+            System.Diagnostics.Debug.WriteLine(authResponse.StatusCode);
             if(authResponse.IsSuccessStatusCode)
             {
-                return serializationService.DeserializeBearerToken(await authResponse.Content.ReadAsStringAsync());
+                string token = serializationService.DeserializeBearerToken(await authResponse.Content.ReadAsStringAsync());
+                //Client.DefaultRequestHeaders.Add("Authorization ", $"Bearer {token}");
+                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                return true;
             }
-            return null;
+            return false;
         }
 
-        public async Task<bool> PostQueueAccessPoints(List<Accesspoint> accesspointsContainer, string bearerToken)
+        public async Task<bool> PostQueueAccessPoints(List<Accesspoint> accesspointsContainer)
         {
             var accesspointsJson = serializationService.SerializeAccessPointContainer(accesspointsContainer);
             var data = new StringContent(accesspointsJson, Encoding.UTF8, "application/json");
@@ -59,7 +60,6 @@ namespace AccessPointMapApp.Services
                 Content = data,
                 RequestUri = new Uri(QueuePostEndpointUrl)
             };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer " + bearerToken);
 
             var response = await Client.SendAsync(request);
             if(response.IsSuccessStatusCode)
@@ -69,7 +69,7 @@ namespace AccessPointMapApp.Services
             return false;
         }
 
-        public async Task<bool> PostMasterAccessPoints(List<Accesspoint> accesspointsContainer, string bearerToken)
+        public async Task<bool> PostMasterAccessPoints(List<Accesspoint> accesspointsContainer)
         {
             var accesspointsJson = serializationService.SerializeAccessPointContainer(accesspointsContainer);
             var data = new StringContent(accesspointsJson, Encoding.UTF8, "application/json");
@@ -80,7 +80,6 @@ namespace AccessPointMapApp.Services
                 Content = data,
                 RequestUri = new Uri(MasterPostEndpointUrl)
             };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer " + bearerToken);
 
             var response = await Client.SendAsync(request);
             if (response.IsSuccessStatusCode)

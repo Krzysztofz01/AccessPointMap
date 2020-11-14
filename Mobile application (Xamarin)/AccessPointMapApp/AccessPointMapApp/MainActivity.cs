@@ -33,7 +33,8 @@ namespace AccessPointMapApp
 			Android.Manifest.Permission.ChangeNetworkState,
 			Android.Manifest.Permission.WriteExternalStorage,
 			Android.Manifest.Permission.ReadExternalStorage,
-			Android.Manifest.Permission.WakeLock
+			Android.Manifest.Permission.WakeLock,
+			Android.Manifest.Permission.ReadPhoneState
 		};
 
 		protected override void OnCreate(Bundle savedInstanceState)
@@ -57,7 +58,7 @@ namespace AccessPointMapApp
 			ButtonScan = FindViewById<Button>(Resource.Id.scanButton);
 			ButtonScan.Text = "Start scan";
 			ButtonUpload = FindViewById<Button>(Resource.Id.uploadButton);
-			ButtonUpload.Text = "Stop scan";
+			ButtonUpload.Text = "Save data";
 			ButtonUpload.Enabled = false;
 
 			ButtonScan.Click += ButtonScanClickEvent;

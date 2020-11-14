@@ -40,15 +40,20 @@ namespace AccessPointMapApp
 
         private async void AuthButtonClickEvent(object sender, System.EventArgs e)
         {
+            Toast.MakeText(this, "Data preparation!", ToastLength.Short).Show();
+            foreach (var element in AccesspointContainer)
+            {
+                element.PostedBy = LoginFormInput.Text;
+            }
+
             Toast.MakeText(this, "Sending data to server!", ToastLength.Short).Show();
             var webApiService = new WebApiService();
 
-            var bearerToken = await webApiService.AuthRequest(LoginFormInput.Text, PasswordFormInput.Text);
-            if (!string.IsNullOrEmpty(bearerToken))
+            if (await webApiService.AuthRequest(LoginFormInput.Text, PasswordFormInput.Text))
             {
                 if(ForceMasterCheckBox.Checked)
                 {
-                    if(await webApiService.PostMasterAccessPoints(AccesspointContainer, bearerToken))
+                    if(await webApiService.PostMasterAccessPoints(AccesspointContainer))
                     {
                         Toast.MakeText(this, "Data sent successfully!", ToastLength.Short).Show();  
                     }
@@ -59,7 +64,7 @@ namespace AccessPointMapApp
                 }
                 else
                 {
-                    if (await webApiService.PostQueueAccessPoints(AccesspointContainer, bearerToken))
+                    if (await webApiService.PostQueueAccessPoints(AccesspointContainer))
                     {
                         Toast.MakeText(this, "Data sent successfully!", ToastLength.Short).Show();
                     }

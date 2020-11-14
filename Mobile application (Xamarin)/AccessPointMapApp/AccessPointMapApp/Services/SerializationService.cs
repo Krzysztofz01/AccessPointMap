@@ -20,5 +20,10 @@ namespace AccessPointMapApp.Services
         {
             return JsonConvert.DeserializeObject<LoginResponse>(response).bearerToken;
         }
+
+        public string SerializeAuthCredentials(string login, string password)
+        {
+            return JsonConvert.SerializeObject(new { Email = login, Password = password });
+        }
     }
 }
