@@ -13,25 +13,25 @@ export class AccesspointDataService {
   
   constructor(private httpClient: HttpClient) { }
 
-  private getAllAccessPoints(token: string) : Observable<Array<Accesspoint>> {
+  public getAllAccessPoints(token: string) : Observable<Array<Accesspoint>> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master'), { headers: headers });
+    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master'), { headers });
   }
 
-  private getAccessPointById(id: number, token: string) : Observable<Accesspoint> {
+  public getAccessPointById(id: number, token: string) : Observable<Accesspoint> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.get<Accesspoint>(this.url(`accesspoints/master/${id}`), { headers: headers });
+    return this.httpClient.get<Accesspoint>(this.url(`accesspoints/master/${id}`), { headers });
   }
 
-  private searchAccessPoints(token:string, ssid: string = null, freq: number = null, brand: string = null, security: string = null) : Observable<Array<Accesspoint>> {
+  public searchAccessPoints(token:string, ssid: string = null, freq: number = null, brand: string = null, security: string = null) : Observable<Array<Accesspoint>> {
     const params = new HttpParams()
       .set("ssid", ssid)
       .set("freq", freq.toString())
@@ -43,43 +43,43 @@ export class AccesspointDataService {
         'Authorization': `Bearer ${token}`
       });
 
-    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master/search'), {params: params, headers: headers});
+    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master/search'), { params, headers });
   }
 
-  private displayAccesspoint(id: number, display: boolean, token: string) : Observable<any> {
+  public displayAccesspoint(id: number, display: boolean, token: string) : Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.post('accesspoints/master/visibility', { id: id, display: display }, {headers: headers});
+    return this.httpClient.post('accesspoints/master/visibility', { id, display }, { headers });
   }
 
-  private mergeAccesspoints(ids: Array<number>, token: string) : Observable<any> {
+  public mergeAccesspoints(ids: Array<number>, token: string) : Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.post(this.url('accesspoints/master/merge'), { ids }, { headers: headers });
+    return this.httpClient.post(this.url('accesspoints/master/merge'), { ids }, { headers });
   }
 
-  private getBrands(token: string) : Observable<Array<string>> {
+  public getBrands(token: string) : Observable<Array<string>> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.get<Array<string>>(this.url('accesspoints/master/brands'), { headers: headers });
+    return this.httpClient.get<Array<string>>(this.url('accesspoints/master/brands'), { headers });
   }
 
-  private deleteAccesspoint(id: number, token: string) : Observable<any> {
+  public deleteAccesspoint(id: number, token: string) : Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.delete(this.url(`accesspoints/master/${id}`), { headers: headers});
+    return this.httpClient.delete(this.url(`accesspoints/master/${id}`), { headers });
   }
 
   private url(endpoint: string): string {

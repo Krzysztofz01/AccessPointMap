@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { LocalStorageOptions } from './../models/local-storage-options.model';
 
 @Injectable({
