@@ -59,6 +59,6 @@ export class UserDataService {
   }
 
   private url(endpoint: string): string {
-    return this.baseUrl + this.apiUrl + endpoint;
+    return 'http://' + this.baseUrl + this.apiUrl + endpoint;
   }
 }

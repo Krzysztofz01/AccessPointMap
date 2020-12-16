@@ -5,11 +5,17 @@ import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import Style from 'ol/style/Style';
+import Text from 'ol/style/Text';
 import Icon from 'ol/style/Icon';
-import OSM from 'ol/source/OSM';
+import { OSM, Vector as VectorSource } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
 import * as olProj from 'ol/proj';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
+import { Accesspoint } from 'src/app/models/accesspoint.model';
+import { CacheManagerService } from 'src/app/services/cache-manager.service';
+import { LocalStorageOptions } from 'src/app/models/local-storage-options.model';
+
+const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
 
 @Component({
   selector: 'global-map',
@@ -19,53 +25,100 @@ import { AccesspointDataService } from 'src/app/services/accesspoint-data.servic
 export class GlobalMapComponent implements OnInit {
   private map: Map;
 
-  constructor(private accesspointDataService: AccesspointDataService) { }
+  constructor(private accesspointDataService: AccesspointDataService, private cacheService: CacheManagerService) { }
 
   ngOnInit(): void {
-    this.map = new Map({
-      target: 'global-map',
-      layers: [
-        new TileLayer({
-          source: new OSM()
+    this.initializeMap();
+  }
+
+  private initializeMap(): void {
+    const cachedData = this.cacheService.load(CACHE_KEY);
+    console.log(cachedData);
+    if(cachedData == null) {
+      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODEyNTE1NywiZXhwIjoxNjA4MTI4NzU3LCJpYXQiOjE2MDgxMjUxNTd9.y2FfMftoiymjg2TNDRPT4e6QrysmHPlUU1hP6ZQhaq4").toPromise()
+      .then(data => {
+        const featuresContainer: Array<Feature> = new Array<Feature>();
+        data.forEach(x => {
+          featuresContainer.push(this.prepareSingleMarker(x));
+        });
+        
+        const sourceVector = new VectorSource({
+          features: featuresContainer
+        });
+
+        const layerVector = new VectorLayer({
+          source: sourceVector
         })
-      ],
-      view: new View({
-        center: olProj.fromLonLat([0.0, 0.0]),
-        zoom: 5
+
+        console.log(featuresContainer);
+        const options: LocalStorageOptions = { key: CACHE_KEY, data: data , expirationMinutes: 60 };
+        this.cacheService.delete(CACHE_KEY);
+        this.cacheService.save(options);
+
+        this.map = new Map({
+          target: 'global-map',
+          layers: [
+            new TileLayer({
+              source: new OSM()
+            }),
+            layerVector
+          ],
+          view: new View({
+            center: olProj.fromLonLat([18.31, 50.16]),
+            zoom: 16
+          })
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    } else {
+      const features: Array<Feature> = new Array<Feature>();
+      cachedData.forEach(element => features.push(this.prepareSingleMarker(element)));
+
+      this.map = new Map({
+        target: 'global-map',
+        layers: [
+          new TileLayer({
+            source: new OSM()
+          }),
+          new VectorLayer({
+            source: new VectorSource({
+              features: features
+            })
+          })
+        ],
+        view: new View({
+          center: olProj.fromLonLat([18.31, 50.16]),
+          zoom: 16
+        })
+      });
+    }
+  }
+
+  private prepareSingleMarker(accesspoint: Accesspoint) : Feature {
+    const feat : Feature = new Feature({
+      geometry: new Point(olProj.fromLonLat([accesspoint.highLongitude, accesspoint.highLatitude]))
+    });
+    const style = new Style({
+      image: new Icon({
+        anchor: [0.5, 1],
+        src: this.getPinColor(accesspoint)
       })
     });
 
-    this.getMarkerLayer();
+    feat.setStyle(style);
+    return feat;
   }
 
-  private getMarkerLayer() : VectorLayer {
-    const features = new Array<Feature>();
-    this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwNzk0MjYyMiwiZXhwIjoxNjA3OTQ2MjIyLCJpYXQiOjE2MDc5NDI2MjJ9.mxISQlAU0r6Nc-AqXH97AaiL9bqgLxDm0WkF4oaCIW4").toPromise().then(data => {
-      console.log(data);
-      data.forEach(x => {
-        let markerPoint = new Feature({
-          geometry: new Point(olProj.transform([x.HighLongitude, x.HighLatitude], 'EPSG:4326', 'EPSG:3857'))
-        });
-
-        let markerStyle = new Style({
-          image: Icon(({
-            anchor: [0.5, 1],
-            src: this.getPinColor(x.SecurityData)
-          }))
-        });
-
-        markerPoint.setStyle(markerStyle);
-        features.push(markerPoint);
-      });
-    });
-  }
-
-  private getPinColor(securityData: string) : string {
+  private getPinColor(accesspoint: Accesspoint) : string {
     const green = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00';
     const yellow = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00';
     const red = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%23F44E3B';
-    const securityDataArray = JSON.parse(securityData);
+    const blue = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%230062B1'; 
+    const securityDataArray = JSON.parse(accesspoint.securityData);
 
+    if(accesspoint.ssid == 'Hidden network') return blue;
     if(securityDataArray.includes('WPA2') || securityDataArray.includes('WPA')) return green;
     if(securityDataArray.includes('WEP') || securityDataArray.includes('WPS')) return yellow;
     return red;
