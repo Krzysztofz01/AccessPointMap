@@ -5,7 +5,6 @@ import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import Style from 'ol/style/Style';
-import Text from 'ol/style/Text';
 import Icon from 'ol/style/Icon';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
@@ -28,72 +27,54 @@ export class GlobalMapComponent implements OnInit {
   constructor(private accesspointDataService: AccesspointDataService, private cacheService: CacheManagerService) { }
 
   ngOnInit(): void {
-    this.initializeMap();
+    this.fetchMapContent();
   }
 
-  private initializeMap(): void {
+  private fetchMapContent(): void {
     const cachedData = this.cacheService.load(CACHE_KEY);
-    console.log(cachedData);
     if(cachedData == null) {
-      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODEyNTE1NywiZXhwIjoxNjA4MTI4NzU3LCJpYXQiOjE2MDgxMjUxNTd9.y2FfMftoiymjg2TNDRPT4e6QrysmHPlUU1hP6ZQhaq4").toPromise()
+      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODIxMDUxMiwiZXhwIjoxNjA4MjE3NzEyLCJpYXQiOjE2MDgyMTA1MTJ9.VKozhPnaSaGdB_egrqJmuCl_GX-oELrQvtH0gnkN_sk").toPromise()
       .then(data => {
         const featuresContainer: Array<Feature> = new Array<Feature>();
         data.forEach(x => {
           featuresContainer.push(this.prepareSingleMarker(x));
         });
         
-        const sourceVector = new VectorSource({
-          features: featuresContainer
-        });
+        this.initializeMap(featuresContainer);
 
-        const layerVector = new VectorLayer({
-          source: sourceVector
-        })
-
-        console.log(featuresContainer);
         const options: LocalStorageOptions = { key: CACHE_KEY, data: data , expirationMinutes: 60 };
         this.cacheService.delete(CACHE_KEY);
         this.cacheService.save(options);
-
-        this.map = new Map({
-          target: 'global-map',
-          layers: [
-            new TileLayer({
-              source: new OSM()
-            }),
-            layerVector
-          ],
-          view: new View({
-            center: olProj.fromLonLat([18.31, 50.16]),
-            zoom: 16
-          })
-        });
       })
       .catch(error => {
         console.log(error);
       });
     } else {
+      console.log("test")
       const features: Array<Feature> = new Array<Feature>();
       cachedData.forEach(element => features.push(this.prepareSingleMarker(element)));
-
-      this.map = new Map({
-        target: 'global-map',
-        layers: [
-          new TileLayer({
-            source: new OSM()
-          }),
-          new VectorLayer({
-            source: new VectorSource({
-              features: features
-            })
-          })
-        ],
-        view: new View({
-          center: olProj.fromLonLat([18.31, 50.16]),
-          zoom: 16
-        })
-      });
+      this.initializeMap(features);
     }
+  }
+
+  private initializeMap(featuresArray: Array<Feature>): void {
+    this.map = new Map({
+      target: 'global-map',
+      layers: [
+        new TileLayer({
+          source: new OSM()
+        }),
+        new VectorLayer({
+          source: new VectorSource({
+            features: featuresArray
+          })
+        })
+      ],
+      view: new View({
+        center: olProj.fromLonLat([18.31, 50.16]),
+        zoom: 16
+      })
+    });
   }
 
   private prepareSingleMarker(accesspoint: Accesspoint) : Feature {

@@ -4,11 +4,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GlobalMapComponent } from './layout/global-map/global-map.component';
 import { HttpClientModule } from '@angular/common/http';
+import { AccesspointViewComponent } from './layout/accesspoint-view/accesspoint-view.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GlobalMapComponent
+    GlobalMapComponent,
+    AccesspointViewComponent
   ],
   imports: [
     BrowserModule,

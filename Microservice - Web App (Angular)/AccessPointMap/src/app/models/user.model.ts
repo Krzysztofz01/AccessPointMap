@@ -1,13 +1,13 @@
 export interface User {
-    Id: number
-    Password: string
-    Email: string
-    TokenExpiration: number
-    WritePermission: boolean
-    ReadPermission: boolean
-    AdminPermission: boolean
-    CreateDate: Date
-    LastLoginDate: Date
-    LastLoginIp: string
-    Active: boolean
+    id: number
+    password: string
+    email: string
+    tokenExpiration: number
+    writePermission: boolean
+    readPermission: boolean
+    adminPermission: boolean
+    createDate: Date
+    lastLoginDate: Date
+    lastLoginIp: string
+    active: boolean
 }

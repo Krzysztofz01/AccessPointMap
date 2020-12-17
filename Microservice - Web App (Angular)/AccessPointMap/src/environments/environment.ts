@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  apiUrl: "localhost:3201"
+  apiUrl: "localhost:3201",
+  serverEmail: "frontend@apm.com",
+  serverPassword: "adminadminadmin"
 };
 
 /*

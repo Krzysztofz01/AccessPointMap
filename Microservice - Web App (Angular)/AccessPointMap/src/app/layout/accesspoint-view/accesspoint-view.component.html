@@ -1,0 +1,17 @@
+<div class="pt-5">
+    <div *ngIf="accessPoint != null; else accesspoint_empty_view">
+        <h1>{{ accessPoint.ssid }}</h1>
+        <h5>BSSID: {{ accessPoint.bssid }}</h5>
+        <h5>Brand: {{ accessPoint.brand }}</h5>
+        <h5>Frequency: {{ accessPoint.frequency }}</h5>
+        <h5>Security: <span [style.color]=" security.color "><strong>{{ security.type }}</strong> - {{ security.description }}</span></h5>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center mt-5">
+        <div id="accesspoint-map"></div>
+    </div>
+</div>
+
+<ng-template #accesspoint_empty_view>
+
+</ng-template>
