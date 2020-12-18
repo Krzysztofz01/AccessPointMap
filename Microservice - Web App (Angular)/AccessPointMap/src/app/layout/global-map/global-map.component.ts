@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import VectorLayer from 'ol/layer/Vector';
@@ -13,6 +13,7 @@ import { AccesspointDataService } from 'src/app/services/accesspoint-data.servic
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { LocalStorageOptions } from 'src/app/models/local-storage-options.model';
+import { SelectedAccesspointService } from 'src/app/services/selected-accesspoint.service';
 
 const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
 
@@ -24,7 +25,7 @@ const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
 export class GlobalMapComponent implements OnInit {
   private map: Map;
 
-  constructor(private accesspointDataService: AccesspointDataService, private cacheService: CacheManagerService) { }
+  constructor(private accesspointDataService: AccesspointDataService, private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService) { }
 
   ngOnInit(): void {
     this.fetchMapContent();
@@ -33,7 +34,7 @@ export class GlobalMapComponent implements OnInit {
   private fetchMapContent(): void {
     const cachedData = this.cacheService.load(CACHE_KEY);
     if(cachedData == null) {
-      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODIxMDUxMiwiZXhwIjoxNjA4MjE3NzEyLCJpYXQiOjE2MDgyMTA1MTJ9.VKozhPnaSaGdB_egrqJmuCl_GX-oELrQvtH0gnkN_sk").toPromise()
+      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODI4MDA3MiwiZXhwIjoxNjA4Mjg3MjcyLCJpYXQiOjE2MDgyODAwNzJ9.nHQojAXUWqdw1dREBPIGprMMC36Q1JIkJciZUVZDWNs").toPromise()
       .then(data => {
         const featuresContainer: Array<Feature> = new Array<Feature>();
         data.forEach(x => {
@@ -75,11 +76,23 @@ export class GlobalMapComponent implements OnInit {
         zoom: 16
       })
     });
+
+    this.map.on('click', (e) => {
+      const selectedAccessPoints: Array<Accesspoint> = new Array<Accesspoint>();
+      this.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
+        selectedAccessPoints.push(feature.values_.attributes.accesspoint);
+      });
+      
+      if(selectedAccessPoints.length) {
+        this.selectedAccesspoint.changeAccesspoint(selectedAccessPoints[0]);
+      }
+    });
   }
 
   private prepareSingleMarker(accesspoint: Accesspoint) : Feature {
     const feat : Feature = new Feature({
-      geometry: new Point(olProj.fromLonLat([accesspoint.highLongitude, accesspoint.highLatitude]))
+      geometry: new Point(olProj.fromLonLat([accesspoint.highLongitude, accesspoint.highLatitude])),
+      attributes: { accesspoint }
     });
     const style = new Style({
       image: new Icon({
