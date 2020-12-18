@@ -124,7 +124,7 @@ namespace AccessPointMapApp
 					AccesspointContainer.Add(new Accesspoint()
 					{
 						Bssid = result.Bssid,
-						Ssid = result.Ssid,
+						Ssid = (result.Ssid == string.Empty) ? "Hidden network" : result.Ssid,
 						Frequency = result.Frequency,
 						HighSignalLevel = result.Level,
 						HighLongitude = currentLocation.Longitude,
