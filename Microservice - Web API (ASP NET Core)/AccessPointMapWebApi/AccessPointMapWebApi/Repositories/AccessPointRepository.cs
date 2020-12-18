@@ -45,6 +45,11 @@ namespace AccessPointMapWebApi.Repositories
         {
             foreach (var element in accesspoints)
             {
+                element.HighLatitude = Math.Round(element.HighLatitude, 7);
+                element.HighLongitude = Math.Round(element.HighLongitude, 7);
+                element.LowLatitude = Math.Round(element.LowLatitude, 7);
+                element.LowLongitude = Math.Round(element.LowLongitude, 7);
+
                 //Check if element with given BSSID is already in database
                 if (context.Accesspoints.Any(accesspoint => accesspoint.Bssid == element.Bssid))
                 {
@@ -76,8 +81,8 @@ namespace AccessPointMapWebApi.Repositories
                     //Calculate location fields, if location changed
                     if (locationChanged)
                     {
-                        accesspoint.SignalRadius = geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude);
-                        accesspoint.SignalArea = geocalculationService.getArea(accesspoint.SignalRadius);
+                        accesspoint.SignalRadius = Math.Round(geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude), 4);
+                        accesspoint.SignalArea = Math.Round(geocalculationService.getArea(accesspoint.SignalRadius), 4);
                     }
 
                     if (accesspoint.SecurityDataRaw != element.SecurityDataRaw)
@@ -108,8 +113,8 @@ namespace AccessPointMapWebApi.Repositories
                 else
                 {
                     //Create element
-                    element.SignalRadius = geocalculationService.getDistance(element.LowLatitude, element.LowLongitude, element.HighLatitude, element.HighLongitude);
-                    element.SignalArea = geocalculationService.getArea(element.SignalRadius);
+                    element.SignalRadius = Math.Round(geocalculationService.getDistance(element.LowLatitude, element.LowLongitude, element.HighLatitude, element.HighLongitude), 4);
+                    element.SignalArea = Math.Round(geocalculationService.getArea(element.SignalRadius), 4);
                     element.SecurityData = SecurityDataFormat(element.SecurityDataRaw);
                     element.Brand = await brandRepository.GetByBssid(element.Bssid);
                     element.DeviceType = "Default";
@@ -197,8 +202,8 @@ namespace AccessPointMapWebApi.Repositories
                     //Calculate location fields, if location changed
                     if (locationChanged)
                     {
-                        masterAccessPoint.SignalRadius = geocalculationService.getDistance(masterAccessPoint.LowLatitude, masterAccessPoint.LowLongitude, masterAccessPoint.HighLatitude, masterAccessPoint.HighLongitude);
-                        masterAccessPoint.SignalArea = geocalculationService.getArea(masterAccessPoint.SignalRadius);
+                        masterAccessPoint.SignalRadius = Math.Round(geocalculationService.getDistance(masterAccessPoint.LowLatitude, masterAccessPoint.LowLongitude, masterAccessPoint.HighLatitude, masterAccessPoint.HighLongitude), 4);
+                        masterAccessPoint.SignalArea = Math.Round(geocalculationService.getArea(masterAccessPoint.SignalRadius), 4);
                     }
 
                     if (masterAccessPoint.SecurityDataRaw != guestAccessPoint.SecurityDataRaw)
@@ -238,8 +243,8 @@ namespace AccessPointMapWebApi.Repositories
                         PostedBy = guestAccessPoint.PostedBy
                     };
 
-                    accesspoint.SignalRadius = geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude);
-                    accesspoint.SignalArea = geocalculationService.getArea(accesspoint.SignalRadius);
+                    accesspoint.SignalRadius = Math.Round(geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude), 4);
+                    accesspoint.SignalArea = Math.Round(geocalculationService.getArea(accesspoint.SignalRadius), 4);
                     accesspoint.SecurityData = SecurityDataFormat(accesspoint.SecurityDataRaw);
                     accesspoint.Brand = await brandRepository.GetByBssid(accesspoint.Bssid);
                     accesspoint.DeviceType = "Default";

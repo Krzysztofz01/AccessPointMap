@@ -20,7 +20,6 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<IEnumerable<Accesspoint>>> GetAllAccesspoints()
         {
             return Ok(await accessPointRepository.GetAll());
@@ -81,7 +80,6 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet("brands")]
-        [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<IEnumerable<string>>> GetBrands()
         {
             return Ok(await accessPointRepository.GetBrandList());

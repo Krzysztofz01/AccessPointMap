@@ -2,6 +2,7 @@
 using AccessPointMapWebApi.Models;
 using AccessPointMapWebApi.Services;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,6 +34,11 @@ namespace AccessPointMapWebApi.Repositories
         {
             foreach (var accesspoint in accesspoints)
             {
+                accesspoint.HighLatitude = Math.Round(accesspoint.HighLatitude, 7);
+                accesspoint.HighLongitude = Math.Round(accesspoint.HighLongitude, 7);
+                accesspoint.LowLatitude = Math.Round(accesspoint.LowLatitude, 7);
+                accesspoint.LowLongitude = Math.Round(accesspoint.LowLongitude, 7);
+
                 accesspoint.SignalRadius = geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude);
                 accesspoint.SignalArea = geocalculationService.getArea(accesspoint.SignalRadius);
                 accesspoint.DeviceType = "Default";
