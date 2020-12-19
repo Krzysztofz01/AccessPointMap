@@ -1,0 +1,20 @@
+.security-average, .security-bad, .security-good {
+    font-weight: bold;
+}
+
+.security-good {
+    color: #68BC00 !important;
+}
+
+.security-average {
+    color: #FB9E00 !important;
+}
+
+.security-bad {
+    color: #F44E3B !important;
+}
+
+.apTitle {
+   cursor: pointer;
+   font-weight: bold; 
+}

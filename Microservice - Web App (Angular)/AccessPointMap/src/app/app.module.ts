@@ -5,17 +5,21 @@ import { AppComponent } from './app.component';
 import { GlobalMapComponent } from './layout/global-map/global-map.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AccesspointViewComponent } from './layout/accesspoint-view/accesspoint-view.component';
+import { AccesspointTableComponent } from './layout/accesspoint-table/accesspoint-table.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
     AppComponent,
     GlobalMapComponent,
-    AccesspointViewComponent
+    AccesspointViewComponent,
+    AccesspointTableComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -35,8 +35,9 @@ export class AccesspointViewComponent implements OnInit {
   }
 
   private initializeMap(): void {
-      const circle = new Circle(olProj.fromLonLat([this.accessPoint.highLongitude, this.accessPoint.highLatitude]), this.accessPoint.signalRadius);
+      const circle = new Circle(olProj.fromLonLat([this.accessPoint.highLongitude, this.accessPoint.highLatitude]), (this.accessPoint.signalRadius < 16) ? 16 : this.accessPoint.signalRadius);
       const circleFeature = new Feature(circle);
+      console.log((this.accessPoint.signalRadius < 16) ? 16 : this.accessPoint.signalRadius);
 
       if(this.map === undefined) {
         this.map = new Map({
@@ -54,7 +55,7 @@ export class AccesspointViewComponent implements OnInit {
           ],
           view: new View({
             center: olProj.fromLonLat([this.accessPoint.highLongitude, this.accessPoint.highLatitude]),
-            zoom: 19
+            zoom: 17
           })
         });
       } else {

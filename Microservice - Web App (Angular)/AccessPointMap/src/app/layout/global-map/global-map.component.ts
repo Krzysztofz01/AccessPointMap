@@ -34,7 +34,7 @@ export class GlobalMapComponent implements OnInit {
   private fetchMapContent(): void {
     const cachedData = this.cacheService.load(CACHE_KEY);
     if(cachedData == null) {
-      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODI4MDA3MiwiZXhwIjoxNjA4Mjg3MjcyLCJpYXQiOjE2MDgyODAwNzJ9.nHQojAXUWqdw1dREBPIGprMMC36Q1JIkJciZUVZDWNs").toPromise()
+      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODM4MTkxOCwiZXhwIjoxNjA4Mzg5MTE4LCJpYXQiOjE2MDgzODE5MTh9.59d8Zh2qw3s68smtvr-mCOTuUb4TOKOXHU8E8X-Ke0A").toPromise()
       .then(data => {
         const featuresContainer: Array<Feature> = new Array<Feature>();
         data.forEach(x => {
@@ -107,7 +107,7 @@ export class GlobalMapComponent implements OnInit {
 
   private getPinColor(accesspoint: Accesspoint) : string {
     const green = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00';
-    const yellow = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00';
+    const yellow = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%23FB9E00';
     const red = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%23F44E3B';
     const blue = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%230062B1'; 
     const securityDataArray = JSON.parse(accesspoint.securityData);
