@@ -7,18 +7,22 @@ import { HttpClientModule } from '@angular/common/http';
 import { AccesspointViewComponent } from './layout/accesspoint-view/accesspoint-view.component';
 import { AccesspointTableComponent } from './layout/accesspoint-table/accesspoint-table.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { SecurityChartComponent } from './layout/security-chart/security-chart.component';
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
     AppComponent,
     GlobalMapComponent,
     AccesspointViewComponent,
-    AccesspointTableComponent
+    AccesspointTableComponent,
+    SecurityChartComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    ChartsModule,
     NgbModule
   ],
   providers: [],
