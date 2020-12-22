@@ -21,7 +21,7 @@ export class DataFetchService {
   private fetchAccessPoints(): void {
     const localStorageData = this.cacheService.load(CACHE_KEY_ACCESSPOINTS);
     if(localStorageData == null) {
-      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODU1Nzk0MiwiZXhwIjoxNjA4NTY1MTQyLCJpYXQiOjE2MDg1NTc5NDJ9.JvXsXIhW9U_-7YK1UmyXjxWc9EQ3VuiZqPzWuXZ_iKs").toPromise()
+      this.accesspointDataService.getAllAccessPoints("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODY2MzkwMCwiZXhwIjoxNjA4NjcxMTAwLCJpYXQiOjE2MDg2NjM5MDB9.AIaiWbJsWJ2jtTO9bx7lCcb08OprE83h2GUXbcCRdVg").toPromise()
       .then(data => {
         const options: LocalStorageOptions = { key: CACHE_KEY_ACCESSPOINTS, data: data , expirationMinutes: 60 };
         this.cacheService.delete(CACHE_KEY_ACCESSPOINTS);
@@ -36,7 +36,7 @@ export class DataFetchService {
   private fetchBrands(): void {
     const localStorageData = this.cacheService.load(CACHE_KEY_BRANDS);
     if(localStorageData == null) {
-      this.accesspointDataService.getBrands("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODU1Nzk0MiwiZXhwIjoxNjA4NTY1MTQyLCJpYXQiOjE2MDg1NTc5NDJ9.JvXsXIhW9U_-7YK1UmyXjxWc9EQ3VuiZqPzWuXZ_iKs").toPromise()
+      this.accesspointDataService.getBrands("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODY2MzkwMCwiZXhwIjoxNjA4NjcxMTAwLCJpYXQiOjE2MDg2NjM5MDB9.AIaiWbJsWJ2jtTO9bx7lCcb08OprE83h2GUXbcCRdVg").toPromise()
       .then(data => {
         const options: LocalStorageOptions = { key: CACHE_KEY_BRANDS, data: data , expirationMinutes: 120 };
         this.cacheService.delete(CACHE_KEY_BRANDS);

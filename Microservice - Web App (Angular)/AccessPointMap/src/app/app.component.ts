@@ -10,6 +10,6 @@ export class AppComponent {
   title = 'AccessPointMap';
 
   constructor(private dataFetchService: DataFetchService) {
-    dataFetchService.localDataCheck();
+    this.dataFetchService.localDataCheck();
   }
 }

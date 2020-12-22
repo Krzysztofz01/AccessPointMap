@@ -12,6 +12,7 @@ import * as olProj from 'ol/proj';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { SelectedAccesspointService } from 'src/app/services/selected-accesspoint.service';
+import { DataFetchService } from 'src/app/services/data-fetch.service';
 
 const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
 
@@ -23,7 +24,7 @@ const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
 export class GlobalMapComponent implements OnInit {
   private map: Map;
 
-  constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService) { }
+  constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService, private dataFetchService: DataFetchService) { }
 
   ngOnInit(): void {
     this.initializeMapData();
@@ -32,6 +33,10 @@ export class GlobalMapComponent implements OnInit {
   private initializeMapData(): void {
     const featuresArray = new Array<Feature>();
     const cachedData: Array<Accesspoint> = this.cacheService.load(CACHE_KEY);
+    if(cachedData == null) {
+      this.dataFetchService.localDataCheck();
+      const cachedData: Array<Accesspoint> = this.cacheService.load(CACHE_KEY);
+    }
     cachedData.forEach(element => featuresArray.push(this.prepareSingleMarker(element)));
     this.initializeMap(featuresArray);
   }

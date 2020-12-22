@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Accesspoint } from '../models/accesspoint.model';
 import { ChartData } from '../models/chart-data.model';
+import { LocalStorageOptions } from '../models/local-storage-options.model';
 import { CacheManagerService } from './cache-manager.service';
 
 @Injectable({
@@ -10,7 +11,33 @@ export class ChartPreparationService {
 
   constructor(private cacheService: CacheManagerService) { }
 
-  public prepareSecurityChart(accesspoints: Array<Accesspoint>): ChartData {
+  public prepareCharts(accesspoints: Array<Accesspoint>): void {
+    const cacheElements: Array<LocalStorageOptions> = [];
+
+    if(this.cacheService.load('CHART_SECURITY') == null) cacheElements.push(
+      { key: 'CHART_SECURITY', data: this.prepareSecurityChart(accesspoints), expirationMinutes: 10080 }
+    );
+
+    if(this.cacheService.load('CHART_FREQUENCY') == null) cacheElements.push(
+      { key: 'CHART_FREQUENCY', data: this.prepareFrequencyChart(accesspoints), expirationMinutes: 10080 }
+    );
+
+    if(this.cacheService.load('CHART_AREA') == null) cacheElements.push(
+      { key: 'CHART_AREA', data: this.prepareAreaChart(accesspoints), expirationMinutes: 10080 }
+    );
+
+    if(this.cacheService.load('CHART_BRANDS') == null) cacheElements.push(
+      { key: 'CHART_BRANDS', data: this.prepareBrandChartStatic(accesspoints), expirationMinutes: 10080 }
+    );
+
+    if(cacheElements.length > 0) {
+      cacheElements.forEach(x => {
+        this.cacheService.save(x);
+      });
+    }
+  }
+
+  private prepareSecurityChart(accesspoints: Array<Accesspoint>): ChartData {
     const WPA2 = { name: 'WPA2', count: 0 };
     const WPA = { name: 'WPA', count: 0 };
     const WPS = { name: 'WPS', count: 0 };
@@ -35,7 +62,7 @@ export class ChartPreparationService {
     };
   }
 
-  public prepareFrequencyChart(accesspoints: Array<Accesspoint>): ChartData {
+  private prepareFrequencyChart(accesspoints: Array<Accesspoint>): ChartData {
     const freqCount: Array<any> = [];
     accesspoints.forEach(x => {
       if(freqCount.length < 1) freqCount.push({ freq: x.frequency, count: 1}); 
@@ -63,7 +90,7 @@ export class ChartPreparationService {
     }
   }
 
-  public prepareAreaChart(accesspoints: Array<Accesspoint>): ChartData {
+  private prepareAreaChart(accesspoints: Array<Accesspoint>): ChartData {
     accesspoints.sort((a, b) => (a.signalArea < b.signalArea) ? 1 : -1);
     const labels: Array<string> = [];
     const values: Array<number> = [];
@@ -80,7 +107,7 @@ export class ChartPreparationService {
     }
   }
 
-  public prepareBrandChartStatic(accesspoints: Array<Accesspoint>): ChartData {
+  private prepareBrandChartStatic(accesspoints: Array<Accesspoint>): ChartData {
     const tplink = { name: 'tp-link', count: 0 };
     const dasan = { name: 'dasan', count: 0 };
     const dlink = { name: 'd-link', count: 0 };
@@ -99,13 +126,13 @@ export class ChartPreparationService {
 
     return {
       type: 'bar',
-      labels: [ tplink.name, dasan.name, dlink.name, sagem.name, ubiquiti.name ],
+      labels: [ 'Tp-Link', 'Dasan', 'D-Link', 'Sagem', 'Ubiquiti' ],
       content: [ tplink.count, dasan.count, dlink.count, sagem.count, ubiquiti.count ],
       colors: ['#000000', '#000000', '#000000', '#000000', '#000000']
     }
   }
 
-  public prepareBrandChartDynamic(accesspoints: Array<Accesspoint>): ChartData {
+  private prepareBrandChartDynamic(accesspoints: Array<Accesspoint>): ChartData {
     //Changes to the API
     return null;
   }

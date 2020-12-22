@@ -6,11 +6,11 @@ import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { ChartPreparationService } from 'src/app/services/chart-preparation.service';
 
 @Component({
-  selector: 'security-chart',
-  templateUrl: './security-chart.component.html',
-  styleUrls: ['./security-chart.component.css']
+  selector: 'frequency-chart',
+  templateUrl: './frequency-chart.component.html',
+  styleUrls: ['./frequency-chart.component.css']
 })
-export class SecurityChartComponent implements OnInit {
+export class FrequencyChartComponent implements OnInit {
   public chartLabels: Label[];
   public chartDisplayType: ChartType;
   public chartLegend: boolean;
@@ -21,7 +21,7 @@ export class SecurityChartComponent implements OnInit {
 
   ngOnInit(): void {
     this.chartPreparationService.prepareCharts(this.cacheService.load('VECTOR_LAYER_ACCESSPOINTS'));
-    const preparedChartData: ChartData = this.cacheService.load('CHART_SECURITY');
+    const preparedChartData: ChartData = this.cacheService.load('CHART_FREQUENCY');
     
     this.chartLabels = preparedChartData.labels;
     this.chartData = [

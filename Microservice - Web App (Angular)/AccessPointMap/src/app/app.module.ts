@@ -9,6 +9,9 @@ import { AccesspointTableComponent } from './layout/accesspoint-table/accesspoin
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SecurityChartComponent } from './layout/security-chart/security-chart.component';
 import { ChartsModule } from 'ng2-charts';
+import { AreaChartComponent } from './layout/area-chart/area-chart.component';
+import { FrequencyChartComponent } from './layout/frequency-chart/frequency-chart.component';
+import { BrandChartComponent } from './layout/brand-chart/brand-chart.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +19,10 @@ import { ChartsModule } from 'ng2-charts';
     GlobalMapComponent,
     AccesspointViewComponent,
     AccesspointTableComponent,
-    SecurityChartComponent
+    SecurityChartComponent,
+    AreaChartComponent,
+    FrequencyChartComponent,
+    BrandChartComponent
   ],
   imports: [
     BrowserModule,
