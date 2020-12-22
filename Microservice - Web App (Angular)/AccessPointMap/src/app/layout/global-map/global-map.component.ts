@@ -12,9 +12,9 @@ import * as olProj from 'ol/proj';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { SelectedAccesspointService } from 'src/app/services/selected-accesspoint.service';
-import { DataFetchService } from 'src/app/services/data-fetch.service';
-
-const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
+import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
+import { LocalStorageOptions } from 'src/app/models/local-storage-options.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'global-map',
@@ -24,21 +24,33 @@ const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
 export class GlobalMapComponent implements OnInit {
   private map: Map;
 
-  constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService, private dataFetchService: DataFetchService) { }
+  constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService, private accesspointDataService: AccesspointDataService) { }
 
   ngOnInit(): void {
     this.initializeMapData();
   }
 
   private initializeMapData(): void {
+    const accesspoints: Array<Accesspoint> = this.cacheService.load(environment.CACHE_ACCESSPOINTS);
     const featuresArray = new Array<Feature>();
-    const cachedData: Array<Accesspoint> = this.cacheService.load(CACHE_KEY);
-    if(cachedData == null) {
-      this.dataFetchService.localDataCheck();
-      const cachedData: Array<Accesspoint> = this.cacheService.load(CACHE_KEY);
+    if(accesspoints != null) {
+      accesspoints.forEach(element => featuresArray.push(this.prepareSingleMarker(element)));
+      this.initializeMap(featuresArray);
+    } else {
+      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODY2MzkwMCwiZXhwIjoxNjA4NjcxMTAwLCJpYXQiOjE2MDg2NjM5MDB9.AIaiWbJsWJ2jtTO9bx7lCcb08OprE83h2GUXbcCRdVg').toPromise()
+        .then(x => {
+          x.forEach(element => {
+            featuresArray.push(this.prepareSingleMarker(element));
+          });
+          this.initializeMap(featuresArray);
+          this.cacheService.delete(environment.CACHE_ACCESSPOINTS);
+          const cacheOptions: LocalStorageOptions = { key: environment.CACHE_ACCESSPOINTS, data: x, expirationMinutes: 60 };
+          this.cacheService.save(cacheOptions);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
-    cachedData.forEach(element => featuresArray.push(this.prepareSingleMarker(element)));
-    this.initializeMap(featuresArray);
   }
 
   private initializeMap(featuresArray: Array<Feature>): void {

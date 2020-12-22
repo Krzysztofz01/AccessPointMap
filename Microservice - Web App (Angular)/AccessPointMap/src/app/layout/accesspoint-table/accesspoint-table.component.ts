@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { SelectedAccesspointService } from 'src/app/services/selected-accesspoint.service';
-
-const CACHE_KEY = "VECTOR_LAYER_ACCESSPOINTS";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'accesspoint-table',
@@ -30,7 +29,7 @@ export class AccesspointTableComponent implements OnInit {
   }
 
   private initializeDataTable(): void {
-    this.accesspointContainer = this.cacheService.load(CACHE_KEY);
+    this.accesspointContainer = this.cacheService.load(environment.CACHE_ACCESSPOINTS);
     this.accesspointContainerSize = this.accesspointContainer.length;
   }
 

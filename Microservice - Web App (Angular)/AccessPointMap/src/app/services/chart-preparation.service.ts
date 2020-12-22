@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { Accesspoint } from '../models/accesspoint.model';
 import { ChartData } from '../models/chart-data.model';
 import { LocalStorageOptions } from '../models/local-storage-options.model';
@@ -14,20 +15,20 @@ export class ChartPreparationService {
   public prepareCharts(accesspoints: Array<Accesspoint>): void {
     const cacheElements: Array<LocalStorageOptions> = [];
 
-    if(this.cacheService.load('CHART_SECURITY') == null) cacheElements.push(
-      { key: 'CHART_SECURITY', data: this.prepareSecurityChart(accesspoints), expirationMinutes: 10080 }
+    if(this.cacheService.load(environment.CACHE_CHART_SECURITY) == null) cacheElements.push(
+      { key: environment.CACHE_CHART_SECURITY, data: this.prepareSecurityChart(accesspoints), expirationMinutes: 10080 }
     );
 
-    if(this.cacheService.load('CHART_FREQUENCY') == null) cacheElements.push(
-      { key: 'CHART_FREQUENCY', data: this.prepareFrequencyChart(accesspoints), expirationMinutes: 10080 }
+    if(this.cacheService.load(environment.CACHE_CHART_FREQUENCY) == null) cacheElements.push(
+      { key: environment.CACHE_CHART_FREQUENCY, data: this.prepareFrequencyChart(accesspoints), expirationMinutes: 10080 }
     );
 
-    if(this.cacheService.load('CHART_AREA') == null) cacheElements.push(
-      { key: 'CHART_AREA', data: this.prepareAreaChart(accesspoints), expirationMinutes: 10080 }
+    if(this.cacheService.load(environment.CACHE_CHART_AREA) == null) cacheElements.push(
+      { key: environment.CACHE_CHART_AREA, data: this.prepareAreaChart(accesspoints), expirationMinutes: 10080 }
     );
 
-    if(this.cacheService.load('CHART_BRANDS') == null) cacheElements.push(
-      { key: 'CHART_BRANDS', data: this.prepareBrandChartStatic(accesspoints), expirationMinutes: 10080 }
+    if(this.cacheService.load(environment.CACHE_CHART_BRANDS) == null) cacheElements.push(
+      { key: environment.CACHE_CHART_BRANDS, data: this.prepareBrandChartStatic(accesspoints), expirationMinutes: 10080 }
     );
 
     if(cacheElements.length > 0) {

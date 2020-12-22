@@ -5,8 +5,11 @@
 export const environment = {
   production: false,
   apiUrl: "localhost:3201",
-  serverEmail: "frontend@apm.com",
-  serverPassword: "adminadminadmin"
+  CACHE_ACCESSPOINTS: 'ACCESSPOINTS_ARRAY',
+  CACHE_CHART_SECURITY: 'CHART_SECURITY',
+  CACHE_CHART_FREQUENCY: 'CHART_FREQUENCY',
+  CACHE_CHART_AREA: 'CHART_AREA',
+  CACHE_CHART_BRANDS: 'CHART_BRANDS'
 };
 
 /*

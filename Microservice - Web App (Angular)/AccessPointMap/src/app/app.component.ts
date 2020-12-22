@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { DataFetchService } from './services/data-fetch.service';
 
 @Component({
   selector: 'app-root',
@@ -8,8 +7,4 @@ import { DataFetchService } from './services/data-fetch.service';
 })
 export class AppComponent {
   title = 'AccessPointMap';
-
-  constructor(private dataFetchService: DataFetchService) {
-    this.dataFetchService.localDataCheck();
-  }
 }
