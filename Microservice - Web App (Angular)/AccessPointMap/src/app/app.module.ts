@@ -12,6 +12,8 @@ import { ChartsModule } from 'ng2-charts';
 import { AreaChartComponent } from './layout/area-chart/area-chart.component';
 import { FrequencyChartComponent } from './layout/frequency-chart/frequency-chart.component';
 import { BrandChartComponent } from './layout/brand-chart/brand-chart.component';
+import { PageMainComponent } from './layout/page-main/page-main.component';
+import { PageAdminComponent } from './layout/page-admin/page-admin.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import { BrandChartComponent } from './layout/brand-chart/brand-chart.component'
     SecurityChartComponent,
     AreaChartComponent,
     FrequencyChartComponent,
-    BrandChartComponent
+    BrandChartComponent,
+    PageMainComponent,
+    PageAdminComponent
   ],
   imports: [
     BrowserModule,

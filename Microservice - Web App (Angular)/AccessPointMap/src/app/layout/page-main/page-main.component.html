@@ -1,0 +1,36 @@
+<div class="container-fluid px-5 mt-3">
+    <div class="row">
+      <div class="col-6">
+        <ul class="nav nav-pills mb-3">
+            <li class="nav-item">
+                <a class="nav-link" (click)="toggleComp('map')" [ngClass]="isToggled('map') ? 'active' : '' ">Map</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" (click)="toggleComp('table')" [ngClass]="isToggled('table') ? 'active' : '' ">Table</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" (click)="toggleComp('chSec')" [ngClass]="isToggled('chSec') ? 'active' : '' ">Security</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" (click)="toggleComp('chAre')" [ngClass]="isToggled('chAre') ? 'active' : '' ">Area</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" (click)="toggleComp('chFre')" [ngClass]="isToggled('chFre') ? 'active' : '' ">Frequency</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" (click)="toggleComp('chBra')" [ngClass]="isToggled('chBra') ? 'active' : '' ">Brands</a>
+            </li>
+        </ul>
+
+        <global-map *ngIf="isToggled('map')"></global-map>
+        <accesspoint-table *ngIf="isToggled('table')"></accesspoint-table>
+        <security-chart *ngIf="isToggled('chSec')"></security-chart>
+        <area-chart *ngIf="isToggled('chAre')"></area-chart>
+        <frequency-chart *ngIf="isToggled('chFre')"></frequency-chart>
+        <brand-chart *ngIf="isToggled('chBra')"></brand-chart>
+      </div>
+      <div class="col-6">
+        <accesspoint-view></accesspoint-view>
+      </div>
+    </div>
+  </div>
