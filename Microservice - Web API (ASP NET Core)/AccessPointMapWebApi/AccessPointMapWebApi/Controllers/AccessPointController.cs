@@ -80,9 +80,9 @@ namespace AccessPointMapWebApi.Controllers
         }
 
         [HttpGet("brands")]
-        public async Task<ActionResult<IEnumerable<string>>> GetBrands()
+        public async Task<ActionResult<IEnumerable<AccessPointBrandCountDto>>> GetBrands()
         {
-            return Ok(await accessPointRepository.GetBrandList());
+            return Ok(await accessPointRepository.GetBrandListOrderedCount());
         }
 
         [HttpDelete("{id}")]

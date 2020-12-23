@@ -16,6 +16,9 @@ namespace AccessPointMapWebApi.Repositories
         Task<Accesspoint> GetById(int id);
         Task<IEnumerable<Accesspoint>> SearchByParams(string ssid, int freq, string brand, string security);
         Task<IEnumerable<string>> GetBrandList();
+        Task<IEnumerable<AccessPointBrandCountDto>> GetBrandListOrderedCount();
+        Task<bool> UpdateBrand(IEnumerable<Accesspoint> accesspoints);
+        Task<IEnumerable<Accesspoint>> GetAccesspointsNoBrand();
         Task<int> AddOrUpdate(List<Accesspoint> accesspoints);
         Task<bool> ChangeVisibility(int id, bool visible);
         Task<bool> Merge(List<int> accesspointsId);
@@ -276,6 +279,38 @@ namespace AccessPointMapWebApi.Repositories
         public async Task<IEnumerable<string>> GetBrandList()
         {
             return await context.Accesspoints.Where(element => element.Display == true).Select(param => param.Brand).Distinct().ToListAsync();
+        }
+
+        public async Task<IEnumerable<AccessPointBrandCountDto>> GetBrandListOrderedCount()
+        {
+            return await context.Accesspoints
+                .GroupBy(p => p.Brand)
+                .Select(p => new AccessPointBrandCountDto() { Brand = p.Key, Count = p.Count() })
+                .OrderByDescending(p => p.Count).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Accesspoint>> GetAccesspointsNoBrand()
+        {
+            return await context.Accesspoints.Where(x => x.Brand == "No brand info" && x.Display == true).ToListAsync();
+        }
+
+        public async Task<bool> UpdateBrand(IEnumerable<Accesspoint> accesspoints)
+        {
+            foreach(var accesspoint in accesspoints)
+            {
+                var existingAccesspoint = context.Accesspoints.FirstOrDefault(x => x.Id == accesspoint.Id);
+                if(existingAccesspoint != null)
+                {
+                    existingAccesspoint.Brand = accesspoint.Brand;
+                    context.Entry(existingAccesspoint).State = EntityState.Modified;
+                }
+            }
+
+            if(await context.SaveChangesAsync() > 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         private string SecurityDataFormat(string securityData)

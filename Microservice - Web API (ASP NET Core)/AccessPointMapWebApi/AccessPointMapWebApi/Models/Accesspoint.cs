@@ -68,4 +68,10 @@ namespace AccessPointMapWebApi.Models
         [Required]
         public bool Display { get; set; }
     }
+
+    public class AccessPointBrandCountDto
+    {
+        public string Brand { get; set; }
+        public int Count { get; set; }
+    }
 }
