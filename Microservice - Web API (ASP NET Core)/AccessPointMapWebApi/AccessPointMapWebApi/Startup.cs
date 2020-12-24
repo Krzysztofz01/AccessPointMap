@@ -2,6 +2,8 @@ using AccessPointMapWebApi.DatabaseContext;
 using AccessPointMapWebApi.Repositories;
 using AccessPointMapWebApi.Services;
 using AccessPointMapWebApi.Settings;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 namespace AccessPointMapWebApi
@@ -37,12 +40,23 @@ namespace AccessPointMapWebApi
             //Services
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IGeocalculationService, GeocalculationService>();
+            services.AddTransient<IBrandUpdateService, BrandUpdateService>();
 
             //Cross-Origin Resource Sharing
             services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
             {
                 builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
             }));
+
+            //Hangfire Server
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseDefaultTypeSerializer()
+                .UseMemoryStorage()
+            );
+
+            services.AddHangfireServer();
 
             //JWT Authentication
             var JsonWebTokenSection = Configuration.GetSection("JsonWebTokenSettings");
@@ -73,7 +87,11 @@ namespace AccessPointMapWebApi
             services.AddControllers();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IRecurringJobManager recurringJobManager,
+            IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -92,6 +110,15 @@ namespace AccessPointMapWebApi
             {
                 endpoints.MapControllers();
             });
+
+            //Hangfire
+            app.UseHangfireServer();
+
+            recurringJobManager.AddOrUpdate(
+                "Brand name update",
+                () => serviceProvider.GetService<IBrandUpdateService>().Update(),
+                Cron.Daily,
+                TimeZoneInfo.Local);
         }
     }
 }
