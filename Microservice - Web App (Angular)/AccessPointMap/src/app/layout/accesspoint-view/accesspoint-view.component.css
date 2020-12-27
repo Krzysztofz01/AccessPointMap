@@ -2,3 +2,7 @@
     width: 75%;
     height: 50vh;
 }
+
+h1, h5 {
+    color: #67f494 !important;
+}

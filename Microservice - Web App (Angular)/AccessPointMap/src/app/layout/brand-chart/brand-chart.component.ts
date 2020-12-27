@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Colors, Label } from 'ng2-charts';
 import { ChartData } from 'src/app/models/chart-data.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
@@ -17,6 +17,7 @@ export class BrandChartComponent implements OnInit {
   public chartDisplayType: ChartType;
   public chartLegend: boolean;
   public chartOptions: ChartOptions;
+  public chartColors: Colors[];
   public chartData: ChartDataSets[];
   public chartReady: boolean;
 
@@ -35,8 +36,25 @@ export class BrandChartComponent implements OnInit {
     this.chartDisplayType = 'bar';
     this.chartLegend = false;
     this.chartOptions = {
-      responsive: true
-    }
+      responsive: true,
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: preparedChartData.colors[0]
+          }
+        }],
+        xAxes: [{
+          ticks: {
+            fontColor: preparedChartData.colors[0]
+          }
+        }]
+      }
+    };
+    this.chartColors = [
+      {
+        backgroundColor: preparedChartData.colors[0]
+      }
+    ];
     this.chartReady = true;
   }
 

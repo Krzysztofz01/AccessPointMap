@@ -37,7 +37,7 @@ export class GlobalMapComponent implements OnInit {
       accesspoints.forEach(element => featuresArray.push(this.prepareSingleMarker(element)));
       this.initializeMap(featuresArray);
     } else {
-      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODcyMjI1NiwiZXhwIjoxNjA4NzI5NDU2LCJpYXQiOjE2MDg3MjIyNTZ9.PRkYnCzdKpNObnIWm2BN7ANyrgopevk79yUO1LufqRQ').toPromise()
+      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwOTA4NDkyNCwiZXhwIjoxNjA5MDkyMTI0LCJpYXQiOjE2MDkwODQ5MjR9.FGJfo5eGBCY50okozs8edA_A_qQ2kEge4n6qBj19VHE').toPromise()
         .then(x => {
           x.forEach(element => {
             featuresArray.push(this.prepareSingleMarker(element));
@@ -55,6 +55,7 @@ export class GlobalMapComponent implements OnInit {
 
   private initializeMap(featuresArray: Array<Feature>): void {
     this.map = new Map({
+      controls: [],
       target: 'global-map',
       layers: [
         new TileLayer({

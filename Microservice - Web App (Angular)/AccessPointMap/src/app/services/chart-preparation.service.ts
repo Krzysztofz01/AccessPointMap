@@ -59,7 +59,7 @@ export class ChartPreparationService {
       type: 'bar',
       labels: [WPA2.name, WPA.name, WPS.name, WEP.name, None.name],
       content: [WPA2.count, WPA.count, WPS.count, WEP.count, None.count],
-      colors: ['#000000', '#000000', '#000000', '#000000', '#000000']
+      colors: ['#67f494', '#67f494', '#67f494', '#67f494', '#67f494']
     };
   }
 
@@ -87,7 +87,7 @@ export class ChartPreparationService {
       type: 'bar',
       labels: labels,
       content: values,
-      colors: ['#000000', '#000000', '#000000', '#000000', '#000000']
+      colors: ['#67f494', '#67f494', '#67f494', '#67f494', '#67f494']
     }
   }
 
@@ -104,7 +104,7 @@ export class ChartPreparationService {
       type: 'bar',
       labels: labels,
       content: values,
-      colors: ['#000000', '#000000', '#000000', '#000000', '#000000']
+      colors: ['#67f494', '#67f494', '#67f494', '#67f494', '#67f494']
     }
   }
 
@@ -129,7 +129,7 @@ export class ChartPreparationService {
       type: 'bar',
       labels: [ 'Tp-Link', 'Dasan', 'D-Link', 'Sagem', 'Ubiquiti' ],
       content: [ tplink.count, dasan.count, dlink.count, sagem.count, ubiquiti.count ],
-      colors: ['#000000', '#000000', '#000000', '#000000', '#000000']
+      colors: ['#67f494', '#67f494', '#67f494', '#67f494', '#67f494']
     }
   }
 

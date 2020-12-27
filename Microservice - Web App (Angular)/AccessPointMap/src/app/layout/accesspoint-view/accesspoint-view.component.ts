@@ -41,6 +41,7 @@ export class AccesspointViewComponent implements OnInit {
 
       if(this.map === undefined) {
         this.map = new Map({
+          controls: [],
           target: 'accesspoint-map',
           layers: [
             new TileLayer({
