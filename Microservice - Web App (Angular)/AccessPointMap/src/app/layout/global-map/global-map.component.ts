@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import Map from 'ol/Map';
 import View from 'ol/View';
+import Overlay from 'ol/Overlay';
 import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
@@ -37,7 +38,7 @@ export class GlobalMapComponent implements OnInit {
       accesspoints.forEach(element => featuresArray.push(this.prepareSingleMarker(element)));
       this.initializeMap(featuresArray);
     } else {
-      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwOTExODgzNSwiZXhwIjoxNjA5MTI2MDM1LCJpYXQiOjE2MDkxMTg4MzV9.doDW600HNrta3rU0V_WrnAsTRC0UurEjb-rq0ja-0J8').toPromise()
+      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwOTE1ODI1OSwiZXhwIjoxNjA5MTY1NDU5LCJpYXQiOjE2MDkxNTgyNTl9.UehmaxeZI6xJdcesoVVAgPalfvd3FW1LFSwvGKtzYe4').toPromise()
         .then(x => {
           x.forEach(element => {
             featuresArray.push(this.prepareSingleMarker(element));
@@ -54,6 +55,25 @@ export class GlobalMapComponent implements OnInit {
   }
 
   private initializeMap(featuresArray: Array<Feature>): void {
+    //Map popup
+    const container = document.getElementById('popup');
+    const closer = document.getElementById('popup-closer');
+
+    const overlay: Overlay = new Overlay({
+      element: container,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250
+      }
+    });
+
+    closer.onclick = () => {
+      overlay.setPosition(undefined);
+      closer.blur();
+      return false;
+    };
+
+    //Map element
     this.map = new Map({
       controls: [],
       target: 'global-map',
@@ -67,22 +87,39 @@ export class GlobalMapComponent implements OnInit {
           })
         })
       ],
+      overlays: [
+        overlay
+      ],
       view: new View({
         center: olProj.fromLonLat([18.31, 50.16]),
         zoom: 16
       })
     });
 
+    //Map click event
     this.map.on('click', (e) => {
+      this.popupAccesspoints = undefined;
       const selectedAccessPoints: Array<Accesspoint> = new Array<Accesspoint>();
       this.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
         selectedAccessPoints.push(feature.values_.attributes.accesspoint);
       });
       
-      if(selectedAccessPoints.length) {
+      if(selectedAccessPoints.length == 1) {
         this.selectedAccesspoint.changeAccesspoint(selectedAccessPoints[0]);
+      } else if(selectedAccessPoints.length > 1) {
+        this.popupAccesspoints = [];
+        selectedAccessPoints.forEach(x => {
+          this.popupAccesspoints.push({ name: x.ssid, data: x });
+        });
+        overlay.setPosition(e.coordinate);
       }
     });
+  }
+
+  public popupAccesspoints: Array<object>;
+
+  public setAccesspoint(accesspoint: Accesspoint ) : void {
+    this.selectedAccesspoint.changeAccesspoint(accesspoint);
   }
 
   private prepareSingleMarker(accesspoint: Accesspoint) : Feature {

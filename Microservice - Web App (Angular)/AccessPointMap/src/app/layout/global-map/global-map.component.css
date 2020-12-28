@@ -2,3 +2,42 @@
     width: 100%;
     height: 75vh;
 }
+
+.show-true {
+    visibility: visible;
+}
+
+.show-false {
+    visibility: hidden;
+}
+
+.ol-popup {
+    background-color: #4c5267 !important;
+    border: 1px solid #67f494 !important;
+    border-radius: .25rem;
+}
+
+.ol-popup p {
+    text-align: center;
+    color: #67f494 !important;
+    font-weight: bold;
+}
+
+#popup-content {
+    padding: 5px;
+    text-align: center;
+}
+
+#popup-content a {
+    text-decoration: none;
+    color: #67f494 !important;
+    cursor: pointer;
+}
+
+.ol-popup-closer {
+    text-decoration: none;
+    cursor: pointer;
+    float: right;
+    color: #67f494 !important;
+    padding: 2px;
+}
