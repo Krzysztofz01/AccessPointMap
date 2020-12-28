@@ -76,6 +76,12 @@ export class AccesspointViewComponent implements OnInit {
       }
   }
 
+  public formatPostInfo(accesspoint: Accesspoint): string {
+    const cr = new Date(accesspoint.createDate);
+    const up = new Date(accesspoint.updateDate);
+    return `Uploaded: ${cr.getDay()}.${cr.getMonth()}.${cr.getFullYear()} by: ${accesspoint.postedBy} (Updated: ${up.getDay()}.${up.getMonth()}.${up.getFullYear()})`
+  }
+
   private prepareSecurityInfo(securityData: string): SecurityDisplay {
     const securityArray: Array<string> = JSON.parse(securityData);
     if(securityArray.includes('WPA2')) return { type: 'WPA2', description: 'The strongest security standard, WPA2 type uses CCMP / AES encryption.', color: '#68BC00' };
