@@ -29,10 +29,21 @@ namespace AccessPointMapApp
             AccesspointContainer = serializationService.DeserializeAccessPointContainer(Intent.GetStringExtra("AccessPoints"));
 
             LoginFormInput = FindViewById<EditText>(Resource.Id.formLoginInput);
+            LoginFormInput.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+
             PasswordFormInput = FindViewById<EditText>(Resource.Id.formPasswordInput);
+            PasswordFormInput.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+
             AuthButton = FindViewById<Button>(Resource.Id.authButton);
+            AuthButton.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+            AuthButton.SetBackgroundColor(new Android.Graphics.Color(76, 82, 103));
+
             StorageButton = FindViewById<Button>(Resource.Id.storageButton);
+            StorageButton.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+            StorageButton.SetBackgroundColor(new Android.Graphics.Color(76, 82, 103));
+
             ForceMasterCheckBox = FindViewById<CheckBox>(Resource.Id.checkBoxForceMaster);
+            ForceMasterCheckBox.SetTextColor(new Android.Graphics.Color(103, 244, 148));
 
             AuthButton.Click += AuthButtonClickEvent;
             StorageButton.Click += StorageButtonClickEvent;

@@ -20,6 +20,7 @@ namespace AccessPointMapApp
 	{
 		private Button ButtonScan;
 		private Button ButtonUpload;
+		private Button ButtonFaq;
 
 		private WifiManager WifiManagerObject;
 		private List<Accesspoint> AccesspointContainer;
@@ -57,12 +58,23 @@ namespace AccessPointMapApp
 
 			ButtonScan = FindViewById<Button>(Resource.Id.scanButton);
 			ButtonScan.Text = "Start scan";
+			ButtonScan.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+			ButtonScan.SetBackgroundColor(new Android.Graphics.Color(76, 82, 103));
+
 			ButtonUpload = FindViewById<Button>(Resource.Id.uploadButton);
 			ButtonUpload.Text = "Save data";
 			ButtonUpload.Enabled = false;
+			ButtonUpload.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+			ButtonUpload.SetBackgroundColor(new Android.Graphics.Color(76, 82, 103));
+
+			ButtonFaq = FindViewById<Button>(Resource.Id.faqButton);
+			ButtonFaq.Text = "Before you start";
+			ButtonFaq.SetTextColor(new Android.Graphics.Color(103, 244, 148));
+			ButtonFaq.SetBackgroundColor(new Android.Graphics.Color(76, 82, 103));
 
 			ButtonScan.Click += ButtonScanClickEvent;
 			ButtonUpload.Click += ButtonUploadClickEvent;
+			ButtonFaq.Click += ButtonFaqClickEvent;
 		}
 
 		private async void ButtonScanClickEvent(object sender, System.EventArgs e)
@@ -82,6 +94,20 @@ namespace AccessPointMapApp
 				ButtonScan.Text = "Start scan";
 				if (AccesspointContainer.Count > 0) ButtonUpload.Enabled = true;
 			}
+		}
+
+		private void ButtonFaqClickEvent(object sender, System.EventArgs e)
+		{
+			var dialog = new Android.App.AlertDialog.Builder(this);
+			var faq = dialog.Create();
+			faq.SetTitle("Before you start!");
+			faq.SetMessage($@"1. Android application in KitKat version.
+2. Turn on the wifi and gps service on your device.
+3. Remember to move slowly during the scan, walking is recommended, but cycling is also involved. Driving the car gives incorrect readings for speed reasons.
+4. In order to transfer data, you must provide your authentication data and make sure that the 'force master' option is DESIGNED. Remember to check if you are connected to the internet after the scanning process (Wifi or transfer data).
+5. It is recommended to disable transfer data before starting the scan.");
+			faq.SetButton("OK", (c, ev) => { });
+			faq.Show();
 		}
 
 		private void ButtonUploadClickEvent(object sender, System.EventArgs e)

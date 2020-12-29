@@ -4,40 +4,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#363a51">
 
     <EditText
         android:id="@+id/formLoginInput"
         android:hint="Login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="5px"/>
 
     <EditText
         android:id="@+id/formPasswordInput"
         android:hint="Password"
         android:layout_below="@+id/formLoginInput"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="5px"/>
 
     <Button
         android:id="@+id/authButton"
         android:layout_below="@+id/formPasswordInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sign in and upload"/>
+        android:text="Sign in and upload"
+        android:layout_margin="5px"/>
 
     <Button
         android:id="@+id/storageButton"
         android:layout_below="@+id/authButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save to storage"/>
+        android:text="Save to storage"
+        android:layout_margin="5px"/>
 
     <CheckBox
         android:id="@+id/checkBoxForceMaster"
         android:text="Force master"
         android:layout_below="@+id/storageButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="5px"/>
 
 </RelativeLayout>
