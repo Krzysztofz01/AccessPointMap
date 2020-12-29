@@ -1,0 +1,66 @@
+.security-average, .security-bad, .security-good {
+    font-weight: bold;
+}
+
+.security-good {
+    color: #68BC00 !important;
+}
+
+.security-average {
+    color: #FB9E00 !important;
+}
+
+.security-bad {
+    color: #F44E3B !important;
+}
+
+.apTitle {
+   cursor: pointer;
+   font-weight: bold; 
+}
+
+td, th, tr {
+    border-color: #67f494 !important;
+}
+
+thead, tbody {
+    color: #67f494 !important;
+}
+
+thead {
+    cursor: pointer;
+}
+
+::ng-deep .ngx-pagination {
+    color: #67f494 !important;
+}
+
+::ng-deep .ngx-pagination .disabled {
+    color: #363a51 !important;
+}
+
+::ng-deep .ngx-pagination .current {
+    background-color: #67f494 !important;
+    color: #363a51 !important;
+}
+
+::ng-deep .ngx-pagination .current:hover {
+    background-color: #363a51 !important;
+    color: #67f494 !important;
+}
+
+input {
+    color: #67f494 !important;
+    background-color: #363a51 !important;
+    border: 1px solid #67f494 !important;
+}
+
+input::placeholder {
+    color: #4c5267 !important;
+}
+
+input:focus {
+    border: 1px solid #67f494 !important;
+    background-color: #4c5267 !important;
+    box-shadow: none !important;
+}

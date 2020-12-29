@@ -14,6 +14,11 @@ import { FrequencyChartComponent } from './layout/frequency-chart/frequency-char
 import { BrandChartComponent } from './layout/brand-chart/brand-chart.component';
 import { PageMainComponent } from './layout/page-main/page-main.component';
 import { PageAdminComponent } from './layout/page-admin/page-admin.component';
+import { AccesspointTableV2Component } from './layout/accesspoint-table-v2/accesspoint-table-v2.component';
+import { FormsModule } from '@angular/forms';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { OrderModule } from 'ngx-order-pipe';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   declarations: [
@@ -26,14 +31,19 @@ import { PageAdminComponent } from './layout/page-admin/page-admin.component';
     FrequencyChartComponent,
     BrandChartComponent,
     PageMainComponent,
-    PageAdminComponent
+    PageAdminComponent,
+    AccesspointTableV2Component
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     ChartsModule,
-    NgbModule
+    NgbModule,
+    FormsModule,
+    Ng2SearchPipeModule,
+    OrderModule,
+    NgxPaginationModule
   ],
   providers: [],
   bootstrap: [AppComponent]

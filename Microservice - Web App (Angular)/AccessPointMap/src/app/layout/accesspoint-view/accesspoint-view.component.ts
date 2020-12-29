@@ -29,7 +29,6 @@ export class AccesspointViewComponent implements OnInit {
         this.accessPoint = ap;
         this.security = this.prepareSecurityInfo(this.accessPoint.securityData);
         this.initializeMap();
-        console.log(ap);
       }
     });
   }
@@ -37,7 +36,6 @@ export class AccesspointViewComponent implements OnInit {
   private initializeMap(): void {
       const circle = new Circle(olProj.fromLonLat([this.accessPoint.highLongitude, this.accessPoint.highLatitude]), (this.accessPoint.signalRadius < 16) ? 16 : this.accessPoint.signalRadius);
       const circleFeature = new Feature(circle);
-      console.log((this.accessPoint.signalRadius < 16) ? 16 : this.accessPoint.signalRadius);
 
       if(this.map === undefined) {
         this.map = new Map({

@@ -38,7 +38,7 @@ export class GlobalMapComponent implements OnInit {
       accesspoints.forEach(element => featuresArray.push(this.prepareSingleMarker(element)));
       this.initializeMap(featuresArray);
     } else {
-      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwOTE1ODI1OSwiZXhwIjoxNjA5MTY1NDU5LCJpYXQiOjE2MDkxNTgyNTl9.UehmaxeZI6xJdcesoVVAgPalfvd3FW1LFSwvGKtzYe4').toPromise()
+      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwOTI0MzMzNiwiZXhwIjoxNjA5MjUwNTM2LCJpYXQiOjE2MDkyNDMzMzZ9.HFUD-wF7YSTgRGH7TPw5GyOB9Ert3T-ZT8jZah6LHks').toPromise()
         .then(x => {
           x.forEach(element => {
             featuresArray.push(this.prepareSingleMarker(element));

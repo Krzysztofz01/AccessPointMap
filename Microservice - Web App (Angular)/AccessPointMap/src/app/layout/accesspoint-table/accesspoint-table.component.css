@@ -35,25 +35,6 @@ tbody {
     color: #67f494 !important;
 }
 
-/*ngb-pagination ::ng-deep a {
-    color: black !important;
-  }
-  
-  ngb-pagination ::ng-deep .page-item.active .page-link {
-    border-color: black;
-    background-color: #363a51 !important;
-    background-color: rgba(0, 0, 0, 0.0) !important;
-    color: #67f494 !important;
-  }
-  
-  ngb-pagination ::ng-deep .page-item.active .page-link:focus, .page-link:not(:disabled):not(.disabled):active:focus {
-    box-shadow: 0 0 0 0.1rem  #67f494 !important;
-  }
-  
-  ngb-pagination ::ng-deep .page-link:not(:disabled):not(.disabled):active:focus {
-    box-shadow: 0 0 0 0.1rem #67f494 !important;
-  }*/
-
 ngb-pagination ::ng-deep .page-item .page-link {
     background-color: #4c5267 !important;
     color: #67f494 !important;
