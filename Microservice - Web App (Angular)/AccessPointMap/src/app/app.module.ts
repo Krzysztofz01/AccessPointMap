@@ -19,6 +19,7 @@ import { FormsModule } from '@angular/forms';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { OrderModule } from 'ngx-order-pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { PageAuthComponent } from './layout/page-auth/page-auth.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     BrandChartComponent,
     PageMainComponent,
     PageAdminComponent,
-    AccesspointTableV2Component
+    AccesspointTableV2Component,
+    PageAuthComponent
   ],
   imports: [
     BrowserModule,

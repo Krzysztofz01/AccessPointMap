@@ -1,0 +1,31 @@
+.custom-border {
+    border: 1px solid #67f494 !important;
+    color: #67f494 !important;
+}
+
+input {
+    color: #67f494 !important;
+    background-color: #363a51 !important;
+    border: 1px solid #67f494 !important;
+}
+
+input::placeholder {
+    color: #4c5267 !important;
+}
+
+input:focus {
+    border: 1px solid #67f494 !important;
+    background-color: #4c5267 !important;
+    box-shadow: none !important;
+}
+
+button {
+    color: #4c5267 !important;
+    background-color: #67f494 !important;
+    border: none;
+}
+
+button:focus {
+    border: none;
+    box-shadow: none;
+}
