@@ -15,11 +15,12 @@ import { BrandChartComponent } from './layout/brand-chart/brand-chart.component'
 import { PageMainComponent } from './layout/page-main/page-main.component';
 import { PageAdminComponent } from './layout/page-admin/page-admin.component';
 import { AccesspointTableV2Component } from './layout/accesspoint-table-v2/accesspoint-table-v2.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { OrderModule } from 'ngx-order-pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { PageAuthComponent } from './layout/page-auth/page-auth.component';
+import { PageUserComponent } from './layout/page-user/page-user.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { PageAuthComponent } from './layout/page-auth/page-auth.component';
     PageMainComponent,
     PageAdminComponent,
     AccesspointTableV2Component,
-    PageAuthComponent
+    PageAuthComponent,
+    PageUserComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +47,8 @@ import { PageAuthComponent } from './layout/page-auth/page-auth.component';
     FormsModule,
     Ng2SearchPipeModule,
     OrderModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

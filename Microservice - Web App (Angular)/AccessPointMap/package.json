@@ -24,6 +24,7 @@
     "bootstrap": "^4.5.0",
     "chart.js": "^2.9.4",
     "install": "^0.13.0",
+    "jwt-decode": "^3.1.2",
     "ng2-charts": "^2.4.2",
     "ng2-search-filter": "^0.5.1",
     "ngx-order-pipe": "^2.1.1",

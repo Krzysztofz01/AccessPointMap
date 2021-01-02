@@ -1,17 +1,21 @@
 <div class="container">
     <div class="row text-center mt-5">
         <div class="col-xl custom-border mr-xl-2">
-            <h3 class="mt-2">Sign in</h3>
-            <input type="email" class="form-control my-3" id="loginEmail" placeholder="Email address">
-            <input type="password" class="form-control my-3" id="loginPassword" placeholder="Password">
-            <button class="btn btn-primary my-3" id="loginButton">Sign in</button>
+            <form [formGroup]="loginFormGroup" (ngSubmit)="loginSubmit()">
+                <h3 class="mt-2">Sign in</h3>
+                <input type="email" class="form-control my-3" id="loginEmail" placeholder="Email address" formControlName="email">
+                <input type="password" class="form-control my-3" id="loginPassword" placeholder="Password" formControlName="password">
+                <button type="submit" class="btn btn-primary my-3" id="loginButton">Sign in</button>
+            </form>
         </div>
         <div class="col-xl custom-border ml-xl-2">
-            <h3 class="mt-2">Sign up</h3>
-            <input type="email" class="form-control my-3" id="registerEmail" placeholder="Email address">
-            <input type="password" class="form-control my-3" id="registerPassword" placeholder="Password">
-            <input type="password" class="form-control my-3" id="registerPasswordRepeat" placeholder="Repat password">
-            <button class="btn btn-primary my-3" id="registerButton">Sign up</button>
+            <form [formGroup]="registerFormGroup" (ngSubmit)="registerSubmit()">
+                <h3 class="mt-2">Sign up</h3>
+                <input type="email" class="form-control my-3" id="registerEmail" placeholder="Email address" formControlName="email">
+                <input type="password" class="form-control my-3" id="registerPassword" placeholder="Password" formControlName="password">
+                <input type="password" class="form-control my-3" id="registerPasswordRepeat" placeholder="Repeat password" formControlName="passwordRepeat">
+                <button type="submit" class="btn btn-primary my-3" id="registerButton">Sign up</button>
+            </form>
         </div>
     </div>
 </div>
