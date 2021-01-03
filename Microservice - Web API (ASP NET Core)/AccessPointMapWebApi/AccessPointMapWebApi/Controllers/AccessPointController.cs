@@ -25,6 +25,13 @@ namespace AccessPointMapWebApi.Controllers
             return Ok(await accessPointRepository.GetAll());
         }
 
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<Accesspoint>>> GetAllAccesspointsAdmin()
+        {
+            return Ok(await accessPointRepository.GetAllAdmin());
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<Accesspoint>> GetAccesspointById(int id)

@@ -13,6 +13,7 @@ namespace AccessPointMapWebApi.Repositories
     public interface IAccessPointRepository
     {
         Task<IEnumerable<Accesspoint>> GetAll();
+        Task<IEnumerable<Accesspoint>> GetAllAdmin();
         Task<Accesspoint> GetById(int id);
         Task<IEnumerable<Accesspoint>> SearchByParams(string ssid, int freq, string brand, string security);
         Task<IEnumerable<string>> GetBrandList();
@@ -163,6 +164,11 @@ namespace AccessPointMapWebApi.Repositories
         public async Task<IEnumerable<Accesspoint>> GetAll()
         {
             return await context.Accesspoints.Where(accesspoint => accesspoint.Display == true).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Accesspoint>> GetAllAdmin()
+        {
+            return await context.Accesspoints.ToListAsync();
         }
 
         public async Task<Accesspoint> GetById(int id)
