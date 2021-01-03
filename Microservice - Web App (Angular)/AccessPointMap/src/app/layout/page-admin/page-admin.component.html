@@ -1,1 +1,25 @@
-<p>page-admin works!</p>
+<div class="container-fluid px-5 mt-3">
+    <div class="row">
+        <div class="col-12 text-center">
+            <ul class="nav nav-pills mb-3">
+                <li class="nav-item">
+                    <a class="nav-link" (click)="toggleComp('masterAp')" [ngClass]="isToggled('masterAp') ? 'active' : 'inactive' ">Master accesspoints</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="toggleComp('queueAp')" [ngClass]="isToggled('queueAp') ? 'active' : 'inactive' ">Queue accesspoints</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="toggleComp('users')" [ngClass]="isToggled('users') ? 'active' : 'inactive' ">Users</a>
+                </li>
+                <li class="nav-item ml-5">
+                    <a class="nav-link active" (click)="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <admin-accesspoint-master *ngIf="isToggled('masterAp')"></admin-accesspoint-master>
+        <admin-accesspoint-queue *ngIf="isToggled('queueAp')"></admin-accesspoint-queue>
+        <admin-user *ngIf="isToggled('users')"></admin-user>
+    </div>
+</div>

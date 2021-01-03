@@ -21,6 +21,9 @@ import { OrderModule } from 'ngx-order-pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { PageAuthComponent } from './layout/page-auth/page-auth.component';
 import { PageUserComponent } from './layout/page-user/page-user.component';
+import { AdminAccesspointMasterComponent } from './layout/admin-accesspoint-master/admin-accesspoint-master.component';
+import { AdminAccesspointQueueComponent } from './layout/admin-accesspoint-queue/admin-accesspoint-queue.component';
+import { AdminUserComponent } from './layout/admin-user/admin-user.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +39,10 @@ import { PageUserComponent } from './layout/page-user/page-user.component';
     PageAdminComponent,
     AccesspointTableV2Component,
     PageAuthComponent,
-    PageUserComponent
+    PageUserComponent,
+    AdminAccesspointMasterComponent,
+    AdminAccesspointQueueComponent,
+    AdminUserComponent
   ],
   imports: [
     BrowserModule,
