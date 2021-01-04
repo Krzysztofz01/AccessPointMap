@@ -6,7 +6,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["AccessPointMapWebApi/AccessPointMapWebApi.csproj", "AccessPointMapWebApi/"]
+COPY . AccessPointMapWebApi/
 RUN dotnet restore "AccessPointMapWebApi/AccessPointMapWebApi.csproj"
 COPY . .
 WORKDIR "/src/AccessPointMapWebApi"

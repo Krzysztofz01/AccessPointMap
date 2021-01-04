@@ -42,8 +42,13 @@ export class AuthService {
     return true;
   }
 
+  public getToken(): string {
+    const { token } = this.cacheService.load(this.cacheKey);
+    return token;
+  }
+
   public getPerm(): string {
-    const { token } = this.cacheService.load(this.cacheKey)
+    const { token } = this.cacheService.load(this.cacheKey);
     if(token == null) {
       this.cacheService.delete(this.cacheKey);
       return null;

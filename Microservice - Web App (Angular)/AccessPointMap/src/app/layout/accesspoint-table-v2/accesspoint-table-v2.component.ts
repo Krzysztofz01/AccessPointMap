@@ -22,7 +22,7 @@ export class AccesspointTableV2Component implements OnInit {
   ngOnInit(): void {
     this.accesspointContainer = this.cacheService.load(environment.CACHE_ACCESSPOINTS);
     if(this.accesspointContainer == null) {
-      this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwOTI0MzMzNiwiZXhwIjoxNjA5MjUwNTM2LCJpYXQiOjE2MDkyNDMzMzZ9.HFUD-wF7YSTgRGH7TPw5GyOB9Ert3T-ZT8jZah6LHks')
+      this.accesspointDataService.getAllAccessPoints()
         .subscribe((response) => {
           this.accesspointContainer = response;
           this.cacheService.delete(environment.CACHE_ACCESSPOINTS);

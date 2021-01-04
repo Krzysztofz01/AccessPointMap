@@ -1,1 +1,45 @@
-<p>admin-user works!</p>
+<input class="form-control mb-3" type="text" name="searchQuery" [(ngModel)]="searchQuery" (ngModelChange)="search()"
+    placeholder="Search for keyword... (email or IP)">
+
+<pagination-controls class="custom-pagination-style text-center mb-3" (pageChange)="page = $event"></pagination-controls>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th (click)="sort('id')" scope="col">#&nbsp;ᛨ</th>
+                <th (click)="sort('email')" scope="col">Email&nbsp;ᛨ</th>
+                <th (click)="sort('tokenExpiration')" scope="col">Token expiration&nbsp;ᛨ</th>
+                <th (click)="sort('readPermission')" scope="col">Read permission&nbsp;ᛨ</th>
+                <th (click)="sort('writePermission')" scope="col">Write permission&nbsp;ᛨ</th>              
+                <th (click)="sort('adminPermission')" scope="col">Admin permission&nbsp;ᛨ</th>
+                <th (click)="sort('createDate')" scope="col">Created&nbsp;ᛨ</th>
+                <th (click)="sort('lastLoginDate')" scope="col">Last login date&nbsp;ᛨ</th>
+                <th (click)="sort('lastLoginIp')" scope="col">Last login IP&nbsp;ᛨ</th>
+                <th (click)="sort('active')" scope="col">Activated&nbsp;ᛨ</th>         
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let us of userContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:12, currentPage: page }">
+                <th scope="row">{{ us.id }}</th>
+                <td>{{ us.email }}</td>
+                <td>{{ us.tokenExpiration }}</td>
+                <td>{{ us.readPermission }}</td>
+                <td>{{ us.writePermission }}</td>
+                <td>{{ us.adminPermission }}</td>
+                <td>{{ us.createDate }}</td>
+                <td>{{ us.lastLoginDate }}</td>
+                <td>{{ us.lastLoginIp }}</td>
+                <td>{{ us.active }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary mx-1">Activate</button>
+                        <button type="button" class="btn btn-primary mx-1">Edit</button>
+                        <button type="button" class="btn btn-primary mx-1">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

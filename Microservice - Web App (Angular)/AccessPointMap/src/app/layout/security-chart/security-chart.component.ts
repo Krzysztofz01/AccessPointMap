@@ -63,7 +63,7 @@ export class SecurityChartComponent implements OnInit {
     if(preparedChartData == null) {
       const accesspoints = this.cacheService.load(environment.CACHE_ACCESSPOINTS);
       if(accesspoints == null) {
-        this.accesspointDataService.getAllAccessPoints('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZyb250ZW5kQGFwbS5jb20iLCJyb2xlIjoiUmVhZCIsIm5iZiI6MTYwODY2MzkwMCwiZXhwIjoxNjA4NjcxMTAwLCJpYXQiOjE2MDg2NjM5MDB9.AIaiWbJsWJ2jtTO9bx7lCcb08OprE83h2GUXbcCRdVg').toPromise()
+        this.accesspointDataService.getAllAccessPoints().toPromise()
           .then(x => {
             this.chartPreparationService.prepareCharts(x);
             preparedChartData = this.cacheService.load(environment.CACHE_CHART_SECURITY);

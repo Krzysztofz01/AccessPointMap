@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { environment } from './../../environments/environment';
 import { Accesspoint } from './../models/accesspoint.model';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +13,17 @@ export class AccesspointDataService {
   
   constructor(private httpClient: HttpClient) { }
 
-  public getAllAccessPoints(token: string) : Observable<Array<Accesspoint>> {
+  public getAllAccessPoints() : Observable<Array<Accesspoint>> {
+    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master'));
+  }
+
+  public getAllAccessPointsAdmin(token: string) : Observable<Array<Accesspoint>> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master'), { headers });
+    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master/all'), { headers });
   }
 
   public getAccessPointById(id: number, token: string) : Observable<Accesspoint> {
@@ -65,13 +68,8 @@ export class AccesspointDataService {
     return this.httpClient.post(this.url('accesspoints/master/merge'), { ids }, { headers });
   }
 
-  public getBrands(token: string) : Observable<Array<string>> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.httpClient.get<Array<string>>(this.url('accesspoints/master/brands'), { headers });
+  public getBrands() : Observable<Array<string>> {
+    return this.httpClient.get<Array<string>>(this.url('accesspoints/master/brands'));
   }
 
   public deleteAccesspoint(id: number, token: string) : Observable<any> {

@@ -1,1 +1,45 @@
-<p>admin-accesspoint-master works!</p>
+<input class="form-control mb-3" type="text" name="searchQuery" [(ngModel)]="searchQuery" (ngModelChange)="search()"
+    placeholder="Search for keyword... (name, MAC address or brand)">
+
+<pagination-controls class="custom-pagination-style text-center mb-3" (pageChange)="page = $event"></pagination-controls>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th (click)="sort('id')" scope="col">#&nbsp;ᛨ</th>
+                <th (click)="sort('ssid')" scope="col">Ssid&nbsp;ᛨ</th>
+                <th (click)="sort('bssid')" scope="col">Bssid&nbsp;ᛨ</th>
+                <th (click)="sort('brand')" scope="col">Brand&nbsp;ᛨ</th>
+                <th (click)="sort('frequency')" scope="col">Frequency&nbsp;ᛨ</th>
+                <th (click)="sort('securityData')" scope="col">Security&nbsp;ᛨ</th>
+                <th (click)="sort('signalArea')" scope="col">Signal Area&nbsp;ᛨ</th>
+                <th (click)="sort('postedBy')" scope="col">Posted By&nbsp;ᛨ</th>
+                <th (click)="sort('display')" scope="col">Visible&nbsp;ᛨ</th>
+                <th (click)="sort('updateDate')" scope="col">Created/Updated&nbsp;ᛨ</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:12, currentPage: page }">
+                <th scope="row">{{ ap.id }}</th>
+                <td>{{ ap.ssid }}</td>
+                <td>{{ ap.bssid }}</td>
+                <td>{{ ap.brand }}</td>
+                <td>{{ ap.frequency }}</td>
+                <td>{{ ap.securityData }}</td>
+                <td>{{ ap.signalArea }}</td>
+                <td>{{ ap.postedBy}}</td>
+                <td>{{ ap.display }}</td>
+                <td>{{ ap.createDate }}/{{ ap.updateDate }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary mx-1">Edit</button>
+                        <button type="button" class="btn btn-primary mx-1">Delete</button>
+                        <button type="button" class="btn btn-primary mx-1">Change display</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
