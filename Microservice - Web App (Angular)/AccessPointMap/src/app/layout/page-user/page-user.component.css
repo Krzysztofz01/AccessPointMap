@@ -8,3 +8,15 @@
     color: #67f494 !important;
     cursor: pointer;
 }
+
+.btn {
+    background-color: #67f494 !important;
+    color: #4c5267 !important;
+    cursor: pointer;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+p {
+    color: #67f494 !important;
+}

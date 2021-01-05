@@ -64,11 +64,10 @@ export class AuthService {
 
   private doLogin(token: string): void {
     const payload: any = jwt_decode(token);
-    this.userEmail = payload.email;
-    this.userPermission = payload.role;
-
+    const tokenExpiration = (payload.exp - payload.iat) / 60;
+    
     this.cacheService.delete(this.cacheKey);
-    this.cacheService.save({ key: this.cacheKey, data: { token }, expirationMinutes: 5 });
+    this.cacheService.save({ key: this.cacheKey, data: { token }, expirationMinutes: tokenExpiration });
   }
 
   private doLogout(): void {

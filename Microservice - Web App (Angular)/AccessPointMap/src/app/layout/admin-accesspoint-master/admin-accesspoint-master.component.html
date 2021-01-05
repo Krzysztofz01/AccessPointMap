@@ -21,22 +21,22 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:12, currentPage: page }">
+            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:11, currentPage: page }">
                 <th scope="row">{{ ap.id }}</th>
                 <td>{{ ap.ssid }}</td>
                 <td>{{ ap.bssid }}</td>
                 <td>{{ ap.brand }}</td>
                 <td>{{ ap.frequency }}</td>
-                <td>{{ ap.securityData }}</td>
-                <td>{{ ap.signalArea }}</td>
+                <td>{{ formatSecurity(ap) }}</td>
+                <td>{{ ap.signalArea }}m<sup>2</sup></td>
                 <td>{{ ap.postedBy}}</td>
-                <td>{{ ap.display }}</td>
-                <td>{{ ap.createDate }}/{{ ap.updateDate }}</td>
+                <td><span [ngClass]="(ap.display == true) ? 'status-good' : 'status-bad'">{{ (ap.display == true) ? "Visible" : "Hidden" }}</span></td>
+                <td>{{ formatDates(ap) }}</td>
                 <td>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-primary mx-1">Edit</button>
-                        <button type="button" class="btn btn-primary mx-1">Delete</button>
-                        <button type="button" class="btn btn-primary mx-1">Change display</button>
+                        <button type="button" class="btn btn-primary mx-1" (click)="deleteAccesspoint(ap)">Delete</button>
+                        <button type="button" class="btn btn-primary mx-1" (click)="displayAccesspoint(ap)">Change display</button>
                     </div>
                 </td>
             </tr>

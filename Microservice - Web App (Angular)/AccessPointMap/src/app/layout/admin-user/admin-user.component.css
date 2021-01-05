@@ -51,3 +51,11 @@ input:focus {
     border: none !important;
     box-shadow: none !important;
 }
+
+.status-good {
+    color: #68BC00 !important;
+}
+
+.status-bad {
+    color: #F44E3B !important;
+}

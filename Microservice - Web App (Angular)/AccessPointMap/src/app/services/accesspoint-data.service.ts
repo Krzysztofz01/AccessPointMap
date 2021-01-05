@@ -56,7 +56,7 @@ export class AccesspointDataService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.post('accesspoints/master/visibility', { id, display }, { headers });
+    return this.httpClient.post(this.url('accesspoints/master/visibility'), { id, display }, { headers });
   }
 
   public mergeAccesspoints(ids: Array<number>, token: string) : Observable<any> {

@@ -21,22 +21,22 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let us of userContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:12, currentPage: page }">
+            <tr *ngFor="let us of userContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:11, currentPage: page }">
                 <th scope="row">{{ us.id }}</th>
                 <td>{{ us.email }}</td>
                 <td>{{ us.tokenExpiration }}</td>
-                <td>{{ us.readPermission }}</td>
-                <td>{{ us.writePermission }}</td>
-                <td>{{ us.adminPermission }}</td>
-                <td>{{ us.createDate }}</td>
-                <td>{{ us.lastLoginDate }}</td>
+                <td><span [ngClass]="(us.readPermission == true) ? 'status-good' : 'status-bad'">{{ (us.readPermission == true) ? 'Granted' : 'Not allowed' }}</span></td>
+                <td><span [ngClass]="(us.writePermission == true) ? 'status-good' : 'status-bad'">{{ (us.writePermission == true) ? 'Granted' : 'Not allowed' }}</span></td>
+                <td><span [ngClass]="(us.adminPermission == true) ? 'status-good' : 'status-bad'">{{ (us.adminPermission == true) ? 'Granted' : 'Not allowed' }}</span></td>
+                <td>{{ dateFormat(us.createDate) }}</td>
+                <td>{{ dateFormat(us.lastLoginDate) }}</td>
                 <td>{{ us.lastLoginIp }}</td>
-                <td>{{ us.active }}</td>
+                <td><span [ngClass]="(us.active == true) ? 'status-good' : 'status-bad'">{{ (us.active == true) ? 'Activated' : 'Not activated' }}</span></td>
                 <td>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-primary mx-1">Activate</button>
+                        <button type="button" class="btn btn-primary mx-1" (click)="changeUserActivation(us)">{{ (us.active == true) ? 'Disable' : 'Activate' }}</button>
                         <button type="button" class="btn btn-primary mx-1">Edit</button>
-                        <button type="button" class="btn btn-primary mx-1">Delete</button>
+                        <button type="button" class="btn btn-primary mx-1" (click)="deleteUser(us)">Delete</button>
                     </div>
                 </td>
             </tr>

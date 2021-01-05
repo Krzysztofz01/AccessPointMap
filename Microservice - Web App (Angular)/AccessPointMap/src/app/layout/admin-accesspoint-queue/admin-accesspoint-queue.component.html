@@ -14,26 +14,24 @@
                 <th (click)="sort('securityDataRaw')" scope="col">Security&nbsp;ᛨ</th>
                 <th (click)="sort('signalArea')" scope="col">Signal Area&nbsp;ᛨ</th>
                 <th (click)="sort('postedBy')" scope="col">Posted By&nbsp;ᛨ</th>
-                <th (click)="sort('display')" scope="col">Visible&nbsp;ᛨ</th>
                 <th (click)="sort('createDate')" scope="col">Created&nbsp;ᛨ</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:12, currentPage: page }">
+            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:11, currentPage: page }">
                 <th scope="row">{{ ap.id }}</th>
                 <td>{{ ap.ssid }}</td>
                 <td>{{ ap.bssid }}</td>
                 <td>{{ ap.frequency }}</td>
                 <td>{{ ap.securityDataRaw }}</td>
-                <td>{{ ap.signalArea }}</td>
+                <td>{{ ap.signalArea }}m<sup>2</sup></td>
                 <td>{{ ap.postedBy}}</td>
-                <td>{{ ap.display }}</td>
-                <td>{{ ap.createDate }}</td>
+                <td>{{ formatDate(ap) }}</td>
                 <td>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-primary mx-1">Merge</button>
-                        <button type="button" class="btn btn-primary mx-1">Delete</button>
+                        <button type="button" class="btn btn-primary mx-1" (click)="mergeAccesspoint(ap)">Merge</button>
+                        <button type="button" class="btn btn-primary mx-1" (click)="deleteAccesspoint(ap)">Delete</button>
                     </div>
                 </td>
             </tr>

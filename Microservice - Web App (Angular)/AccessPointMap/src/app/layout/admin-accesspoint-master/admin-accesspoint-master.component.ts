@@ -14,15 +14,49 @@ export class AdminAccesspointMasterComponent implements OnInit {
   public sortKey: string = 'id';
   public sortReverse: boolean = false;
   public page: number = 1;
+  private token: string;
 
   constructor(private accesspointDataService: AccesspointDataService, private authService: AuthService) { }
 
   ngOnInit(): void {
-    const token = this.authService.getToken();
-    this.accesspointDataService.getAllAccessPointsAdmin(token)
+    this.token = this.authService.getToken();
+    this.accesspointDataService.getAllAccessPointsAdmin(this.token)
       .subscribe((response) => {
         this.accesspointContainer = response;
       });
+  }
+
+  public deleteAccesspoint(accesspoint: Accesspoint): void {
+    this.accesspointDataService.deleteAccesspoint(accesspoint.id, this.token)
+      .subscribe((response) => {
+        console.log(response);
+      });
+  }
+
+  public displayAccesspoint(accesspoint: Accesspoint): void {
+    this.accesspointDataService.displayAccesspoint(accesspoint.id, !accesspoint.display, this.token)
+      .subscribe((response) => {
+        console.log(response);
+      });
+  }
+
+  public formatDates(accesspoint: Accesspoint): string {
+    const cr = new Date(accesspoint.createDate);
+    const up = new Date(accesspoint.updateDate);
+    return `${cr.getDay()}.${cr.getMonth()}.${cr.getFullYear()}/${up.getDay()}.${up.getMonth()}.${up.getFullYear()}`;
+  }
+
+  public formatSecurity(accessPoint: Accesspoint): string {
+    const secArray: Array<string> = JSON.parse(accessPoint.securityData);
+    let outputFormat = '';
+    secArray.forEach((element, index) => {
+      if(index == 0) {
+        outputFormat += element;
+      } else {
+        outputFormat += `/${element}`;
+      }
+    });
+    return outputFormat;
   }
 
   public search(): void {
