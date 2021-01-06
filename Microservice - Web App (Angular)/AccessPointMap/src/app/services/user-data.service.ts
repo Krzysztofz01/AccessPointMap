@@ -55,7 +55,7 @@ export class UserDataService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.httpClient.put(this.url('auth/user'), { user }, { headers });
+    return this.httpClient.put(this.url('auth/user'), user, { headers });
   }
 
   private url(endpoint: string): string {

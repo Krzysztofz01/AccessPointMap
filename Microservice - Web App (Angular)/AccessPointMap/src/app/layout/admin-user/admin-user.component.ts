@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { User } from 'src/app/models/user.model';
 import { UserDataService } from 'src/app/services/user-data.service';
+import { AdminUserEditModalComponent } from '../admin-user-edit-modal/admin-user-edit-modal.component';
 
 @Component({
   selector: 'admin-user',
@@ -16,7 +18,7 @@ export class AdminUserComponent implements OnInit {
   public page: number = 1;
   private token: string;
 
-  constructor(private userDataService: UserDataService, private authService: AuthService) { }
+  constructor(private userDataService: UserDataService, private authService: AuthService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.token = this.authService.getToken();
@@ -31,6 +33,21 @@ export class AdminUserComponent implements OnInit {
       .subscribe((response) => {
         console.log(response);
       });
+  }
+
+  public editUser(user: User): void {
+    const ref = this.modalService.open(AdminUserEditModalComponent, { windowClass: 'custom-modal' });
+    ref.componentInstance.user = user;
+
+    ref.result.then((user) => {
+      this.userDataService.updateUser(user, this.token)
+        .subscribe((response) => {
+          console.log(response);
+        });
+    },
+    (exit) => {
+      console.log('No changes');
+    });
   }
 
   public deleteUser(user: User): void {
