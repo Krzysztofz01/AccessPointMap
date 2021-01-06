@@ -1,1 +1,53 @@
-<p>admin-accesspoint-master-edit-modal works!</p>
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edit: {{ accesspoint.bssid }}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('exit')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form [formGroup]="accesspointForm">
+        <div class="form-group">
+            <label for="ssid">SSID</label>
+            <input type="text" class="form-control" id="ssid" formControlName="ssid">
+        </div>
+        <div class="form-group">
+            <label for="frequency">Frequency</label>
+            <input type="number" class="form-control" id="frequency" formControlName="frequency">
+        </div>
+        <div class="form-group">
+            <label for="highSignalLevel">High signal level</label>
+            <input type="number" class="form-control" id="highSignalLevel" formControlName="highSignalLevel">
+        </div>
+        <div class="form-group">
+            <label for="highLatitude">High latitude</label>
+            <input type="number" class="form-control" id="highLatitude" formControlName="highLatitude">
+        </div>
+        <div class="form-group">
+            <label for="highLongitude">High longitude</label>
+            <input type="number" class="form-control" id="highLongitude" formControlName="highLongitude">
+        </div>
+        <div class="form-group">
+            <label for="lowSignalLevel">Low signal level</label>
+            <input type="number" class="form-control" id="lowSignalLevel" formControlName="lowSignalLevel">
+        </div>
+        <div class="form-group">
+            <label for="lowLatitude">Low latitude</label>
+            <input type="number" class="form-control" id="lowLatitude" formControlName="lowLatitude">
+        </div>
+        <div class="form-group">
+            <label for="lowLongitude">Low longitude</label>
+            <input type="number" class="form-control" id="lowLongitude" formControlName="lowLongitude">
+        </div>
+        <div class="form-group">
+            <label for="postedby">Posted by</label>
+            <input type="text" class="form-control" id="postedby" formControlName="postedby">
+        </div>
+        <div class="form-group">
+            <label for="securityDataRaw">Raw security data</label>
+            <input type="text" class="form-control" id="securityDataRaw" formControlName="securityDataRaw">
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="saveChanges()">Save</button>
+</div>

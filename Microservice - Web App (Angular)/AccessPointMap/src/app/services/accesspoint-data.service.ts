@@ -81,6 +81,15 @@ export class AccesspointDataService {
     return this.httpClient.delete(this.url(`accesspoints/master/${id}`), { headers });
   }
 
+  public addOrUpdateAccesspoint(accesspoint: Accesspoint, token: string) : Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.httpClient.post(this.url('accesspoints/master'), [accesspoint], { headers });
+  }
+
   private url(endpoint: string): string {
     return 'http://' + this.baseUrl + this.apiUrl + endpoint;
   }

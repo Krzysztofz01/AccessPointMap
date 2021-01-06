@@ -34,5 +34,4 @@ export class AdminUserEditModalComponent implements OnInit {
       this.modal.close(this.user);
     }
   }
-
 }
