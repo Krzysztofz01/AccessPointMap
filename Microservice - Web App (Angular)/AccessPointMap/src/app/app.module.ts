@@ -26,6 +26,7 @@ import { AdminAccesspointQueueComponent } from './layout/admin-accesspoint-queue
 import { AdminUserComponent } from './layout/admin-user/admin-user.component';
 import { AdminUserEditModalComponent } from './layout/admin-user-edit-modal/admin-user-edit-modal.component';
 import { AdminAccesspointMasterEditModalComponent } from './layout/admin-accesspoint-master-edit-modal/admin-accesspoint-master-edit-modal.component';
+import { PageErrorComponent } from './layout/page-error/page-error.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { AdminAccesspointMasterEditModalComponent } from './layout/admin-accessp
     AdminAccesspointQueueComponent,
     AdminUserComponent,
     AdminUserEditModalComponent,
-    AdminAccesspointMasterEditModalComponent
+    AdminAccesspointMasterEditModalComponent,
+    PageErrorComponent
   ],
   imports: [
     BrowserModule,

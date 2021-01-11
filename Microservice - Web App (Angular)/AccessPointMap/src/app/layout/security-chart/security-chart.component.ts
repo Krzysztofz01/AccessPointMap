@@ -5,6 +5,7 @@ import { ChartData } from 'src/app/models/chart-data.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { ChartPreparationService } from 'src/app/services/chart-preparation.service';
+import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -21,7 +22,7 @@ export class SecurityChartComponent implements OnInit {
   public chartData: ChartDataSets[];
   public chartReady: boolean;
 
-  constructor(private cacheService: CacheManagerService, private chartPreparationService: ChartPreparationService, private accesspointDataService: AccesspointDataService) { }
+  constructor(private cacheService: CacheManagerService, private chartPreparationService: ChartPreparationService, private accesspointDataService: AccesspointDataService, private errorHandlingService: ErrorHandlingService) { }
 
   ngOnInit(): void {
     this.chartReady = false;
@@ -71,6 +72,7 @@ export class SecurityChartComponent implements OnInit {
           })
           .catch(error => {
             console.log(error);
+            this.errorHandlingService.setException(`${error.name} ${error.statusText}`);
           });
       } else {
         this.chartPreparationService.prepareCharts(accesspoints);

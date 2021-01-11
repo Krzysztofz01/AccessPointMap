@@ -16,6 +16,7 @@ import { SelectedAccesspointService } from 'src/app/services/selected-accesspoin
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { LocalStorageOptions } from 'src/app/models/local-storage-options.model';
 import { environment } from 'src/environments/environment';
+import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 
 @Component({
   selector: 'global-map',
@@ -25,7 +26,7 @@ import { environment } from 'src/environments/environment';
 export class GlobalMapComponent implements OnInit {
   private map: Map;
 
-  constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService, private accesspointDataService: AccesspointDataService) { }
+  constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService, private accesspointDataService: AccesspointDataService, private errorHandlingService: ErrorHandlingService) { }
 
   ngOnInit(): void {
     this.initializeMapData();
@@ -50,6 +51,7 @@ export class GlobalMapComponent implements OnInit {
         })
         .catch(error => {
           console.log(error);
+          this.errorHandlingService.setException(`${error.name} ${error.statusText}`);
         });
     }
   }

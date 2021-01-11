@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 
 @Component({
   selector: 'app-page-auth',
@@ -12,16 +13,17 @@ export class PageAuthComponent implements OnInit {
   public loginFormGroup: FormGroup;
   public registerFormGroup: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router, private errorHandlingSerive: ErrorHandlingService) { }
 
   ngOnInit(): void {
     this.formsInit();
   }
 
   public loginSubmit(): void {
-    if(this.loginFormGroup.valid) {
+    if(this.loginFormGroup.valid || this.loginFormGroup.get('email').errors?.serverError) {
       this.authService.login(this.loginFormGroup.value)
         .subscribe(res => {
+          console.log(res);
           if(res) {
             const permission = this.authService.getPerm();
             if(permission == "Admin") {
@@ -29,7 +31,12 @@ export class PageAuthComponent implements OnInit {
             } else {
               this.router.navigate(['/user']);
             }
+          } else {
+            this.loginFormGroup.get('email').setErrors({ serverError: 'Invalid email or password'});
           }
+        },
+        (error) => {
+          this.errorHandlingSerive.setException(`${error.name} ${error.statusText}`);
         });
     }
   }
@@ -52,5 +59,4 @@ export class PageAuthComponent implements OnInit {
       passwordRepeat: new FormControl('')
     });
   }
-
 }

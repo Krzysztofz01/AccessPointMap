@@ -1,6 +1,15 @@
 <div class="container">
     <div class="row text-center mt-5">
         <div class="col-xl custom-border mr-xl-2">
+            <div *ngIf="loginFormGroup.get('email').invalid && loginFormGroup.get('email').errors && (loginFormGroup.get('email').dirty || loginFormGroup.get('email').touched)" class="alert alert-danger my-2" role="alert">
+                <div *ngIf="loginFormGroup.get('email').errors.required">Email is required.</div>
+                <div *ngIf="loginFormGroup.get('email').errors.email">Wrong email format.</div>
+                <div *ngIf="loginFormGroup.get('email').errors?.serverError">Invalid email or password.</div>
+            </div>
+            <div *ngIf="loginFormGroup.get('password').invalid && loginFormGroup.get('password').errors && (loginFormGroup.get('password').dirty || loginFormGroup.get('password').touched)" class="alert alert-danger my-2" role="alert">
+                <div *ngIf="loginFormGroup.get('password').errors.required">Password is required.</div>
+            </div>
+
             <form [formGroup]="loginFormGroup" (ngSubmit)="loginSubmit()">
                 <h3 class="mt-2">Sign in</h3>
                 <input type="email" class="form-control my-3" id="loginEmail" placeholder="Email address" formControlName="email">

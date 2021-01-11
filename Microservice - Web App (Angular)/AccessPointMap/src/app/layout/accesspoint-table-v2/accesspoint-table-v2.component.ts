@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { CacheManagerService } from 'src/app/services/cache-manager.service';
+import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 import { SelectedAccesspointService } from 'src/app/services/selected-accesspoint.service';
 import { environment } from 'src/environments/environment';
 
@@ -17,7 +18,7 @@ export class AccesspointTableV2Component implements OnInit {
   public sortReverse: boolean = false;
   public page: number = 1;
 
-  constructor(private cacheService: CacheManagerService, private accesspointDataService: AccesspointDataService, private selectedAccesspoint: SelectedAccesspointService) { }
+  constructor(private cacheService: CacheManagerService, private accesspointDataService: AccesspointDataService, private selectedAccesspoint: SelectedAccesspointService, private errorHandlingService: ErrorHandlingService) { }
 
   ngOnInit(): void {
     this.accesspointContainer = this.cacheService.load(environment.CACHE_ACCESSPOINTS);
@@ -28,6 +29,10 @@ export class AccesspointTableV2Component implements OnInit {
           this.cacheService.delete(environment.CACHE_ACCESSPOINTS);
           this.cacheService.save({ key: environment.CACHE_ACCESSPOINTS, data: response, expirationMinutes: 60 });
           this.accesspointContainer = this.accesspointContainer.map((accesspoint, i) => ({secName: this.getSecurityName(accesspoint), secColor: this.getSecurityColor(accesspoint), ...accesspoint}));
+        },
+        (error) => {
+          console.log(error);
+          this.errorHandlingService.setException(`${error.name} ${error.statusText}`);
         });
     }
     this.accesspointContainer = this.accesspointContainer.map((accesspoint, i) => ({secName: this.getSecurityName(accesspoint), secColor: this.getSecurityColor(accesspoint), ...accesspoint}));
