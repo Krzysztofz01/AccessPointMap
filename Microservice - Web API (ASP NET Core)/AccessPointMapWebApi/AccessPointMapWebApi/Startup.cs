@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
@@ -28,19 +29,25 @@ namespace AccessPointMapWebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //Database 
+            //Settings
+            services.Configure<LogsDatabaseSettings>(Configuration.GetSection(nameof(LogsDatabaseSettings)));
+
+            //Databases 
             services.AddDbContext<AccessPointMapContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("AccessPointMap")));
+            services.AddSingleton<ILogsDatabaseSettings>(opt => opt.GetRequiredService<IOptions<LogsDatabaseSettings>>().Value);
 
             //Repositories
             services.AddScoped<IAccessPointRepository, AccessPointRepository>();
             services.AddScoped<IBrandRepository, BrandRepository>();
             services.AddScoped<IGuestAccesspointRepository, GuestAccesspointRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ILogsRepository, LogsRepository>();
 
             //Services
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IGeocalculationService, GeocalculationService>();
             services.AddTransient<IBrandUpdateService, BrandUpdateService>();
+            services.AddTransient<ILogCleanupService, LogCleanupService>();
 
             //Cross-Origin Resource Sharing
             services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
@@ -83,6 +90,9 @@ namespace AccessPointMapWebApi
                 };
             });
 
+            //Http Client
+            services.AddHttpClient();
+
             //Controllers
             services.AddControllers();
         }
@@ -115,8 +125,14 @@ namespace AccessPointMapWebApi
             app.UseHangfireServer();
 
             recurringJobManager.AddOrUpdate(
-                "Brand name update",
+                "JOB_BRAND_UPDATE",
                 () => serviceProvider.GetService<IBrandUpdateService>().Update(),
+                Cron.Daily,
+                TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
+                "JOB_LOG_CLEAN",
+                () => serviceProvider.GetService<ILogCleanupService>().Cleanup(),
                 Cron.Daily,
                 TimeZoneInfo.Local);
         }
