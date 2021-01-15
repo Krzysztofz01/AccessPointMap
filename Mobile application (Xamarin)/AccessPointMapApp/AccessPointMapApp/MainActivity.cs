@@ -8,6 +8,7 @@ using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Widget;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace AccessPointMapApp
 
 		private WifiManager WifiManagerObject;
 		private List<Accesspoint> AccesspointContainer;
+		private Dictionary<string, Accesspoint> AccesspointMap;
 		private string[] Permissions = new string[]
 		{
 			Android.Manifest.Permission.AccessNetworkState,
@@ -49,6 +51,7 @@ namespace AccessPointMapApp
 			ActivityCompat.RequestPermissions(this, Permissions, 0);
 			WifiManagerObject = (WifiManager)GetSystemService(WifiService);
 			AccesspointContainer = new List<Accesspoint>();
+			AccesspointMap = new Dictionary<string, Accesspoint>();
 
 			if(!WifiManagerObject.IsWifiEnabled)
 			{
@@ -85,7 +88,8 @@ namespace AccessPointMapApp
 				while(ButtonScan.Text == "Stop scan")
 				{
 					#pragma warning disable CS0612
-					await StartScan();
+					//await StartScan();
+					await StartScanV2();
 					#pragma warning restore CS0612
 				}
 			}
@@ -114,7 +118,11 @@ namespace AccessPointMapApp
 		{
 			var uploadActivity = new Intent(this, typeof(UploadActivity));
 			var serializationService = new SerializationService();
-			uploadActivity.PutExtra("AccessPoints", serializationService.SerializeAccessPointContainer(AccesspointContainer));
+
+			//uploadActivity.PutExtra("AccessPoints", serializationService.SerializeAccessPointContainer(AccesspointContainer));
+			var accesspointMapList = AccesspointMap.Select(x => x.Value).ToList();
+			uploadActivity.PutExtra("AccessPoints", serializationService.SerializeAccessPointContainer(accesspointMapList));
+
 			StartActivity(uploadActivity);
 		}
 
@@ -164,7 +172,64 @@ namespace AccessPointMapApp
 				}
 			}
 		}
-	
+
+        [System.Obsolete]
+        private async Task StartScanV2()
+        {
+			IList<ScanResult> scanResults = null;
+			Location currentLocation = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium));
+			WifiManagerObject.StartScan();
+			scanResults = WifiManagerObject.ScanResults;
+
+			foreach(var result in scanResults)
+            {
+				try
+                {
+					AccesspointMap.Add(result.Bssid, new Accesspoint()
+					{
+						Bssid = result.Bssid,
+						Ssid = (result.Ssid == string.Empty) ? "Hidden network" : result.Ssid,
+						Frequency = result.Frequency,
+						HighSignalLevel = result.Level,
+						HighLongitude = currentLocation.Longitude,
+						HighLatitude = currentLocation.Latitude,
+						LowSignalLevel = result.Level,
+						LowLongitude = currentLocation.Longitude,
+						LowLatitude = currentLocation.Latitude,
+						SecurityDataRaw = result.Capabilities,
+						PostedBy = null
+					});
+                }
+				catch(ArgumentException)
+                {
+					var knownAccessPoint = AccesspointMap[result.Bssid];
+					bool changes = false;
+					
+					if (result.Level > knownAccessPoint.HighSignalLevel)
+					{
+						knownAccessPoint.HighSignalLevel = result.Level;
+						knownAccessPoint.HighLatitude = currentLocation.Latitude;
+						knownAccessPoint.HighLongitude = currentLocation.Longitude;
+						changes = true;
+					}
+
+					if (result.Level < knownAccessPoint.LowSignalLevel)
+					{
+						knownAccessPoint.LowSignalLevel = result.Level;
+						knownAccessPoint.LowLatitude = currentLocation.Latitude;
+						knownAccessPoint.LowLongitude = currentLocation.Longitude;
+						changes = true;
+					}
+
+					if(changes)
+                    {
+						AccesspointMap[result.Bssid] = knownAccessPoint;
+					}
+				}
+            }
+		}
+
+
 		public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
 		{
 			Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
