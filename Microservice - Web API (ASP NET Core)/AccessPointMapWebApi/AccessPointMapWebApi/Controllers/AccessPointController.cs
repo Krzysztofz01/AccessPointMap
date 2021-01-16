@@ -12,11 +12,14 @@ namespace AccessPointMapWebApi.Controllers
     public class AccessPointController : ControllerBase
     {
         private readonly IAccessPointRepository accessPointRepository;
+        private readonly ILogsRepository logsRepository;
 
         public AccessPointController(
-            IAccessPointRepository accessPointRepository)
+            IAccessPointRepository accessPointRepository,
+            ILogsRepository logsRepository)
         {
             this.accessPointRepository = accessPointRepository;
+            this.logsRepository = logsRepository;
         }
 
         [HttpGet]
@@ -60,8 +63,14 @@ namespace AccessPointMapWebApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddOrUpdateAccesspoints(List<Accesspoint> accesspoints)
         {
-            int rowsAffected = await accessPointRepository.AddOrUpdate(accesspoints);
-            return Ok(new { rowsPosted = accesspoints.Count, rowsAffected });
+            if(accesspoints.Count > 0)
+            {
+                int rowsAffected = await accessPointRepository.AddOrUpdate(accesspoints);
+                await logsRepository.Create($"{ accesspoints[0]?.PostedBy } commited { rowsAffected } updated to master table");
+                return Ok(new { rowsPosted = accesspoints.Count, rowsAffected });
+            }
+            return BadRequest();
+            
         }
 
         [HttpPost("visibility")]
@@ -81,6 +90,7 @@ namespace AccessPointMapWebApi.Controllers
         {
             if (await accessPointRepository.Merge(accesspointsId))
             {
+                await logsRepository.Create($"Merged { accesspointsId.Count } entities from queue to master table");
                 return Ok();
             }
             return BadRequest();

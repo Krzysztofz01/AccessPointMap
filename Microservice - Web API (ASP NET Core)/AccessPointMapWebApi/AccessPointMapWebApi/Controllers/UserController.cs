@@ -12,11 +12,14 @@ namespace AccessPointMapWebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepository;
+        private readonly ILogsRepository logsRepository;
 
         public UserController(
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ILogsRepository logsRepository)
         {
             this.userRepository = userRepository;
+            this.logsRepository = logsRepository;
         }
 
         [HttpGet("user")]
@@ -56,6 +59,7 @@ namespace AccessPointMapWebApi.Controllers
         {
             if (await userRepository.Activate(activation.Id, activation.Active))
             {
+                await logsRepository.Create($"User with id: { activation.Id } activations status set to: { activation.Active }");
                 return Ok();
             }
             return NotFound();
@@ -80,6 +84,7 @@ namespace AccessPointMapWebApi.Controllers
 
             if (!loginStatus.Contains("ERROR:"))
             {
+                await logsRepository.Create($"User: { loginForm.Email } logged from { ipAddress }");
                 return Ok(new { bearerToken = loginStatus });
             }
             else
@@ -100,6 +105,7 @@ namespace AccessPointMapWebApi.Controllers
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             if (await userRepository.Register(userForm, ipAddress))
             {
+                await logsRepository.Create($"User: { userForm.Email } registered from { ipAddress }");
                 return Ok();
             }
             return BadRequest();

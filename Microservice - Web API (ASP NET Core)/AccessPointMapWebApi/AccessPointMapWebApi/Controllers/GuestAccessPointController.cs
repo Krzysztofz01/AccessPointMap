@@ -12,11 +12,14 @@ namespace AccessPointMapWebApi.Controllers
     public class GuestAccessPointController : ControllerBase
     {
         private readonly IGuestAccesspointRepository guestAccesspointRepository;
+        private readonly ILogsRepository logsRepository;
 
         public GuestAccessPointController(
-            IGuestAccesspointRepository guestAccesspointsRepository)
+            IGuestAccesspointRepository guestAccesspointRepository,
+            ILogsRepository logsRepository)
         {
-            this.guestAccesspointRepository = guestAccesspointsRepository;
+            this.guestAccesspointRepository = guestAccesspointRepository;
+            this.logsRepository = logsRepository;
         }
 
         [HttpGet]
@@ -42,8 +45,14 @@ namespace AccessPointMapWebApi.Controllers
         [Authorize(Roles = "Write,Admin")]
         public async Task<ActionResult> AddGuestAccesspoints(List<GuestAccesspoint> accesspoints)
         {
-            int rowsAffected = await guestAccesspointRepository.Add(accesspoints);
-            return Ok(new { rowsAffected });
+            if(accesspoints.Count > 0)
+            {
+                int rowsAffected = await guestAccesspointRepository.Add(accesspoints);
+                await logsRepository.Create($"{ accesspoints[0]?.PostedBy } commited { rowsAffected } updates to the queue table");
+                return Ok(new { rowsAffected });
+            }
+            return BadRequest();
+            
         }
 
         [HttpDelete("{id}")]

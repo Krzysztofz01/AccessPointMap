@@ -13,6 +13,11 @@ namespace AccessPointMapWebApi.Controllers
     {
         private readonly ILogsRepository logsRepository;
 
+        public LogsController(ILogsRepository logsRepository)
+        {
+            this.logsRepository = logsRepository;
+        }
+
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Log>>> GetLogs()
