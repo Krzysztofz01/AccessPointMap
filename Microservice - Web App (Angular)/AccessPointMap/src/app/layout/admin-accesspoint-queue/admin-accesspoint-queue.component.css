@@ -51,3 +51,8 @@ input:focus {
     border: none !important;
     box-shadow: none !important;
 }
+
+.ssid {
+    font-weight: bold;
+    cursor: pointer;
+}

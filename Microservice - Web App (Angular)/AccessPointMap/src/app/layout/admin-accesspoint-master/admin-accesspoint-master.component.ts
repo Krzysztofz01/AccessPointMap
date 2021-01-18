@@ -3,6 +3,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
+import { AccesspointViewModalComponent } from '../accesspoint-view-modal/accesspoint-view-modal.component';
 import { AdminAccesspointMasterEditModalComponent } from '../admin-accesspoint-master-edit-modal/admin-accesspoint-master-edit-modal.component';
 
 @Component({
@@ -48,6 +49,11 @@ export class AdminAccesspointMasterComponent implements OnInit {
     (exit) => {
       console.log('No changes');
     });
+  }
+
+  public viewAccesspoint(accesspoint: Accesspoint): void {
+    const ref = this.modalService.open(AccesspointViewModalComponent, { size: 'lg' });
+    ref.componentInstance.mapInit(accesspoint);
   }
 
   public displayAccesspoint(accesspoint: Accesspoint): void {

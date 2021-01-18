@@ -59,3 +59,8 @@ input:focus {
 .status-bad {
     color: #F44E3B !important;
 }
+
+.ssid {
+    font-weight: bold;
+    cursor: pointer;
+}

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { AccesspointQueue } from 'src/app/models/acesspoint-queue.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { AccesspointQueueDataService } from 'src/app/services/accesspoint-queue-data.service';
+import { AccesspointViewModalComponent } from '../accesspoint-view-modal/accesspoint-view-modal.component';
 
 @Component({
   selector: 'admin-accesspoint-queue',
@@ -17,7 +19,7 @@ export class AdminAccesspointQueueComponent implements OnInit {
   public page: number = 1;
   private token: string;
 
-  constructor(private accesspointDataService: AccesspointDataService, private accesspointQueueDataService: AccesspointQueueDataService, private authService: AuthService) { }
+  constructor(private accesspointDataService: AccesspointDataService, private accesspointQueueDataService: AccesspointQueueDataService, private authService: AuthService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.token = this.authService.getToken();
@@ -32,6 +34,11 @@ export class AdminAccesspointQueueComponent implements OnInit {
       .subscribe((response) => {
         console.log(response);
       });
+  }
+
+  public viewAccesspoint(accesspoint: AccesspointQueue): void {
+    const ref = this.modalService.open(AccesspointViewModalComponent, { size: 'lg' });
+    ref.componentInstance.mapInit(accesspoint);
   }
 
   public mergeAccesspoint(accesspoint: AccesspointQueue): void {
