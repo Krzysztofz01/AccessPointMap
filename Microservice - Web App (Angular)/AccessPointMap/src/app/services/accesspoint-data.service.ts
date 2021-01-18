@@ -90,6 +90,24 @@ export class AccesspointDataService {
     return this.httpClient.post(this.url('accesspoints/master'), [accesspoint], { headers });
   }
 
+  public addOrUpdateAccesspointsMaster(data: object, token: string) : Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.httpClient.post(this.url('accesspoints/master'), data, { headers });
+  }
+
+  public addOrUpdateAccesspointsQueue(data: object, token: string) : Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.httpClient.post(this.url('accesspoints/queue'), data, { headers });
+  }
+
   private url(endpoint: string): string {
     return 'http://' + this.baseUrl + this.apiUrl + endpoint;
   }

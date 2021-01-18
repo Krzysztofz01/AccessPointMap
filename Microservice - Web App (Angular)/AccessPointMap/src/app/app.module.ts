@@ -27,6 +27,8 @@ import { AdminUserComponent } from './layout/admin-user/admin-user.component';
 import { AdminUserEditModalComponent } from './layout/admin-user-edit-modal/admin-user-edit-modal.component';
 import { AdminAccesspointMasterEditModalComponent } from './layout/admin-accesspoint-master-edit-modal/admin-accesspoint-master-edit-modal.component';
 import { PageErrorComponent } from './layout/page-error/page-error.component';
+import { AdminAccesspointAddComponent } from './layout/admin-accesspoint-add/admin-accesspoint-add.component';
+import { AccesspointViewModalComponent } from './layout/accesspoint-view-modal/accesspoint-view-modal.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,9 @@ import { PageErrorComponent } from './layout/page-error/page-error.component';
     AdminUserComponent,
     AdminUserEditModalComponent,
     AdminAccesspointMasterEditModalComponent,
-    PageErrorComponent
+    PageErrorComponent,
+    AdminAccesspointAddComponent,
+    AccesspointViewModalComponent
   ],
   imports: [
     BrowserModule,

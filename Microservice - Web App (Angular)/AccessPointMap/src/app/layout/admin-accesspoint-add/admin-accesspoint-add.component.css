@@ -1,0 +1,11 @@
+.btn {
+    background-color: #67f494 !important;
+    color: #4c5267 !important;
+    cursor: pointer;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+label {
+    color: #67f494 !important;
+}

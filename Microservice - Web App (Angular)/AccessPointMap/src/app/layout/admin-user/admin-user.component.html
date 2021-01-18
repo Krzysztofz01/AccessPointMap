@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let us of userContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:11, currentPage: page }">
+            <tr *ngFor="let us of userContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:10, currentPage: page }">
                 <th scope="row">{{ us.id }}</th>
                 <td>{{ us.email }}</td>
                 <td>{{ us.tokenExpiration }}</td>

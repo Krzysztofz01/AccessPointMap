@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:11, currentPage: page }">
+            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:10, currentPage: page }">
                 <th scope="row">{{ ap.id }}</th>
                 <td>{{ ap.ssid }}</td>
                 <td>{{ ap.bssid }}</td>

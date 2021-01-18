@@ -6,7 +6,8 @@ import { NavToggler } from 'src/app/models/nav-toggler.model';
 const innerComponents: Array<NavToggler> = [
   { name: 'masterAp', visible: false },
   { name: 'queueAp', visible: false },
-  { name: 'users', visible: false }
+  { name: 'users', visible: false },
+  { name: 'add', visible: false }
 ];
 
 @Component({
