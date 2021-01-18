@@ -1,0 +1,29 @@
+td, th, tr {
+    border-color: #67f494 !important;
+}
+
+thead, tbody {
+    color: #67f494 !important;
+}
+
+thead {
+    cursor: pointer;
+}
+
+::ng-deep .ngx-pagination {
+    color: #67f494 !important;
+}
+
+::ng-deep .ngx-pagination .disabled {
+    color: #363a51 !important;
+}
+
+::ng-deep .ngx-pagination .current {
+    background-color: #67f494 !important;
+    color: #363a51 !important;
+}
+
+::ng-deep .ngx-pagination .current:hover {
+    background-color: #363a51 !important;
+    color: #67f494 !important;
+}

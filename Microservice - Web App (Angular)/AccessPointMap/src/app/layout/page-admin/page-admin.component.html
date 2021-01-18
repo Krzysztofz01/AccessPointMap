@@ -14,6 +14,9 @@
                 <li class="nav-item">
                     <a class="nav-link" (click)="toggleComp('add')" [ngClass]="isToggled('add') ? 'active' : 'inactive' ">Upload</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="toggleComp('log')" [ngClass]="isToggled('log') ? 'active' : 'inactive' ">Logs</a>
+                </li>
                 <li class="nav-item ml-5">
                     <a class="nav-link active" (click)="logout()">Logout</a>
                 </li>
@@ -26,6 +29,7 @@
             <admin-accesspoint-queue *ngIf="isToggled('queueAp')"></admin-accesspoint-queue>
             <admin-user *ngIf="isToggled('users')"></admin-user>
             <admin-accesspoint-add *ngIf="isToggled('add')"></admin-accesspoint-add>
+            <admin-logs *ngIf="isToggled('log')"></admin-logs>
         </div>
     </div>
 </div>
