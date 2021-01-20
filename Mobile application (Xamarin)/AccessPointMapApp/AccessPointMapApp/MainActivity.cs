@@ -96,7 +96,8 @@ namespace AccessPointMapApp
 			else
 			{
 				ButtonScan.Text = "Start scan";
-				if (AccesspointContainer.Count > 0) ButtonUpload.Enabled = true;
+				//if (AccesspointContainer.Count > 0) ButtonUpload.Enabled = true;
+				ButtonUpload.Enabled = true;
 			}
 		}
 
@@ -126,7 +127,7 @@ namespace AccessPointMapApp
 			StartActivity(uploadActivity);
 		}
 
-		[System.Obsolete]
+		[Obsolete]
 		private async Task StartScan()
 		{
 			IList<ScanResult> scanResults = null;
@@ -173,18 +174,18 @@ namespace AccessPointMapApp
 			}
 		}
 
-        [System.Obsolete]
-        private async Task StartScanV2()
-        {
+		[Obsolete]
+		private async Task StartScanV2()
+		{
 			IList<ScanResult> scanResults = null;
 			Location currentLocation = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium));
 			WifiManagerObject.StartScan();
 			scanResults = WifiManagerObject.ScanResults;
 
 			foreach(var result in scanResults)
-            {
+			{
 				try
-                {
+				{
 					AccesspointMap.Add(result.Bssid, new Accesspoint()
 					{
 						Bssid = result.Bssid,
@@ -199,9 +200,9 @@ namespace AccessPointMapApp
 						SecurityDataRaw = result.Capabilities,
 						PostedBy = null
 					});
-                }
+				}
 				catch(ArgumentException)
-                {
+				{
 					var knownAccessPoint = AccesspointMap[result.Bssid];
 					bool changes = false;
 					
@@ -222,11 +223,11 @@ namespace AccessPointMapApp
 					}
 
 					if(changes)
-                    {
+					{
 						AccesspointMap[result.Bssid] = knownAccessPoint;
 					}
 				}
-            }
+			}
 		}
 
 

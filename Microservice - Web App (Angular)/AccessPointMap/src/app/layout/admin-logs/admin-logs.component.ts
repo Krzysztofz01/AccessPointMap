@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { Log } from 'src/app/models/log.model';
+import { DateFormatingService } from 'src/app/services/date-formating.service';
 import { LogDataService } from 'src/app/services/log-data.service';
 
 @Component({
@@ -12,7 +13,7 @@ export class AdminLogsComponent implements OnInit {
   public logContainer: Array<Log>;
   public page: number = 1;
 
-  constructor(private logDataService: LogDataService, private authService: AuthService) { }
+  constructor(private logDataService: LogDataService, private authService: AuthService, private dateService: DateFormatingService) { }
 
   ngOnInit(): void {
     this.logDataService.getLogs(this.authService.getToken())
@@ -22,7 +23,6 @@ export class AdminLogsComponent implements OnInit {
   }
 
   public formatDates(log: Log): string {
-    const dt = new Date(log.date);
-    return `${dt.getDay()}.${dt.getMonth()}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}:${dt.getSeconds()}`;
+    return this.dateService.single(log.date);
   }
 }

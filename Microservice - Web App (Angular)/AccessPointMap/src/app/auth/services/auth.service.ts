@@ -47,6 +47,21 @@ export class AuthService {
     return token;
   }
 
+  public getEmail(): string {
+    const { token } = this.cacheService.load(this.cacheKey);
+    if(token == null) {
+      this.cacheService.delete(this.cacheKey);
+      return null;
+    } else {
+      const payload: any = jwt_decode(token);
+      const email = payload.email;
+      if(email != null) {
+        return email;
+      }
+      return null;
+    }
+  }
+
   public getPerm(): string {
     const { token } = this.cacheService.load(this.cacheKey);
     if(token == null) {
@@ -74,6 +89,10 @@ export class AuthService {
     this.userEmail = null;
     this.userPermission = null;
     this.cacheService.delete(this.cacheKey);
+  }
+
+  public register(data: any): Observable<any> {
+    return this.httpClient.post<Jwtoken>(this.url('auth/register'), data);
   }
 
   private url(endpoint: string):string {

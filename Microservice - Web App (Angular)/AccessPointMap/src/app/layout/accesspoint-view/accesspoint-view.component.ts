@@ -10,6 +10,7 @@ import TileLayer from 'ol/layer/Tile';
 import * as olProj from 'ol/proj';
 import { SecurityDisplay } from 'src/app/models/security-display.model';
 import { SelectedAccesspointService } from 'src/app/services/selected-accesspoint.service';
+import { DateFormatingService } from 'src/app/services/date-formating.service';
 
 @Component({
   selector: 'accesspoint-view',
@@ -21,7 +22,7 @@ export class AccesspointViewComponent implements OnInit {
   private map: Map;
   public security: SecurityDisplay;
 
-  constructor(private selectedAccesspoint: SelectedAccesspointService) { }
+  constructor(private selectedAccesspoint: SelectedAccesspointService, private dateService: DateFormatingService) { }
 
   ngOnInit(): void {  
     this.selectedAccesspoint.currentAccesspoint.subscribe(ap => {
@@ -75,9 +76,8 @@ export class AccesspointViewComponent implements OnInit {
   }
 
   public formatPostInfo(accesspoint: Accesspoint): string {
-    const cr = new Date(accesspoint.createDate);
-    const up = new Date(accesspoint.updateDate);
-    return `Uploaded: ${cr.getDay()}.${cr.getMonth()}.${cr.getFullYear()} by: ${accesspoint.postedBy} (Updated: ${up.getDay()}.${up.getMonth()}.${up.getFullYear()})`
+    const dateArray = this.dateService.pairSep(accesspoint.createDate, accesspoint.updateDate);
+    return `Uploaded: ${ dateArray[0] } by: ${accesspoint.postedBy} (Updated: ${ dateArray[1] })`;
   }
 
   private prepareSecurityInfo(securityData: string): SecurityDisplay {

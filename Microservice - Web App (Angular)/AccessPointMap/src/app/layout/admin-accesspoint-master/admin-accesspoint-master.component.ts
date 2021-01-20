@@ -3,6 +3,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
+import { DateFormatingService } from 'src/app/services/date-formating.service';
 import { AccesspointViewModalComponent } from '../accesspoint-view-modal/accesspoint-view-modal.component';
 import { AdminAccesspointMasterEditModalComponent } from '../admin-accesspoint-master-edit-modal/admin-accesspoint-master-edit-modal.component';
 
@@ -19,7 +20,7 @@ export class AdminAccesspointMasterComponent implements OnInit {
   public page: number = 1;
   private token: string;
 
-  constructor(private accesspointDataService: AccesspointDataService, private authService: AuthService, private modalService: NgbModal) { }
+  constructor(private accesspointDataService: AccesspointDataService, private authService: AuthService, private modalService: NgbModal, private dateService: DateFormatingService) { }
 
   ngOnInit(): void {
     this.token = this.authService.getToken();
@@ -30,6 +31,9 @@ export class AdminAccesspointMasterComponent implements OnInit {
   }
 
   public deleteAccesspoint(accesspoint: Accesspoint): void {
+    const index = this.accesspointContainer.indexOf(accesspoint);
+    this.accesspointContainer = this.accesspointContainer.slice(0, index).concat(this.accesspointContainer.slice(index + 1, this.accesspointContainer.length));
+
     this.accesspointDataService.deleteAccesspoint(accesspoint.id, this.token)
       .subscribe((response) => {
         console.log(response);
@@ -60,13 +64,12 @@ export class AdminAccesspointMasterComponent implements OnInit {
     this.accesspointDataService.displayAccesspoint(accesspoint.id, !accesspoint.display, this.token)
       .subscribe((response) => {
         console.log(response);
+        this.accesspointContainer.find(x => x == accesspoint).display = !this.accesspointContainer.find(x => x == accesspoint).display;
       });
   }
 
   public formatDates(accesspoint: Accesspoint): string {
-    const cr = new Date(accesspoint.createDate);
-    const up = new Date(accesspoint.updateDate);
-    return `${cr.getDay()}.${cr.getMonth()}.${cr.getFullYear()}/${up.getDay()}.${up.getMonth()}.${up.getFullYear()}`;
+    return this.dateService.pair(accesspoint.createDate, accesspoint.updateDate);
   }
 
   public formatSecurity(accessPoint: Accesspoint): string {

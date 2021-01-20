@@ -12,10 +12,12 @@ import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 export class PageAuthComponent implements OnInit {
   public loginFormGroup: FormGroup;
   public registerFormGroup: FormGroup;
+  public registerMessage: boolean;
 
   constructor(private authService: AuthService, private router: Router, private errorHandlingSerive: ErrorHandlingService) { }
 
   ngOnInit(): void {
+    this.registerMessage = false;
     this.formsInit();
   }
 
@@ -43,10 +45,19 @@ export class PageAuthComponent implements OnInit {
 
   public registerSubmit(): void {
     if(this.registerFormGroup.valid) {
-
+      this.authService.register(this.registerFormGroup.value)
+        .subscribe((response) => {
+          console.log(response);
+          this.registerMessage = true;
+          this.registerFormGroup.reset();
+        },
+        (error) => {
+          console.log(error);
+          this.registerFormGroup.reset();
+        });
     }
   }
-
+    
   private formsInit(): void {
     this.loginFormGroup = new FormGroup({
       email: new FormControl('', [ Validators.required, Validators.email ]),
@@ -55,8 +66,7 @@ export class PageAuthComponent implements OnInit {
 
     this.registerFormGroup = new FormGroup({
       email: new FormControl('', [ Validators.required, Validators.email ]),
-      password: new FormControl('', [ Validators.required, Validators.minLength(5), Validators.maxLength(128)]),
-      passwordRepeat: new FormControl('')
+      password: new FormControl('', [ Validators.required, Validators.minLength(5), Validators.maxLength(128)])
     });
   }
 }

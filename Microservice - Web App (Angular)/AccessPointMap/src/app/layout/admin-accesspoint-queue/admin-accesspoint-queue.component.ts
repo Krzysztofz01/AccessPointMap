@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { AccesspointQueue } from 'src/app/models/acesspoint-queue.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { AccesspointQueueDataService } from 'src/app/services/accesspoint-queue-data.service';
+import { DateFormatingService } from 'src/app/services/date-formating.service';
 import { AccesspointViewModalComponent } from '../accesspoint-view-modal/accesspoint-view-modal.component';
 
 @Component({
@@ -19,7 +20,7 @@ export class AdminAccesspointQueueComponent implements OnInit {
   public page: number = 1;
   private token: string;
 
-  constructor(private accesspointDataService: AccesspointDataService, private accesspointQueueDataService: AccesspointQueueDataService, private authService: AuthService, private modalService: NgbModal) { }
+  constructor(private accesspointDataService: AccesspointDataService, private accesspointQueueDataService: AccesspointQueueDataService, private authService: AuthService, private modalService: NgbModal, private dateService: DateFormatingService) { }
 
   ngOnInit(): void {
     this.token = this.authService.getToken();
@@ -30,6 +31,9 @@ export class AdminAccesspointQueueComponent implements OnInit {
   }
 
   public deleteAccesspoint(accesspoint: AccesspointQueue): void {
+    const index = this.accesspointContainer.indexOf(accesspoint);
+    this.accesspointContainer = this.accesspointContainer.slice(0, index).concat(this.accesspointContainer.slice(index + 1, this.accesspointContainer.length));
+    
     this.accesspointQueueDataService.deleteAccesspoint(accesspoint.id, this.token)
       .subscribe((response) => {
         console.log(response);
@@ -42,6 +46,9 @@ export class AdminAccesspointQueueComponent implements OnInit {
   }
 
   public mergeAccesspoint(accesspoint: AccesspointQueue): void {
+    const index = this.accesspointContainer.indexOf(accesspoint);
+    this.accesspointContainer = this.accesspointContainer.slice(0, index).concat(this.accesspointContainer.slice(index + 1, this.accesspointContainer.length));
+
     this.accesspointDataService.mergeAccesspoints([accesspoint.id], this.token)
       .subscribe((response) => {
         console.log(response);
@@ -49,8 +56,7 @@ export class AdminAccesspointQueueComponent implements OnInit {
   }
 
   public formatDate(accesspoint: AccesspointQueue): string {
-    const dt = new Date(accesspoint.createDate);
-    return `${dt.getHours()}:${dt.getMinutes()} ${dt.getDay()}.${dt.getMonth()}.${dt.getFullYear()}`;
+    return this.dateService.single(accesspoint.createDate);
   }
 
   public search(): void {

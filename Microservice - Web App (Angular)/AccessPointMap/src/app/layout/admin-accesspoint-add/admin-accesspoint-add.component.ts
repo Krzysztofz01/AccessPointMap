@@ -19,7 +19,13 @@ export class AdminAccesspointAddComponent implements OnInit {
   }
 
   public upload(): void {
-    const uploadData = JSON.parse(this.textData);
+    const uploadData: Array<any> = JSON.parse(this.textData);
+
+    const email = this.authService.getEmail();
+    uploadData.forEach(x => {
+      x.postedBy = email;
+    });
+
     if(this.forceMasterCheck) {
       this.accesspointDataService.addOrUpdateAccesspointsMaster(uploadData, this.authService.getToken())
         .subscribe((response) => {

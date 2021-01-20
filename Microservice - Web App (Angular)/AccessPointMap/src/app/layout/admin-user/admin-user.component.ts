@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { User } from 'src/app/models/user.model';
+import { DateFormatingService } from 'src/app/services/date-formating.service';
 import { UserDataService } from 'src/app/services/user-data.service';
 import { AdminUserEditModalComponent } from '../admin-user-edit-modal/admin-user-edit-modal.component';
 
@@ -18,7 +19,7 @@ export class AdminUserComponent implements OnInit {
   public page: number = 1;
   private token: string;
 
-  constructor(private userDataService: UserDataService, private authService: AuthService, private modalService: NgbModal) { }
+  constructor(private userDataService: UserDataService, private authService: AuthService, private modalService: NgbModal, private dateService: DateFormatingService) { }
 
   ngOnInit(): void {
     this.token = this.authService.getToken();
@@ -32,6 +33,7 @@ export class AdminUserComponent implements OnInit {
     this.userDataService.activateUser(user.id, !user.active, this.token)
       .subscribe((response) => {
         console.log(response);
+        this.userContainer.find(x => x == user).active = !this.userContainer.find(x => x == user).active;
       });
   }
 
@@ -51,6 +53,9 @@ export class AdminUserComponent implements OnInit {
   }
 
   public deleteUser(user: User): void {
+    const index = this.userContainer.indexOf(user);
+    this.userContainer = this.userContainer.slice(0, index).concat(this.userContainer.slice(index + 1, this.userContainer.length));
+
     this.userDataService.deleteUser(user.id, this.token)
       .subscribe((response) => {
         console.log(response);
@@ -58,8 +63,7 @@ export class AdminUserComponent implements OnInit {
   }
 
   public dateFormat(date: Date): string {
-    const dt = new Date(date);
-    return `${dt.getHours()}:${dt.getMinutes()} ${dt.getDay()}.${dt.getMonth()}.${dt.getFullYear()}`;
+    return this.dateService.single(date);
   }
 
   public search(): void {
