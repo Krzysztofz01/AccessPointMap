@@ -5,3 +5,11 @@ h1, h4, h5 {
 h1 {
     font-size: 5rem;
 }
+
+.btn {
+    background-color: #67f494 !important;
+    color: #4c5267 !important;
+    cursor: pointer;
+    border: none !important;
+    box-shadow: none !important;
+}

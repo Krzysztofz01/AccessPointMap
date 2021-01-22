@@ -3,7 +3,8 @@
         <div class="col-12 mt-5">
             <h1>Error :(</h1>
             <h4>The service is not available at this time. Maintenance work is underway, come back in 5 minutes.</h4>
-            <h5>{{ message }}</h5>
+            <h5 class="mt-5">{{ message }}</h5>
+            <button type="button" class="btn btn-primary mt-2" (click)="reload()">Try reload</button>
         </div>
     </div>
 </div>

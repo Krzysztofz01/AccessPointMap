@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CacheManagerService } from 'src/app/services/cache-manager.service';
 import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 
 @Component({
@@ -10,7 +11,7 @@ import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 export class PageErrorComponent implements OnInit {
   public message: string;
 
-  constructor(private errorHandlingService: ErrorHandlingService, private router: Router) { }
+  constructor(private errorHandlingService: ErrorHandlingService, private router: Router, private cacheService: CacheManagerService) { }
 
   ngOnInit(): void {
     this.errorHandlingService.getException()
@@ -21,5 +22,10 @@ export class PageErrorComponent implements OnInit {
           this.message = response;
         }
       });
+  }
+
+  public reload(): void {
+    this.cacheService.drop();
+    this.router.navigate(['/']);
   }
 }
