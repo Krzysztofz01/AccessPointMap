@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/auth/services/auth.service';
-import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AdminAccesspointAddModalComponent } from '../admin-accesspoint-add-modal/admin-accesspoint-add-modal.component';
 
 @Component({
   selector: 'admin-accesspoint-add',
@@ -11,7 +11,7 @@ export class AdminAccesspointAddComponent implements OnInit {
   @Input() textData: string;
   @Input() forceMasterCheck: boolean;
 
-  constructor(private accesspointDataService: AccesspointDataService, private authService: AuthService) { }
+  constructor(private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.textData = "";
@@ -21,22 +21,7 @@ export class AdminAccesspointAddComponent implements OnInit {
   public upload(): void {
     const uploadData: Array<any> = JSON.parse(this.textData);
 
-    const email = this.authService.getEmail();
-    uploadData.forEach(x => {
-      x.postedBy = email;
-    });
-
-    if(this.forceMasterCheck) {
-      this.accesspointDataService.addOrUpdateAccesspointsMaster(uploadData, this.authService.getToken())
-        .subscribe((response) => {
-          console.log(response);
-        });
-    } else {
-      this.accesspointDataService.addOrUpdateAccesspointsQueue(uploadData, this.authService.getToken())
-        .subscribe((response) => {
-          console.log(response);
-        });
-    }
+    const ref = this.modalService.open(AdminAccesspointAddModalComponent);
+    ref.componentInstance.upload(uploadData, this.forceMasterCheck);
   }
-
 }
