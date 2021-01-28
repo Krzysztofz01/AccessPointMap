@@ -55,6 +55,13 @@ export class AdminAccesspointQueueComponent implements OnInit {
       });
   }
 
+  public mergeAllAccesspoints(): void {
+    this.accesspointDataService.mergeAllAccesspoints(this.token)
+      .subscribe(() => {
+        this.accesspointContainer = [];
+      });
+  }
+
   public formatDate(accesspoint: AccesspointQueue): string {
     return this.dateService.single(accesspoint.createDate);
   }

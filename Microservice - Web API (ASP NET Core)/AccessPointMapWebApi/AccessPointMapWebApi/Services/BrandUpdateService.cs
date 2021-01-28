@@ -1,8 +1,6 @@
 ﻿using AccessPointMapWebApi.Models;
 using AccessPointMapWebApi.Repositories;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,17 +15,22 @@ namespace AccessPointMapWebApi.Services
     {
         private readonly IBrandRepository brandRepository;
         private readonly IAccessPointRepository accessPointRepository;
+        private readonly ILogsRepository logsRepository;
 
         public BrandUpdateService(
             IBrandRepository brandRepository,
-            IAccessPointRepository accessPointRepository)
+            IAccessPointRepository accessPointRepository,
+            ILogsRepository logsRepository)
         {
             this.brandRepository = brandRepository;
             this.accessPointRepository = accessPointRepository;
+            this.logsRepository = logsRepository;
         }
 
         public async Task Update()
         {
+            await logsRepository.Create("BrandUpdateService started");
+
             var accesspoints = await accessPointRepository.GetAccesspointsNoBrand();
             var updatedAccesspoints = new List<Accesspoint>();
             int dailyRequestLimit = 1000;
@@ -46,6 +49,8 @@ namespace AccessPointMapWebApi.Services
                 dailyRequestLimit--;
                 Thread.Sleep(2500); 
             }
+
+            await logsRepository.Create("BrandUpdateService finished");
         }
     }
 }

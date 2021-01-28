@@ -68,6 +68,15 @@ export class AccesspointDataService {
     return this.httpClient.post(this.url('accesspoints/master/merge'), { ids }, { headers });
   }
 
+  public mergeAllAccesspoints(token): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.httpClient.get(this.url('accesspoints/master/merge/all'), { headers });
+  }
+
   public getBrands() : Observable<Array<string>> {
     return this.httpClient.get<Array<string>>(this.url('accesspoints/master/brands'));
   }

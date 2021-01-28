@@ -23,6 +23,7 @@ namespace AccessPointMapWebApi.Repositories
         Task<int> AddOrUpdate(List<Accesspoint> accesspoints);
         Task<bool> ChangeVisibility(int id, bool visible);
         Task<bool> Merge(List<int> accesspointsId);
+        Task<bool> MergeAll();
         Task<bool> Delete(int id);
     }
 
@@ -262,6 +263,102 @@ namespace AccessPointMapWebApi.Repositories
                 }
 
                 await guestAccesspointsRepository.DeleteLazy(id);
+            }
+
+            if (await context.SaveChangesAsync() > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> MergeAll()
+        {
+            var guestAccessPointContainer = await guestAccesspointsRepository.GetAll();
+
+            foreach (var guestAccessPoint in guestAccessPointContainer)
+            {
+                var masterAccessPoint = context.Accesspoints.Where(element => element.Bssid == guestAccessPoint.Bssid).FirstOrDefault();
+                if (masterAccessPoint != null)
+                {
+                    //Update existing accesspoint
+                    bool locationChanged = false;
+                    bool globalChanges = false;
+
+                    //Low signal check, swap if weaker
+                    if (guestAccessPoint.LowSignalLevel < masterAccessPoint.LowSignalLevel)
+                    {
+                        masterAccessPoint.LowSignalLevel = guestAccessPoint.LowSignalLevel;
+                        masterAccessPoint.LowLatitude = guestAccessPoint.LowLatitude;
+                        masterAccessPoint.LowLongitude = guestAccessPoint.LowLongitude;
+                        locationChanged = true;
+                        globalChanges = true;
+                    }
+
+                    //High signal check, swap if stronger
+                    if (guestAccessPoint.HighSignalLevel > masterAccessPoint.HighSignalLevel)
+                    {
+                        masterAccessPoint.HighSignalLevel = guestAccessPoint.HighSignalLevel;
+                        masterAccessPoint.HighLatitude = guestAccessPoint.HighLatitude;
+                        masterAccessPoint.HighLongitude = guestAccessPoint.HighLongitude;
+                        locationChanged = true;
+                        globalChanges = true;
+                    }
+
+                    //Calculate location fields, if location changed
+                    if (locationChanged)
+                    {
+                        masterAccessPoint.SignalRadius = Math.Round(geocalculationService.getDistance(masterAccessPoint.LowLatitude, masterAccessPoint.LowLongitude, masterAccessPoint.HighLatitude, masterAccessPoint.HighLongitude), 4);
+                        masterAccessPoint.SignalArea = Math.Round(geocalculationService.getArea(masterAccessPoint.SignalRadius), 4);
+                    }
+
+                    if (masterAccessPoint.SecurityDataRaw != guestAccessPoint.SecurityDataRaw)
+                    {
+                        masterAccessPoint.SecurityDataRaw = guestAccessPoint.SecurityDataRaw;
+                        masterAccessPoint.SecurityData = SecurityDataFormat(guestAccessPoint.SecurityDataRaw);
+                        globalChanges = true;
+                    }
+
+                    if (string.IsNullOrEmpty(masterAccessPoint.SecurityData))
+                    {
+                        masterAccessPoint.SecurityData = SecurityDataFormat(guestAccessPoint.SecurityDataRaw);
+                        globalChanges = true;
+                    }
+
+                    if (globalChanges)
+                    {
+                        masterAccessPoint.UpdateDate = DateTime.Now;
+                        context.Entry(masterAccessPoint).State = EntityState.Modified;
+                    }
+                }
+                else
+                {
+                    //Create a new accesspoint
+                    var accesspoint = new Accesspoint()
+                    {
+                        Bssid = guestAccessPoint.Bssid,
+                        Ssid = guestAccessPoint.Ssid,
+                        Frequency = guestAccessPoint.Frequency,
+                        HighSignalLevel = guestAccessPoint.HighSignalLevel,
+                        HighLatitude = guestAccessPoint.HighLatitude,
+                        HighLongitude = guestAccessPoint.HighLongitude,
+                        LowSignalLevel = guestAccessPoint.LowSignalLevel,
+                        LowLatitude = guestAccessPoint.LowLatitude,
+                        LowLongitude = guestAccessPoint.LowLongitude,
+                        SecurityDataRaw = guestAccessPoint.SecurityDataRaw,
+                        PostedBy = guestAccessPoint.PostedBy
+                    };
+
+                    accesspoint.SignalRadius = Math.Round(geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude), 4);
+                    accesspoint.SignalArea = Math.Round(geocalculationService.getArea(accesspoint.SignalRadius), 4);
+                    accesspoint.SecurityData = SecurityDataFormat(accesspoint.SecurityDataRaw);
+                    accesspoint.Brand = await brandRepository.GetByBssid(accesspoint.Bssid);
+                    accesspoint.DeviceType = "Default";
+
+                    context.Accesspoints.Add(accesspoint);
+                }
+
+                await guestAccesspointsRepository.DeleteLazy(guestAccessPoint.Id);
             }
 
             if (await context.SaveChangesAsync() > 0)

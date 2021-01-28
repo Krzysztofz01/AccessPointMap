@@ -20,6 +20,7 @@ namespace AccessPointMapWebApi.Services
         public async Task Cleanup()
         {
             await logsRepository.Clear();
+            await logsRepository.Create("Logs cleared by the LogCleanupService");
         }
     }
 }

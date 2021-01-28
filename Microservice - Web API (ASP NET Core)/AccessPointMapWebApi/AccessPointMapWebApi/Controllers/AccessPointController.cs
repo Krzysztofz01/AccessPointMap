@@ -96,6 +96,18 @@ namespace AccessPointMapWebApi.Controllers
             return BadRequest();
         }
 
+        [HttpGet("merge/all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> MergeAllAccesspoints()
+        {
+            if(await accessPointRepository.MergeAll())
+            {
+                await logsRepository.Create($"Merged all entities from queue to master table");
+                return Ok();
+            }
+            return BadRequest();
+        }
+
         [HttpGet("brands")]
         public async Task<ActionResult<IEnumerable<AccessPointBrandCountDto>>> GetBrands()
         {

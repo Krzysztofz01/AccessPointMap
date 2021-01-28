@@ -105,6 +105,7 @@ namespace AccessPointMapWebApi.Repositories
                 if (user.WritePermission != existingUser.WritePermission) existingUser.WritePermission = user.WritePermission;
                 if (user.ReadPermission != existingUser.ReadPermission) existingUser.ReadPermission = user.ReadPermission;
                 if (user.AdminPermission != existingUser.AdminPermission) existingUser.AdminPermission = user.AdminPermission;
+                if (user.TokenExpiration != existingUser.TokenExpiration) existingUser.TokenExpiration = user.TokenExpiration;
                 if (!string.IsNullOrEmpty(user.Email))
                 {
                     var usersWithGivenEmail = context.Users.FirstOrDefault(element => element.Email == user.Email);
