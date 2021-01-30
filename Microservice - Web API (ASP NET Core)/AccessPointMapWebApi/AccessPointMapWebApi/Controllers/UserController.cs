@@ -89,6 +89,7 @@ namespace AccessPointMapWebApi.Controllers
             }
             else
             {
+                await logsRepository.Create($"User: { loginForm.Email } tried to log in from { ipAddress }");
                 switch (loginStatus)
                 {
                     case "ERROR:EMAIL": return NotFound();

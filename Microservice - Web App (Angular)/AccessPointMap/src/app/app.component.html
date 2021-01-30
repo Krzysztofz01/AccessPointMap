@@ -12,6 +12,14 @@
   </div>
 </nav>
 
+<div [ngClass]="(showLoadingIndicator) ? 'loading-visible' : 'loading-hidden'" class="container-fluid loading">
+  <div class="row">
+    <div class="col">
+      <div class="lds-hourglass"></div>
+    </div>
+  </div>
+</div>
+
 <router-outlet></router-outlet>
 
 <footer>

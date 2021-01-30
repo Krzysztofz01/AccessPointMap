@@ -68,6 +68,14 @@ export class AdminAccesspointMasterComponent implements OnInit {
       });
   }
 
+  public stripBrand(accesspoint: Accesspoint): string {
+    const brand = accesspoint.brand;
+    if(brand.length > 22) {
+      return `${brand.substring(0, 18)}...`;
+    } 
+    return brand;
+  }
+
   public formatDates(accesspoint: Accesspoint): string {
     return this.dateService.pair(accesspoint.createDate, accesspoint.updateDate);
   }

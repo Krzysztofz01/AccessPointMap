@@ -46,7 +46,7 @@ namespace AccessPointMapWebApi.Repositories
 
         public async Task<IEnumerable<Log>> GetLogs()
         {
-            return await context.Find(x => x.Date >= DateTime.Now.AddDays(-7)).ToListAsync();
+            return await context.Find(x => x.Date >= DateTime.Now.AddDays(-7)).SortByDescending(x => x.Date).ToListAsync();
         }
     }
 }

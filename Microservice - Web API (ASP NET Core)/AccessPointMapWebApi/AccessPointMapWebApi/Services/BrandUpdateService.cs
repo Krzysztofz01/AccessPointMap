@@ -38,18 +38,19 @@ namespace AccessPointMapWebApi.Services
             foreach(var accesspoint in accesspoints)
             {
                 if (dailyRequestLimit <= 0) break;
-                
+
                 string brand = await brandRepository.GetByBssid(accesspoint.Bssid);
-                if (brand != "No brand info")
+                if(brand != "No brand info")
                 {
                     accesspoint.Brand = brand;
                     updatedAccesspoints.Add(accesspoint);
                 }
 
                 dailyRequestLimit--;
-                Thread.Sleep(2500); 
+                Thread.Sleep(3000);
             }
 
+            await accessPointRepository.UpdateBrand(updatedAccesspoints);
             await logsRepository.Create("BrandUpdateService finished");
         }
     }

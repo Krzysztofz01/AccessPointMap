@@ -21,11 +21,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:10, currentPage: page }">
+            <tr *ngFor="let ap of accesspointContainer | orderBy: sortKey: sortReverse | paginate: { itemsPerPage:11, currentPage: page }">
                 <th scope="row">{{ ap.id }}</th>
                 <td class="ssid" (click)="viewAccesspoint(ap)">{{ ap.ssid }}</td>
                 <td>{{ ap.bssid }}</td>
-                <td>{{ ap.brand }}</td>
+                <td>{{ stripBrand(ap) }}</td>
                 <td>{{ ap.frequency }}</td>
                 <td>{{ formatSecurity(ap) }}</td>
                 <td>{{ ap.signalArea }}m<sup>2</sup></td>

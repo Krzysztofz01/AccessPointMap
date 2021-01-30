@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router, Event, NavigationStart, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,17 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'AccessPointMap';
+  public showLoadingIndicator: boolean = true;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe((routerEvent: Event) => {
+      if(routerEvent instanceof NavigationStart) {
+        this.showLoadingIndicator = true;
+      }
+
+      if(routerEvent instanceof NavigationEnd) {
+        this.showLoadingIndicator = false;
+      }
+    });
+  }
 }
