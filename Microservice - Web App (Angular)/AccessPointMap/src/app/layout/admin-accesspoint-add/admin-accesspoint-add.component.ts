@@ -23,5 +23,6 @@ export class AdminAccesspointAddComponent implements OnInit {
 
     const ref = this.modalService.open(AdminAccesspointAddModalComponent);
     ref.componentInstance.upload(uploadData, this.forceMasterCheck);
+    this.textData = "";
   }
 }
