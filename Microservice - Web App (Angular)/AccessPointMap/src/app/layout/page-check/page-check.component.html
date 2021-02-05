@@ -1,0 +1,46 @@
+<div class="container-fluid">
+    <div class="row text-center my-5">
+        <div class="col-6 mx-auto">
+            <h1>Enter your WiFi name to check if you are safe</h1>
+            <input class="form-control mt-5" type="text" [(ngModel)]="ssidInput" placeholder="Wifi name">
+            <button type="button" class="btn btn-primary mt-2" (click)="search()">Search</button>
+        </div>
+    </div>
+    <div *ngIf="accesspointsNotFound" class="row text-center">
+        <div class="col-5 mx-auto">
+            <h2 class="my-4">No such WiFi was found in our database.</h2>
+            <h5>Check that you have entered your Wifi name correctly. It is possible that the Wifi data has not been indexed yet, collecting statistics is a lengthy process, please try again later.</h5>
+        </div>
+    </div>
+    <div *ngIf="accesspointContainer.length > 0" class="row text-center">
+        <div class="col-5 mx-auto">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td scope="col">SSID</td>
+                        <td scope="col">Status</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let ap of accesspointContainer">
+                        <td class="ssid" (click)="viewAccesspoint(ap)">{{ ap.ssid }}</td>
+                        <td [ngClass]="getSecurityColor(ap)">{{ getSecurityName(ap) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-5 mx-auto">
+            <h3>Security types</h3>
+            <ul>
+                <li><span style="color: #68BC00">WPA2</span> - The strongest security standard, WPA2 type uses CCMP / AES encryption.</li>
+                <li><span style="color: #68BC00">WPA</span> - A slightly older type of security, using TKIP / RC4 and Michael (MIC) encryption. It is recommended to switch to WPA2.</li>
+                <li><span style="color: #FB9E00">WPS</span> - The WPS system automatically generates the parameters needed for connection. Misconfiguration can be a serious vulnerability.</li>
+                <li><span style="color: #FB9E00">WEP</span> - This is a type of security developed in 1999. WEP is vulnerable to FMS attack which makes it necessary to switch to WPA / WPA2 security.</li>
+                <li><span style="color: #F44E3B">None</span> - The network is not secured. Anyone can steal valuable data. WPA / WPA2 security must be configured.</li>
+            </ul>
+            <p>Nowadays, it is imperative to ensure network security. Ubiquitous digitization means that communication, payments, etc. 
+                are carried out via the Internet. Poor-quality security allows an unauthorized person to view the traffic in our home network. 
+                Logins, passwords, bank login details etc. are at risk.</p>
+        </div>
+    </div>
+</div>

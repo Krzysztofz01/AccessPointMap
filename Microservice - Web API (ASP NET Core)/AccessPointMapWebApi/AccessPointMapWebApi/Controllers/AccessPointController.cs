@@ -47,6 +47,25 @@ namespace AccessPointMapWebApi.Controllers
             return Ok(accesspoint);
         }
 
+        [HttpGet("check")]
+        public async Task<ActionResult<IEnumerable<Accesspoint>>> SearchBySsid([FromQuery]string ssid)
+        {
+            if(!string.IsNullOrEmpty(ssid))
+            {
+                var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                var accesspoints = await accessPointRepository.SearchBySsid(ssid);
+                if (accesspoints == null)
+                {
+                    await logsRepository.Create($"{ipAddress} searched for {ssid} and found no results");
+                    return NotFound();
+                }
+
+                await logsRepository.Create($"{ipAddress} searched for {ssid} and found some results");
+                return Ok(accesspoints);
+            }
+            return BadRequest();
+        }
+
         [HttpGet("search")]
         [Authorize(Roles = "Read,Admin")]
         public async Task<ActionResult<IEnumerable<Accesspoint>>> SearchAccesspoints([FromQuery] string ssid = null, [FromQuery] int freq = 0, [FromQuery] string brand = null, [FromQuery] string security = null)

@@ -18,6 +18,7 @@ namespace AccessPointMapWebApi.Repositories
         Task<IEnumerable<Accesspoint>> SearchByParams(string ssid, int freq, string brand, string security);
         Task<IEnumerable<string>> GetBrandList();
         Task<IEnumerable<AccessPointBrandCountDto>> GetBrandListOrderedCount();
+        Task<IEnumerable<Accesspoint>> SearchBySsid(string ssid);
         Task<bool> UpdateBrand(IEnumerable<Accesspoint> accesspoints);
         Task<IEnumerable<Accesspoint>> GetAccesspointsNoBrand();
         Task<int> AddOrUpdate(List<Accesspoint> accesspoints);
@@ -395,6 +396,11 @@ namespace AccessPointMapWebApi.Repositories
         public async Task<IEnumerable<Accesspoint>> GetAccesspointsNoBrand()
         {
             return await context.Accesspoints.Where(x => x.Brand == "No brand info" && x.Display == true).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Accesspoint>> SearchBySsid(string ssid)
+        {
+            return await context.Accesspoints.Where(x => x.Ssid.ToLower().Contains(ssid.Trim().ToLower()) && x.Display == true).ToListAsync();
         }
 
         public async Task<bool> UpdateBrand(IEnumerable<Accesspoint> accesspoints)

@@ -117,6 +117,12 @@ export class AccesspointDataService {
     return this.httpClient.post(this.url('accesspoints/queue'), data, { headers });
   }
 
+  public searchBySsid(ssid: string): Observable<Array<Accesspoint>> {
+    const params = new HttpParams().set("ssid", ssid);
+
+    return this.httpClient.get<Array<Accesspoint>>(this.url('accesspoints/master/check'), { params });
+  }
+
   private url(endpoint: string): string {
     return 'http://' + this.baseUrl + this.apiUrl + endpoint;
   }
