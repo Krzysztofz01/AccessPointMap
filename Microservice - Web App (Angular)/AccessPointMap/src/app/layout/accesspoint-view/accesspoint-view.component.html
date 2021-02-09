@@ -1,6 +1,7 @@
 <div class="pt-5">
     <div *ngIf="accessPoint != null; else accesspoint_empty_view">
         <h1>{{ accessPoint.ssid }}</h1>
+        <hr>
         <h5>BSSID: {{ accessPoint.bssid }}</h5>
         <h5>Brand: {{ accessPoint.brand }}</h5>
         <h5>Frequency: {{ accessPoint.frequency }}</h5>

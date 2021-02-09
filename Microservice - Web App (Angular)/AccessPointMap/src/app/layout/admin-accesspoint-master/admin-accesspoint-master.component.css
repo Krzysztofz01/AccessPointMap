@@ -64,3 +64,9 @@ input:focus {
     font-weight: bold;
     cursor: pointer;
 }
+
+::ng-deep .ngx-pagination a:hover,  ::ng-deep .ngx-pagination button:hover{
+    background-color: #67f494 !important;
+    border: none !important;
+    color: #363a51 !important;
+}

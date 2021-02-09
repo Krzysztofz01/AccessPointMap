@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row text-center mt-5">
-        <div class="col-xl custom-border mr-xl-2">
+        <div class="col-xl-5 mx-auto custom-border my-2">
             <div *ngIf="loginFormGroup.get('email').invalid && loginFormGroup.get('email').errors && (loginFormGroup.get('email').dirty || loginFormGroup.get('email').touched)" class="alert alert-danger my-2" role="alert">
                 <div *ngIf="loginFormGroup.get('email').errors.required">Email is required.</div>
                 <div *ngIf="loginFormGroup.get('email').errors.email">Wrong email format.</div>
@@ -17,7 +17,7 @@
                 <button type="submit" class="btn btn-primary my-3" id="loginButton">Sign in</button>
             </form>
         </div>
-        <div class="col-xl custom-border ml-xl-2">
+        <div class="col-xl-5 mx-auto custom-border my-2">
             <div *ngIf="registerMessage" class="alert alert-success my-2" role="alert">
                 Registration was successful, now you need to wait for your account to be activated.
             </div>

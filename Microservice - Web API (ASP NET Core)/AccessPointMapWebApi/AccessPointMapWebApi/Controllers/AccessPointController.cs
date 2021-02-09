@@ -3,6 +3,7 @@ using AccessPointMapWebApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AccessPointMapWebApi.Controllers
@@ -54,7 +55,7 @@ namespace AccessPointMapWebApi.Controllers
             {
                 var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
                 var accesspoints = await accessPointRepository.SearchBySsid(ssid);
-                if (accesspoints == null)
+                if (!accesspoints.Any())
                 {
                     await logsRepository.Create($"{ipAddress} searched for {ssid} and found no results");
                     return NotFound();
