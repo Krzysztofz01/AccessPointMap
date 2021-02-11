@@ -1,9 +1,12 @@
 <div id="global-map">
-    <div [ngClass]="popupAccesspoints ? 'show-true' : 'show-false'" id="popup" class="ol-popup">
+    <div [ngClass]="(popupAccesspoints != undefined) ? 'show-true' : 'show-false'" id="popup" class="ol-popup">
         <a id="popup-closer" class="ol-popup-closer">🗙</a>
         <p>There are several accesspoints at this location</p>
         <div *ngFor="let el of popupAccesspoints" id="popup-content">
             <a class="accesspoint-link" (click)="setAccesspoint(el.data)">{{ el.name }}</a>
+        </div>
+        <div *ngIf="popupIndicator">
+            <p>Zoom in to display accesspoints!</p>
         </div>
     </div>
 </div>

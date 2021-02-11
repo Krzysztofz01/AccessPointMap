@@ -25,11 +25,16 @@ import { ErrorHandlingService } from 'src/app/services/error-handling.service';
 })
 export class GlobalMapComponent implements OnInit {
   private map: Map;
+  public popupAccesspoints: Array<object>;
+  public popupIndicator: boolean;
 
   constructor(private cacheService: CacheManagerService, private selectedAccesspoint: SelectedAccesspointService, private accesspointDataService: AccesspointDataService, private errorHandlingService: ErrorHandlingService) { }
 
   ngOnInit(): void {
     this.initializeMapData();
+
+    this.popupIndicator = false;
+    this.popupAccesspoints = undefined;
   }
 
   private initializeMapData(): void {
@@ -100,25 +105,33 @@ export class GlobalMapComponent implements OnInit {
 
     //Map click event
     this.map.on('click', (e) => {
+      this.popupIndicator = false;
       this.popupAccesspoints = undefined;
+      
       const selectedAccessPoints: Array<Accesspoint> = new Array<Accesspoint>();
       this.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
         selectedAccessPoints.push(feature.values_.attributes.accesspoint);
       });
-      
-      if(selectedAccessPoints.length == 1) {
-        this.selectedAccesspoint.changeAccesspoint(selectedAccessPoints[0]);
-      } else if(selectedAccessPoints.length > 1) {
+
+      if(selectedAccessPoints.length > 0) {
         this.popupAccesspoints = [];
-        selectedAccessPoints.forEach(x => {
-          this.popupAccesspoints.push({ name: x.ssid, data: x });
-        });
-        overlay.setPosition(e.coordinate);
+
+        if(selectedAccessPoints.length == 1) {
+          this.popupAccesspoints = undefined;
+          this.selectedAccesspoint.changeAccesspoint(selectedAccessPoints[0]);
+        } else if(selectedAccessPoints.length > 1 && selectedAccessPoints.length < 10) {
+          selectedAccessPoints.forEach(x => {
+            this.popupAccesspoints.push({ name: x.ssid, data: x });
+          });
+          overlay.setPosition(e.coordinate);
+        }
+        else {
+          this.popupIndicator = true;
+          overlay.setPosition(e.coordinate);
+        }
       }
     });
   }
-
-  public popupAccesspoints: Array<object>;
 
   public setAccesspoint(accesspoint: Accesspoint ) : void {
     this.selectedAccesspoint.changeAccesspoint(accesspoint);

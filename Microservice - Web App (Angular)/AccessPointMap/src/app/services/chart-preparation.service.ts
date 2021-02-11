@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Accesspoint } from '../models/accesspoint.model';
+import { Brand } from '../models/brand.model';
 import { ChartData } from '../models/chart-data.model';
 import { LocalStorageOptions } from '../models/local-storage-options.model';
 import { CacheManagerService } from './cache-manager.service';
@@ -133,8 +134,25 @@ export class ChartPreparationService {
     }
   }
 
-  private prepareBrandChartDynamic(accesspoints: Array<Accesspoint>): ChartData {
-    //Changes to the API
+  // The dynamic brand chart unlike the other methods, it is not cached and works asynchronously.
+  // We will not pass an array of accesspoints to it, only a list of Brand objects.
+  public prepareBrandChartDynamic(brandContainer: Array<Brand>): ChartData {
+    if(brandContainer.length >= 5) {
+      const labels: Array<string> = [];
+      const content: Array<number> = [];
+
+      for(let i = 0; i < 5; i++) {
+        labels.push(brandContainer[i].brand);
+        content.push(brandContainer[i].count);
+      }
+
+      return {
+        type: 'bar',
+        labels,
+        content,
+        colors: ['#67f494', '#67f494', '#67f494', '#67f494', '#67f494']
+      }
+    }
     return null;
   }
 }

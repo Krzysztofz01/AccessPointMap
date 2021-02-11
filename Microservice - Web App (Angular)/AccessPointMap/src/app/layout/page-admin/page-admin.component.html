@@ -17,8 +17,11 @@
                 <li class="nav-item">
                     <a class="nav-link" (click)="toggleComp('log')" [ngClass]="isToggled('log') ? 'active' : 'inactive' ">Logs</a>
                 </li>
-                <li class="nav-item ml-5">
+                <li class="nav-item mx-4">
                     <a class="nav-link active" (click)="logout()">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" (click)="reload()">Reload</a>
                 </li>
             </ul>
         </div>

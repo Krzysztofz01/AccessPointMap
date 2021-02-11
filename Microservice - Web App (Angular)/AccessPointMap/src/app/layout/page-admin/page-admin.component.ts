@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { NavToggler } from 'src/app/models/nav-toggler.model';
+import { CacheManagerService } from 'src/app/services/cache-manager.service';
+import { environment } from 'src/environments/environment';
 
 const innerComponents: Array<NavToggler> = [
   { name: 'masterAp', visible: false },
@@ -18,7 +20,7 @@ const innerComponents: Array<NavToggler> = [
 })
 export class PageAdminComponent implements OnInit {
 
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(private router: Router, private authService: AuthService, private cacheService: CacheManagerService) { }
 
   ngOnInit(): void {
     this.toggleComp('masterAp');
@@ -27,6 +29,15 @@ export class PageAdminComponent implements OnInit {
   public logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth']);
+  }
+
+  public reload(): void {
+    this.cacheService.delete(environment.CACHE_ACCESSPOINTS);
+    this.cacheService.delete(environment.CACHE_CHART_AREA);
+    this.cacheService.delete(environment.CACHE_CHART_BRANDS);
+    this.cacheService.delete(environment.CACHE_CHART_FREQUENCY);
+    this.cacheService.delete(environment.CACHE_CHART_SECURITY);
+    this.router.navigate(['/']);
   }
 
   public isToggled(name: string): boolean {
