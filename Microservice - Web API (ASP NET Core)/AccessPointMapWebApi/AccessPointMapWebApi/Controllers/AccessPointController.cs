@@ -48,6 +48,18 @@ namespace AccessPointMapWebApi.Controllers
             return Ok(accesspoint);
         }
 
+        [HttpGet("bssid/{bssid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Accesspoint>> GetAccesspointByBssid(string bssid)
+        {
+            var accesspoint = await accessPointRepository.GetByBssid(bssid);
+            if (accesspoint == null)
+            {
+                return NotFound();
+            }
+            return Ok(accesspoint);
+        }
+
         [HttpGet("check")]
         public async Task<ActionResult<IEnumerable<Accesspoint>>> SearchBySsid([FromQuery]string ssid)
         {

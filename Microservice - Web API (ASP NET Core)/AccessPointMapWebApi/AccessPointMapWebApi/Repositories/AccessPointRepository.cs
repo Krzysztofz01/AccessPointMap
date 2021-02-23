@@ -15,6 +15,7 @@ namespace AccessPointMapWebApi.Repositories
         Task<IEnumerable<Accesspoint>> GetAll();
         Task<IEnumerable<Accesspoint>> GetAllAdmin();
         Task<Accesspoint> GetById(int id);
+        Task<Accesspoint> GetByBssid(string bssid);
         Task<IEnumerable<Accesspoint>> SearchByParams(string ssid, int freq, string brand, string security);
         Task<IEnumerable<string>> GetBrandList();
         Task<IEnumerable<AccessPointBrandCountDto>> GetBrandListOrderedCount();
@@ -176,6 +177,11 @@ namespace AccessPointMapWebApi.Repositories
         public async Task<Accesspoint> GetById(int id)
         {
             return await context.Accesspoints.Where(accesspoint => accesspoint.Id == id && accesspoint.Display == true).FirstOrDefaultAsync();
+        }
+
+        public async Task<Accesspoint> GetByBssid(string bssid)
+        {
+            return await context.Accesspoints.Where(accesspoint => accesspoint.Bssid.ToUpper() == bssid.ToUpper()).FirstOrDefaultAsync();
         }
 
         public async Task<bool> Merge(List<int> accesspointsId)

@@ -5,7 +5,7 @@ import { AccesspointQueue } from 'src/app/models/acesspoint-queue.model';
 import { AccesspointDataService } from 'src/app/services/accesspoint-data.service';
 import { AccesspointQueueDataService } from 'src/app/services/accesspoint-queue-data.service';
 import { DateFormatingService } from 'src/app/services/date-formating.service';
-import { AccesspointViewModalComponent } from '../accesspoint-view-modal/accesspoint-view-modal.component';
+import { AdminAccesspointQueueModalComponent } from '../admin-accesspoint-queue-modal/admin-accesspoint-queue-modal.component';
 
 @Component({
   selector: 'admin-accesspoint-queue',
@@ -41,7 +41,7 @@ export class AdminAccesspointQueueComponent implements OnInit {
   }
 
   public viewAccesspoint(accesspoint: AccesspointQueue): void {
-    const ref = this.modalService.open(AccesspointViewModalComponent, { size: 'lg' });
+    const ref = this.modalService.open(AdminAccesspointQueueModalComponent, { size: 'lg' });
     ref.componentInstance.mapInit(accesspoint);
   }
 

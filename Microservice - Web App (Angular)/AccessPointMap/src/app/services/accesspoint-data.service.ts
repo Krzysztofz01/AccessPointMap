@@ -35,6 +35,15 @@ export class AccesspointDataService {
     return this.httpClient.get<Accesspoint>(this.url(`accesspoints/master/${id}`), { headers });
   }
 
+  public getAccessPointByBssid(bssid: string, token: string) : Observable<Accesspoint> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.httpClient.get<Accesspoint>(this.url(`accesspoints/master/bssid/${bssid}`), { headers });
+  }
+
   public searchAccessPoints(token:string, ssid: string = null, freq: number = null, brand: string = null, security: string = null) : Observable<Array<Accesspoint>> {
     const params = new HttpParams()
       .set("ssid", ssid)

@@ -32,6 +32,7 @@ import { AccesspointViewModalComponent } from './layout/accesspoint-view-modal/a
 import { AdminLogsComponent } from './layout/admin-logs/admin-logs.component';
 import { AdminAccesspointAddModalComponent } from './layout/admin-accesspoint-add-modal/admin-accesspoint-add-modal.component';
 import { PageCheckComponent } from './layout/page-check/page-check.component';
+import { AdminAccesspointQueueModalComponent } from './layout/admin-accesspoint-queue-modal/admin-accesspoint-queue-modal.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { PageCheckComponent } from './layout/page-check/page-check.component';
     AccesspointViewModalComponent,
     AdminLogsComponent,
     AdminAccesspointAddModalComponent,
-    PageCheckComponent
+    PageCheckComponent,
+    AdminAccesspointQueueModalComponent
   ],
   imports: [
     BrowserModule,
