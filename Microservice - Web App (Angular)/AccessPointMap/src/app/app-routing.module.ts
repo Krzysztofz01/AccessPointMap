@@ -16,7 +16,8 @@ const routes: Routes = [
   { path: 'admin', component: PageAdminComponent, canActivate: [PageAdminGuard], canLoad: [PageAdminGuard] },
   { path: 'user', component: PageUserComponent, canActivate: [PageUserGuard], canLoad: [PageUserGuard] },
   { path: 'error', component: PageErrorComponent },
-  { path: 'check', component: PageCheckComponent }
+  { path: 'check', component: PageCheckComponent },
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({
