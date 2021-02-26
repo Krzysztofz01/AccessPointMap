@@ -8,8 +8,14 @@
     </div>
     <div *ngIf="accesspointsNotFound" class="row text-center">
         <div class="col-lg-5 mx-auto">
-            <h2 class="my-4">No such WiFi was found in our database.</h2>
-            <h5>Check that you have entered your Wifi name correctly. It is possible that the Wifi data has not been indexed yet, collecting statistics is a lengthy process, please try again later.</h5>
+            <div *ngIf="accesspointToMany != true">
+                <h2 class="my-4">No such WiFi was found in our database.</h2>
+                <h5>Check that you have entered your Wifi name correctly. It is possible that the Wifi data has not been indexed yet, collecting statistics is a lengthy process, please try again later.</h5>
+            </div>
+            <div *ngIf="accesspointToMany == true">
+                <h2 class="my-4">Many results were found.</h2>
+            <h5>Try to further specify your WiFi name to check its security.</h5>
+            </div>
         </div>
     </div>
     <div *ngIf="accesspointContainer.length > 0" class="row text-center">

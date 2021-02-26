@@ -39,6 +39,7 @@ namespace AccessPointMapWebApi.Repositories
                 accesspoint.LowLatitude = Math.Round(accesspoint.LowLatitude, 7);
                 accesspoint.LowLongitude = Math.Round(accesspoint.LowLongitude, 7);
 
+                accesspoint.SecurityDataRaw = CompressRawSecurityData(accesspoint.SecurityDataRaw);
                 accesspoint.SignalRadius = geocalculationService.getDistance(accesspoint.LowLatitude, accesspoint.LowLongitude, accesspoint.HighLatitude, accesspoint.HighLongitude);
                 accesspoint.SignalArea = geocalculationService.getArea(accesspoint.SignalRadius);
                 accesspoint.DeviceType = "Default";
@@ -78,6 +79,14 @@ namespace AccessPointMapWebApi.Repositories
         public async Task<GuestAccesspoint> GetById(int id)
         {
             return await context.GuestAccesspoints.Where(element => element.Id == id).FirstOrDefaultAsync();
+        }
+
+        private string CompressRawSecurityData(string securityDataRaw)
+        {
+            // P - PSK
+            // C - CCMP
+            // T - TKIP
+            return securityDataRaw.Replace("PSK", "P").Replace("CCMP", "C").Replace("TKIP", "T").Trim();
         }
     }
 }

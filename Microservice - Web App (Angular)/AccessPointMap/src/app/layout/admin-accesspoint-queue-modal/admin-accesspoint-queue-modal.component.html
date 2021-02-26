@@ -2,6 +2,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modal-basic-title">{{ ssid }}</h4>
+        <h4 *ngIf="isNew == true" class="modal-ttiel"><span style="color: #67f494;">NEW!</span></h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('exit')">
           <span aria-hidden="true">&times;</span>
         </button>

@@ -22,6 +22,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 export class AdminAccesspointQueueModalComponent {
   private map: Map;
   public ssid: string;
+  public isNew: boolean = false;
 
   constructor(public modal: NgbActiveModal, private accesspointData: AccesspointDataService, private authService: AuthService) { }
 
@@ -31,41 +32,39 @@ export class AdminAccesspointQueueModalComponent {
     const circleFeature = new Feature(circle);
     let knownCircleFeatures = null;
 
+    this.map = new Map({
+      controls: [],
+      target: 'modal-queue-map',
+      layers: [
+        new TileLayer({
+          source: new OSM()
+        }),
+        new VectorLayer({
+          name: 'circleLayer',
+          source: new VectorSource({
+            features: [circleFeature]
+          })
+        })
+      ],
+      view: new View({
+        center: olProj.fromLonLat([accesspoint.highLongitude, accesspoint.highLatitude]),
+        zoom: 18
+      })
+    });
+      
+    this.map.addLayer(new VectorLayer({
+      name: 'circleLayer',
+      source: new VectorSource({
+        features: [circleFeature]
+      })
+    }));
+
     this.accesspointData.getAccessPointByBssid(accesspoint.bssid, this.authService.getToken())
       .subscribe((response) => {
         if(response != null) {
           const knownCircle = new Circle(olProj.fromLonLat([response.highLongitude, response.highLatitude]), response.signalRadius);
           knownCircleFeatures = new Feature(knownCircle);
-        }
-
-        this.map = new Map({
-          controls: [],
-          target: 'modal-queue-map',
-          layers: [
-            new TileLayer({
-              source: new OSM()
-            }),
-            new VectorLayer({
-              name: 'circleLayer',
-              source: new VectorSource({
-                features: [circleFeature]
-              })
-            })
-          ],
-          view: new View({
-            center: olProj.fromLonLat([accesspoint.highLongitude, accesspoint.highLatitude]),
-            zoom: 18
-          })
-        });
-          
-        this.map.addLayer(new VectorLayer({
-          name: 'circleLayer',
-          source: new VectorSource({
-            features: [circleFeature]
-          })
-        }));
-
-        if(knownCircleFeatures != null) {
+        
           this.map.addLayer(new VectorLayer({
             name: 'knownCircleLayer',
             source: new VectorSource({
@@ -78,6 +77,10 @@ export class AdminAccesspointQueueModalComponent {
             })
           }));
         }
+      },
+      (error) => {
+        knownCircleFeatures = null;
+        this.isNew = true;
       });
   }
 }

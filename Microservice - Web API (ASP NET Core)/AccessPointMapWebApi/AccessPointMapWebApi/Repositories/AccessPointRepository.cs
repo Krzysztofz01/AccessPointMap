@@ -94,7 +94,7 @@ namespace AccessPointMapWebApi.Repositories
 
                     if (accesspoint.SecurityDataRaw != element.SecurityDataRaw)
                     {
-                        accesspoint.SecurityDataRaw = element.SecurityDataRaw;
+                        accesspoint.SecurityDataRaw = CompressRawSecurityData(element.SecurityDataRaw);
                         accesspoint.SecurityData = SecurityDataFormat(element.SecurityDataRaw);
                         globalChanges = true;
                     }
@@ -122,6 +122,7 @@ namespace AccessPointMapWebApi.Repositories
                     //Create element
                     element.SignalRadius = Math.Round(geocalculationService.getDistance(element.LowLatitude, element.LowLongitude, element.HighLatitude, element.HighLongitude), 4);
                     element.SignalArea = Math.Round(geocalculationService.getArea(element.SignalRadius), 4);
+                    element.SecurityDataRaw = CompressRawSecurityData(element.SecurityDataRaw);
                     element.SecurityData = SecurityDataFormat(element.SecurityDataRaw);
                     element.Brand = await brandRepository.GetByBssid(element.Bssid);
                     element.DeviceType = "Default";
@@ -225,7 +226,7 @@ namespace AccessPointMapWebApi.Repositories
 
                     if (masterAccessPoint.SecurityDataRaw != guestAccessPoint.SecurityDataRaw)
                     {
-                        masterAccessPoint.SecurityDataRaw = guestAccessPoint.SecurityDataRaw;
+                        masterAccessPoint.SecurityDataRaw = CompressRawSecurityData(guestAccessPoint.SecurityDataRaw);
                         masterAccessPoint.SecurityData = SecurityDataFormat(guestAccessPoint.SecurityDataRaw);
                         globalChanges = true;
                     }
@@ -256,7 +257,7 @@ namespace AccessPointMapWebApi.Repositories
                         LowSignalLevel = guestAccessPoint.LowSignalLevel,
                         LowLatitude = guestAccessPoint.LowLatitude,
                         LowLongitude = guestAccessPoint.LowLongitude,
-                        SecurityDataRaw = guestAccessPoint.SecurityDataRaw,
+                        SecurityDataRaw = CompressRawSecurityData(guestAccessPoint.SecurityDataRaw),
                         PostedBy = guestAccessPoint.PostedBy
                     };
 
@@ -321,7 +322,7 @@ namespace AccessPointMapWebApi.Repositories
 
                     if (masterAccessPoint.SecurityDataRaw != guestAccessPoint.SecurityDataRaw)
                     {
-                        masterAccessPoint.SecurityDataRaw = guestAccessPoint.SecurityDataRaw;
+                        masterAccessPoint.SecurityDataRaw = CompressRawSecurityData(guestAccessPoint.SecurityDataRaw);
                         masterAccessPoint.SecurityData = SecurityDataFormat(guestAccessPoint.SecurityDataRaw);
                         globalChanges = true;
                     }
@@ -352,7 +353,7 @@ namespace AccessPointMapWebApi.Repositories
                         LowSignalLevel = guestAccessPoint.LowSignalLevel,
                         LowLatitude = guestAccessPoint.LowLatitude,
                         LowLongitude = guestAccessPoint.LowLongitude,
-                        SecurityDataRaw = guestAccessPoint.SecurityDataRaw,
+                        SecurityDataRaw = CompressRawSecurityData(guestAccessPoint.SecurityDataRaw),
                         PostedBy = guestAccessPoint.PostedBy
                     };
 
@@ -430,13 +431,21 @@ namespace AccessPointMapWebApi.Repositories
 
         private string SecurityDataFormat(string securityData)
         {
-            string[] types = { "BSS", "ESS", "WEP", "WPA", "WPA2", "WPS" };
+            string[] types = { "BSS", "ESS", "WEP", "WPA", "WPA2", "WPS", "WPA3" };
             List<string> outputTypes = new List<string>();
             foreach (string type in types)
             {
                 if (securityData.Contains(type)) outputTypes.Add(type);
             }
             return JsonConvert.SerializeObject(outputTypes);
+        }
+
+        private string CompressRawSecurityData(string securityDataRaw)
+        {
+            // P - PSK
+            // C - CCMP
+            // T - TKIP
+            return securityDataRaw.Replace("PSK", "P").Replace("CCMP", "C").Replace("TKIP", "T").Trim();
         }
     }
 }

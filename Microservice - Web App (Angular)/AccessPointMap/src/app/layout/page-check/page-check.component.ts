@@ -13,6 +13,7 @@ export class PageCheckComponent implements OnInit {
   @Input() ssidInput: string;
   public accesspointContainer: Array<Accesspoint>;
   public accesspointsNotFound: boolean;
+  public accesspointToMany: boolean;
 
   constructor(private accesspointData: AccesspointDataService, private modalService: NgbModal) { }
 
@@ -20,18 +21,32 @@ export class PageCheckComponent implements OnInit {
     this.ssidInput = "";
     this.accesspointContainer = [];
     this.accesspointsNotFound = false;
+    this.accesspointToMany = false;
   }
 
   public search(): void {
     this.accesspointData.searchBySsid(this.ssidInput.trim())
       .subscribe((response) => {
         if(response.length > 0) {
-          this.accesspointsNotFound = false;
-          this.accesspointContainer = response;
+          if(response.length > 11) {
+            this.accesspointContainer = [];
+            this.accesspointsNotFound = true;
+            this.accesspointToMany = true;
+          } else {
+            this.accesspointContainer = response;
+            this.accesspointsNotFound = false;
+            this.accesspointToMany = false;
+          }
         } else {
           this.accesspointContainer = [];
           this.accesspointsNotFound = true;
+          this.accesspointToMany = false;
         } 
+      },
+      (error) => {
+        this.accesspointContainer = [];
+        this.accesspointsNotFound = true;
+        this.accesspointToMany = false;
       });
   }
 

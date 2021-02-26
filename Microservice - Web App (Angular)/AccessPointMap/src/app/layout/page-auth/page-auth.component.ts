@@ -25,7 +25,6 @@ export class PageAuthComponent implements OnInit {
     if(this.loginFormGroup.valid || this.loginFormGroup.get('email').errors?.serverError) {
       this.authService.login(this.loginFormGroup.value)
         .subscribe(res => {
-          console.log(res);
           if(res) {
             const permission = this.authService.getPerm();
             if(permission == "Admin") {
@@ -47,12 +46,10 @@ export class PageAuthComponent implements OnInit {
     if(this.registerFormGroup.valid) {
       this.authService.register(this.registerFormGroup.value)
         .subscribe((response) => {
-          console.log(response);
           this.registerMessage = true;
           this.registerFormGroup.reset();
         },
-        (error) => {
-          console.log(error);
+        (error) => {;
           this.registerFormGroup.reset();
         });
     }
