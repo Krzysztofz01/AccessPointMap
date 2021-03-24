@@ -42,3 +42,11 @@
     color: #67f494 !important;
     padding: 2px;
 }
+
+.btn {
+    background-color: #67f494 !important;
+    color: #4c5267 !important;
+    cursor: pointer;
+    border: none !important;
+    box-shadow: none !important;
+}

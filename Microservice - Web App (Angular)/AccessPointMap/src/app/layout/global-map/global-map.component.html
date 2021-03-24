@@ -10,3 +10,9 @@
         </div>
     </div>
 </div>
+
+<form class="mt-3" [formGroup]="securitySelect">
+    <select class="form-control" id="security" formControlName="security">
+        <option *ngFor="let security of securityOptions">{{ security }}</option>
+    </select>
+</form>
