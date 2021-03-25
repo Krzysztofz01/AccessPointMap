@@ -10,7 +10,8 @@ const innerComponents: Array<NavToggler> = [
   { name: 'queueAp', visible: false },
   { name: 'users', visible: false },
   { name: 'add', visible: false },
-  { name: 'log', visible: false }
+  { name: 'log', visible: false },
+  { name: 'sandbox', visible: false }
 ];
 
 @Component({

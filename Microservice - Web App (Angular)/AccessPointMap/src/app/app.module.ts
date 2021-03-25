@@ -33,6 +33,7 @@ import { AdminLogsComponent } from './layout/admin-logs/admin-logs.component';
 import { AdminAccesspointAddModalComponent } from './layout/admin-accesspoint-add-modal/admin-accesspoint-add-modal.component';
 import { PageCheckComponent } from './layout/page-check/page-check.component';
 import { AdminAccesspointQueueModalComponent } from './layout/admin-accesspoint-queue-modal/admin-accesspoint-queue-modal.component';
+import { AdminSandboxComponent } from './layout/admin-sandbox/admin-sandbox.component';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { AdminAccesspointQueueModalComponent } from './layout/admin-accesspoint-
     AdminLogsComponent,
     AdminAccesspointAddModalComponent,
     PageCheckComponent,
-    AdminAccesspointQueueModalComponent
+    AdminAccesspointQueueModalComponent,
+    AdminSandboxComponent
   ],
   imports: [
     BrowserModule,

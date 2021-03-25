@@ -17,6 +17,9 @@
                 <li class="nav-item">
                     <a class="nav-link" (click)="toggleComp('log')" [ngClass]="isToggled('log') ? 'active' : 'inactive' ">Logs</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="toggleComp('sandbox')" [ngClass]="isToggled('sandbox') ? 'active' : 'inactive' ">Sandbox</a>
+                </li>
                 <li class="nav-item mx-4">
                     <a class="nav-link active" (click)="logout()">Logout</a>
                 </li>
@@ -33,6 +36,7 @@
             <admin-user *ngIf="isToggled('users')"></admin-user>
             <admin-accesspoint-add *ngIf="isToggled('add')"></admin-accesspoint-add>
             <admin-logs *ngIf="isToggled('log')"></admin-logs>
+            <admin-sandbox *ngIf="isToggled('sandbox')"></admin-sandbox>
         </div>
     </div>
 </div>
