@@ -17,6 +17,11 @@
     box-shadow: none !important;
 }
 
-p {
+p, h1, h2, hr {
     color: #67f494 !important;
+}
+
+.img-size {
+    width:80%;
+    height: auto;
 }

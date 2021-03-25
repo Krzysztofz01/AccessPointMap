@@ -246,10 +246,10 @@ export class GlobalMapComponent implements OnInit {
 
   //Get map pin color based on security or visiblity of given accesspoint
   private getPinColor(accesspoint: Accesspoint) : string {
-    const green = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00';
-    const yellow = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%23FB9E00';
-    const red = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%23F44E3B';
-    const blue = 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%230062B1'; 
+    const green = environment.PIN_ICON_GOOD;
+    const yellow = environment.PIN_ICON_AVERAGE;
+    const red = environment.PIN_ICON_BAD;
+    const blue = environment.PIN_ICON_ALTERNATIVE; 
     const securityDataArray = JSON.parse(accesspoint.securityData);
 
     if(accesspoint.ssid == 'Hidden network') return blue;

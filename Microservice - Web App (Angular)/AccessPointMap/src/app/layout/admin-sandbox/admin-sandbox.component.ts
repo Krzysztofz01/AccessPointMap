@@ -12,6 +12,7 @@ import * as olProj from 'ol/proj';
 import { Accesspoint } from 'src/app/models/accesspoint.model';
 import { FormControl, FormGroup } from '@angular/forms';
 import { DateFormatingService } from 'src/app/services/date-formating.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'admin-sandbox',
@@ -67,7 +68,7 @@ export class AdminSandboxComponent implements OnInit {
     const style = new Style({
       image: new Icon({
         anchor: [0.5, 1],
-        src: 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00'
+        src: environment.PIN_ICON_GOOD
       })
     });
 
