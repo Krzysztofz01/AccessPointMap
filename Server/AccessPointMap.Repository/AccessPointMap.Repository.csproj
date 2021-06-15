@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <UserSecretsId>854cb386-a87c-49b7-82c8-e7a09ad0c446</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20210612145740_InitialMigration.cs" />
+    <Compile Remove="Migrations\20210612145740_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20210612150119_InitialMigration.cs" />
+    <Compile Remove="Migrations\20210612150119_InitialMigration.Designer.cs" />
+    <Compile Remove="Migrations\20210612150339_InitialMigration.cs" />
+    <Compile Remove="Migrations\20210612150339_InitialMigration.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.16" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.16">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.16" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.16">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AccessPointMap.Domain\AccessPointMap.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
