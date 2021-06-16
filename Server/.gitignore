@@ -1,8 +1,9 @@
-AccessPointMap.Domain/bin
-AccessPointMap.Domain/obj
-AccessPointMap.Repository/bin
-AccessPointMap.Repository/obj
-AccessPointMap.Service/bin
-AccessPointMap.Service/obj
-AccessPointMap.Web/bin
-AccessPointMap.Web/obj
+/AccessPointMap.Domain/bin
+/AccessPointMap.Domain/obj
+/AccessPointMap.Repository/bin
+/AccessPointMap.Repository/obj
+/AccessPointMap.Service/bin
+/AccessPointMap.Service/obj
+/AccessPointMap.Web/bin
+/AccessPointMap.Web/obj
+/Logs

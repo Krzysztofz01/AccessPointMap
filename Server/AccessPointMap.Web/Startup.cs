@@ -1,5 +1,8 @@
 using AccessPointMap.Repository;
 using AccessPointMap.Repository.Context;
+using AccessPointMap.Service;
+using AccessPointMap.Service.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Text;
 
 namespace AccessPointMap.Web
 {
@@ -23,6 +29,7 @@ namespace AccessPointMap.Web
         public void ConfigureServices(IServiceCollection services)
         {
             //Settings
+            services.Configure<AdminSettings>(Configuration.GetSection(nameof(AdminSettings)));
 
             //Automapper
             services.AddAutoMapper(cfg =>
@@ -43,6 +50,7 @@ namespace AccessPointMap.Web
             services.AddScoped<IAccessPointRepository, AccessPointRepository>();
 
             //Services
+            services.AddScoped<IUserService, UserService>();
 
             //Cross-Origin Resource Sharing
             services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
@@ -51,6 +59,30 @@ namespace AccessPointMap.Web
             }));
 
             //JWT Authentication
+            var jwtSettingsSection = Configuration.GetSection(nameof(JWTSettings));
+            services.Configure<JWTSettings>(jwtSettingsSection);
+
+            var jwtSettings = jwtSettingsSection.Get<JWTSettings>();
+            var secret = Encoding.ASCII.GetBytes(jwtSettings.Secret);
+
+            services.AddAuthentication(cfg =>
+            {
+                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(secret),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             //Endpoint versioning
             services.AddApiVersioning(opt =>
@@ -81,6 +113,8 @@ namespace AccessPointMap.Web
             app.UseRouting();
 
             app.UseCors("DefaultPolicy");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

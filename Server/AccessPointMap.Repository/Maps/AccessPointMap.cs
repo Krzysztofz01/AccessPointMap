@@ -14,7 +14,7 @@ namespace AccessPointMap.Repository.Maps
             entityBuilder.Property(p => p.Id).UseIdentityColumn().Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
             entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("getdate()");
             entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.DeleteDate).IsRequired().HasDefaultValue(null);
+            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
 
             entityBuilder.Property(p => p.Bssid).IsRequired();
             entityBuilder.Property(p => p.Ssid).IsRequired();

@@ -11,8 +11,8 @@ namespace AccessPointMap.Service
         Task<ServiceResult<AuthDto>> Authenticate(string email, string password, string ipAddress);
         Task<ServiceResult<AuthDto>> RefreshToken(string token, string ipAddress);
         Task<IServiceResult> RevokeToken(string token, string ipAddress);
-        Task<IServiceResult> Register(string email, string password, string ipAddress);
-        Task<IServiceResult> Reset(string email, string password);
+        Task<IServiceResult> Register(string name, string email, string password, string ipAddress);
+        Task<IServiceResult> Reset(string email, string password, string ipAddress);
 
         ServiceResult<IEnumerable<UserDto>> GetAll();
         Task<ServiceResult<UserDto>> Get(long userId);
@@ -21,5 +21,6 @@ namespace AccessPointMap.Service
         Task<IServiceResult> Update(UserDto user, long userId);
 
         long GetUserIdFromPayload(IEnumerable<Claim> claims);
+        UserDto GetUserFromPayload(IEnumerable<Claim> claims);
     }
 }

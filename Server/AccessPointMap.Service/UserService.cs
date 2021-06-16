@@ -155,12 +155,13 @@ namespace AccessPointMap.Service
             return new ServiceResult<AuthDto>(ResultStatus.Failed);
         }
 
-        public async Task<IServiceResult> Register(string email, string password, string ipAddress)
+        public async Task<IServiceResult> Register(string name, string email, string password, string ipAddress)
         {
             if(await userRepository.EmailAvailable(email))
             {
                 var user = new User()
                 {
+                    Name = name,
                     Email = email,
                     LastLoginDate = DateTime.Now,
                     LastLoginIp = ipAddress
@@ -183,18 +184,39 @@ namespace AccessPointMap.Service
             return new ServiceResult(ResultStatus.Conflict);
         }
 
-        public async Task<IServiceResult> Reset(string email, string password)
+        public async Task<IServiceResult> Reset(string email, string password, string ipAddress)
         {
             var user = await userRepository.GetSingleUserByEmail(email);
             if (user is null) return new ServiceResult(ResultStatus.NotFound);
 
             string salt = BCrypt.Net.BCrypt.GenerateSalt(5);
-            user.Password = BCrypt.Net.
+            user.Password = BCrypt.Net.BCrypt.HashPassword(password, salt);
+
+            //Revoke all refresh tokens
+            var refreshTokens = user.RefreshTokens.Where(x => x.Revoked == null);
+            foreach(var refreshToken in refreshTokens)
+            {
+                refreshToken.Revoked = DateTime.Now;
+                refreshToken.RevokedByIp = ipAddress;
+            }
+
+            userRepository.UpdateState(user);
+            if (await userRepository.Save() > 0) return new ServiceResult(ResultStatus.Sucess);
+            return new ServiceResult(ResultStatus.Failed);
         }
 
-        public Task<IServiceResult> RevokeToken(string token, string ipAddress)
+        public async Task<IServiceResult> RevokeToken(string token, string ipAddress)
         {
-            throw new NotImplementedException();
+            var user = await userRepository.GetUserWithToken(token);
+            if (user is null) return new ServiceResult(ResultStatus.NotFound);
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+            refreshToken.Revoked = DateTime.Now;
+            refreshToken.RevokedByIp = ipAddress;
+
+            userRepository.UpdateState(user);
+            if (await userRepository.Save() > 0) return new ServiceResult(ResultStatus.Sucess);
+            return new ServiceResult(ResultStatus.Failed);
         }
 
         private string GenerateJsonWebToken(User user)
@@ -243,9 +265,46 @@ namespace AccessPointMap.Service
             }
         }
 
-        public Task<IServiceResult> Update(UserDto user, long userId)
+        public async Task<IServiceResult> Update(UserDto user, long userId)
         {
-            throw new NotImplementedException();
+            var exisitngUser = await userRepository.GetSingleUser(userId);
+            if (exisitngUser is null) return new ServiceResult(ResultStatus.NotFound);
+
+            bool changes = false;
+
+            if(exisitngUser.ModPermission != user.ModPermission)
+            {
+                changes = true;
+                exisitngUser.ModPermission = user.ModPermission;
+            }
+
+            if(exisitngUser.Name != user.Name)
+            {
+                changes = true;
+                exisitngUser.Name = user.Name;
+            }
+
+            if(changes)
+            {
+                userRepository.UpdateState(exisitngUser);
+                if (await userRepository.Save() == 0) return new ServiceResult(ResultStatus.Failed);
+            }
+            return new ServiceResult(ResultStatus.Sucess);
+        }
+
+        public UserDto GetUserFromPayload(IEnumerable<Claim> claims)
+        {
+            var idClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (idClaim is null) throw new ArgumentException(nameof(idClaim));
+
+            var emailClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            if (emailClaim is null) throw new ArgumentException(nameof(emailClaim));
+
+            return new UserDto
+            {
+                Id = Convert.ToInt64(idClaim.Value),
+                Email = emailClaim.Value
+            };
         }
     }
 }

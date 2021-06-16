@@ -7,6 +7,7 @@ namespace AccessPointMap.Repository.Context
     public class AccessPointMapDbContext : DbContext
     {
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<AccessPoint> AccessPoints { get; set; }
 
         public AccessPointMapDbContext(DbContextOptions options) : base(options)
@@ -17,6 +18,9 @@ namespace AccessPointMap.Repository.Context
         {
             //User mapping
             new UserMap(modelBuilder.Entity<User>());
+
+            //Refresh token mapping
+            new RefreshTokenMap(modelBuilder.Entity<RefreshToken>());
 
             //AccessPoint mapping
             new Maps.AccessPointMap(modelBuilder.Entity<AccessPoint>());

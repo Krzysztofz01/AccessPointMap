@@ -13,7 +13,7 @@ namespace AccessPointMap.Repository.Maps
             entityBuilder.Property(p => p.Id).HasAnnotation("MySql:ValueGeneratedOnAdd", true).ValueGeneratedOnAdd();
             entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("getdate()");
             entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.DeleteDate).IsRequired().HasDefaultValue(null);
+            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
 
             //Props
             entityBuilder.Property(p => p.Name).IsRequired();

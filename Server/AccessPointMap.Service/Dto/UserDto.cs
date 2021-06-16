@@ -14,8 +14,7 @@ namespace AccessPointMap.Service.Dto
         public string LastLoginIp { get; set; }
         public DateTime LastLoginDate { get; set; }
         public bool AdminPermission { get; set; }
-        public bool WritePermission { get; set; }
-        public bool ReadPermission { get; set; }
+        public bool ModPermission { get; set; }
         public bool IsActivated { get; set; }
         public IEnumerable<AccessPointDto> AddedAccessPoints { get; set; }
         public IEnumerable<AccessPointDto> ModifiedAccessPoints { get; set; }

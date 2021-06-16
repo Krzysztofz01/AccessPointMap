@@ -15,7 +15,8 @@ namespace AccessPointMap.Repository
 
         public async Task<bool> EmailAvailable(string email)
         {
-            return !await entities.AnyAsync(u => u.Email == email);
+            bool exist = await entities.AnyAsync(u => u.Email == email);
+            return !exist;
         }
 
         public IEnumerable<User> GetAllUsers()
@@ -41,7 +42,7 @@ namespace AccessPointMap.Repository
         {
             return await entities
                 .Include(u => u.RefreshTokens)
-                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+                .SingleOrDefaultAsync(u => u.DeleteDate == null && u.RefreshTokens.Any(t => t.Token == token));
         }
     }
 }
