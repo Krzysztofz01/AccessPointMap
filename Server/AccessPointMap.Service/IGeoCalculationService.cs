@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AccessPointMap.Service
+﻿namespace AccessPointMap.Service
 {
-    interface IGeoCalculationService
+    public interface IGeoCalculationService
     {
+        double GetDistance(double lat1, double lat2, double lon1, double lon2);
+        double GetArea(double radius);
     }
 }

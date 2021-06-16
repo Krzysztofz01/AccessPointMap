@@ -51,6 +51,10 @@ namespace AccessPointMap.Web
 
             //Services
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccessPointService, AccessPointService>();
+
+            services.AddScoped<IMacResolveService, MacResolveService>();
+            services.AddScoped<IGeoCalculationService, GeoCalculationService>();
 
             //Cross-Origin Resource Sharing
             services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
@@ -98,6 +102,9 @@ namespace AccessPointMap.Web
             });
 
             //Hangfire
+
+            //Http Client Factory
+            services.AddHttpClient();
 
             //Controllers
             services.AddControllers();

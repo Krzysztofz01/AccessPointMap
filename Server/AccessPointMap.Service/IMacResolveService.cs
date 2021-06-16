@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace AccessPointMap.Service
 {
-    interface IMacResolveService
+    public interface IMacResolveService
     {
+        Task<string> GetVendorV1(string bssid);
     }
 }

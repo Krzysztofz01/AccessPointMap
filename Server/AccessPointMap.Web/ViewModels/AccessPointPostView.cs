@@ -30,5 +30,8 @@ namespace AccessPointMap.Web.ViewModels
 
         [Required]
         public double MinSignalLatitude { get; set; }
+
+        [Required]
+        public string FullSecurityData { get; set; }
     }
 }

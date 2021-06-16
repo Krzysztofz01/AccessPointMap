@@ -14,7 +14,7 @@ namespace AccessPointMap.Service
         Task<IServiceResult> Register(string name, string email, string password, string ipAddress);
         Task<IServiceResult> Reset(string email, string password, string ipAddress);
 
-        ServiceResult<IEnumerable<UserDto>> GetAll();
+        Task<ServiceResult<IEnumerable<UserDto>>> GetAll();
         Task<ServiceResult<UserDto>> Get(long userId);
         Task<IServiceResult> Delete(long userId);
         Task<IServiceResult> Activation(long userId);

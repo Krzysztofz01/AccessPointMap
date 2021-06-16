@@ -51,6 +51,18 @@ namespace AccessPointMap.Service
             if (user.AdminPermission) return new ServiceResult(ResultStatus.NotPermited);
 
             user.IsActivated = !user.IsActivated;
+
+            if(!user.IsActivated)
+            {
+                //Revoke all refresh tokens
+                var refreshTokens = user.RefreshTokens.Where(x => x.Revoked == null);
+                foreach (var refreshToken in refreshTokens)
+                {
+                    refreshToken.Revoked = DateTime.Now;
+                    refreshToken.RevokedByIp = string.Empty;
+                }
+            }
+
             userRepository.UpdateState(user);
 
             if (await userRepository.Save() > 0) return new ServiceResult(ResultStatus.Sucess);
@@ -111,9 +123,9 @@ namespace AccessPointMap.Service
             return new ServiceResult<UserDto>(userMapped);
         }
 
-        public ServiceResult<IEnumerable<UserDto>> GetAll()
+        public async Task<ServiceResult<IEnumerable<UserDto>>> GetAll()
         {
-            var users = userRepository.GetAll();
+            var users = await userRepository.GetAll();
             var usersMapped = mapper.Map<IEnumerable<UserDto>>(users);
 
             return new ServiceResult<IEnumerable<UserDto>>(usersMapped);
