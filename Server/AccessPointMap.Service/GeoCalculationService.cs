@@ -20,7 +20,7 @@ namespace AccessPointMap.Service
             double sl = (lon2 - lon1) * PI / 180.0;
             double a = Math.Pow(Math.Sin(so / 2.0), 2.0) + Math.Cos(o1) * Math.Cos(o2) * Math.Pow(Math.Sin(sl / 2.0), 2.0);
             double c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0 - a));
-            return R * c;
+            return Math.Round(R * c, 2);
         }
     }
 }

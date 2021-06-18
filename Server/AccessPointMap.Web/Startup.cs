@@ -2,6 +2,8 @@ using AccessPointMap.Repository;
 using AccessPointMap.Repository.Context;
 using AccessPointMap.Service;
 using AccessPointMap.Service.Settings;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -102,6 +104,13 @@ namespace AccessPointMap.Web
             });
 
             //Hangfire
+            services.AddHangfire(cfg =>
+            {
+                cfg.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseDefaultTypeSerializer()
+                    .UseMemoryStorage();
+            });
 
             //Http Client Factory
             services.AddHttpClient();
@@ -110,7 +119,7 @@ namespace AccessPointMap.Web
             services.AddControllers();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IRecurringJobManager recurringJobManager, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -131,6 +140,11 @@ namespace AccessPointMap.Web
             {
                 cfg.SwaggerEndpoint("/swagger/v1/swagger.json", "AccessPointMap WebAPI v1");
             });
+
+            app.UseHangfireServer();
+
+            recurringJobManager.AddOrUpdate("Update manufacturer information",
+                () => serviceProvider.GetService<IAccessPointService>().UpdateBrands(), Cron.Weekly);
 
             app.UseEndpoints(endpoints =>
             {
