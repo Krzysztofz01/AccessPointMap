@@ -8,6 +8,7 @@ namespace AccessPointMap.Service
     public interface IAccessPointService
     {
         Task<IServiceResult> Add(IEnumerable<AccessPointDto> accessPoints, long userId);
+        Task<IServiceResult> AddMaster(IEnumerable<AccessPointDto> accessPoints, long userId);
         Task<ServiceResult<IEnumerable<AccessPointDto>>> GetAllPublic();
         Task<ServiceResult<AccessPointDto>> GetByIdPublic(long accessPointId);
         Task<ServiceResult<IEnumerable<AccessPointDto>>> SearchBySsid(string ssid);

@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,6 +48,8 @@ namespace AccessPointMap.Service
 
         public async Task<IServiceResult> Add(IEnumerable<AccessPointDto> accessPoints, long userId)
         {
+            var computedAccessPoints = new List<AccessPointDto>();
+
             foreach(var accessPoint in accessPoints)
             {
                 var ap = Normalize(accessPoint);
@@ -66,9 +71,73 @@ namespace AccessPointMap.Service
                 ap.UserAddedId = userId;
 
                 ap.UserModifiedId = userId;
+
+                computedAccessPoints.Add(ap);
             }
 
-            var accessPointsMapped = mapper.Map<IEnumerable<AccessPoint>>(accessPoints);
+            var accessPointsMapped = mapper.Map<IEnumerable<AccessPoint>>(computedAccessPoints);
+            await accessPointRepository.AddRange(accessPointsMapped);
+
+            if (await accessPointRepository.Save() > 0)
+            {
+                return new ServiceResult(ResultStatus.Sucess);
+            }
+            return new ServiceResult(ResultStatus.Failed);
+        }
+
+        public async Task<IServiceResult> AddMaster(IEnumerable<AccessPointDto> accessPoints, long userId)
+        {
+            bool macResolveLimit = false;
+            var computedAccessPoints = new List<AccessPointDto>();
+
+            foreach(var accessPoint in accessPoints)
+            {
+                var ap = Normalize(accessPoint);
+
+                ap.Fingerprint = GenerateFingerprintV1(ap);
+
+                ap.SignalRadius = geoCalculationService.GetDistance(ap.MaxSignalLatitude, ap.MinSignalLatitude, ap.MaxSignalLongitude, ap.MinSignalLongitude);
+
+                ap.SignalArea = geoCalculationService.GetArea(ap.SignalRadius);
+
+                ap.SerializedSecurityData = SerializeSecurityDateV1(ap.FullSecurityData);
+
+                ap.DeviceType = DetectDeviceTypeV1(ap);
+
+                ap.MasterGroup = false;
+
+                ap.Display = false;
+
+                ap.UserAddedId = userId;
+
+                ap.UserModifiedId = userId;
+
+                if (accessPointRepository.GetMasterWithGivenBssid(ap.Bssid) == null)
+                {
+                    ap.MasterGroup = true;
+
+                    if (!macResolveLimit)
+                    {
+                        string manufacturerResult = await macResolveService.GetVendorV1(ap.Bssid);
+
+                        if(manufacturerResult == "#ERROR")
+                        {
+                            macResolveLimit = true;
+                        }
+                        else
+                        {
+                            if(!string.IsNullOrEmpty(manufacturerResult))
+                            {
+                                ap.Manufacturer = manufacturerResult;
+                            }
+                        }
+                    }
+                }
+
+                computedAccessPoints.Add(ap);
+            }
+
+            var accessPointsMapped = mapper.Map<IEnumerable<AccessPoint>>(computedAccessPoints);
             await accessPointRepository.AddRange(accessPointsMapped);
 
             if (await accessPointRepository.Save() > 0)
@@ -223,6 +292,8 @@ namespace AccessPointMap.Service
                     .GetDistance(masterAccessPoint.MinSignalLatitude, masterAccessPoint.MaxSignalLatitude, masterAccessPoint.MinSignalLongitude, masterAccessPoint.MaxSignalLongitude);
 
                 masterAccessPoint.SignalArea = geoCalculationService.GetArea(masterAccessPoint.SignalRadius);
+
+                masterAccessPoint.Fingerprint = GenerateFingerprintV1(mapper.Map<AccessPointDto>(masterAccessPoint));
             }
 
             if (masterAccessPoint.AddDate < queueAccessPoint.AddDate)
@@ -239,8 +310,6 @@ namespace AccessPointMap.Service
                     masterAccessPoint.SerializedSecurityData = SerializeSecurityDateV1(masterAccessPoint.FullSecurityData);
                     changes = true;
                 }
-
-                //FINGERPRINT CHANGE
             }
 
             if (changes)
@@ -262,7 +331,6 @@ namespace AccessPointMap.Service
 
         public async Task<ServiceResult<IEnumerable<AccessPointDto>>> SearchBySsid(string ssid)
         {
-            //TODO Escape regex
             string ssidEscaped = ssid.Trim();
 
             var accessPoints = accessPointRepository.SearchBySsid(ssidEscaped);
@@ -345,16 +413,29 @@ namespace AccessPointMap.Service
 
         private string GenerateFingerprintV1(AccessPointDto accessPoint)
         {
-            //TODO
-            return string.Empty;
+            string latFactor = Math.Round((accessPoint.MinSignalLatitude + accessPoint.MaxSignalLatitude) / 2.0, 4).ToString();
+            string lonFactor = Math.Round((accessPoint.MinSignalLongitude + accessPoint.MaxSignalLongitude) / 2.0, 4).ToString();
+
+            using (var sha1 = SHA1.Create())
+            {
+                byte[] data = sha1.ComputeHash(Encoding.UTF8.GetBytes($"{latFactor}{lonFactor}"));
+
+                var sb = new StringBuilder();
+
+                for(int i=0; i < data.Length; i++)
+                {
+                    sb.Append(data[i].ToString("x2"));
+                }
+                return sb.ToString();
+            }
         }
 
         private string SerializeSecurityDateV1(string fullSecurityData)
         {
-            string[] EncryptionTypes = { "BSS", "ESS", "WEP", "WPA", "WPA2", "WPA3", "WPS", "PSK", "CCMP", "TKIP" };
+            string[] encryptionTypes = { "BSS", "ESS", "WEP", "WPA", "WPA2", "WPA3", "WPS", "PSK", "CCMP", "TKIP" };
             var types = new List<string>();
 
-            foreach(var type in EncryptionTypes)
+            foreach(var type in encryptionTypes)
             {
                 if (fullSecurityData.Contains(type)) types.Add(type);
             }
@@ -364,8 +445,24 @@ namespace AccessPointMap.Service
 
         private string AppendFullSecurityDataV1(string baseSecurityData, string newSecurityData)
         {
-            //TODO
-            return string.Empty;
+            var newSecurityDataArr = newSecurityData.Split('[');
+            var newDataToBeAdded = new List<string>();
+
+            foreach(var part in newSecurityDataArr)
+            {
+                if(!baseSecurityData.Contains(part))
+                {
+                    newDataToBeAdded.Add(Regex.Replace(part, @"[\[\]']+", string.Empty));
+                }
+            }
+
+            var sb = new StringBuilder(baseSecurityData);
+            foreach(var element in newDataToBeAdded)
+            {
+                sb.Append($"[{element}]");
+            }
+
+            return sb.ToString();
         }
 
         private string DetectDeviceTypeV1(AccessPointDto accessPoint)
