@@ -345,5 +345,29 @@ namespace AccessPointMap.Web.Controllers
                 return Problem();
             }
         }
+
+        [HttpGet("statistics")]
+        public async Task<ActionResult<AccessPointStatisticsGetView>> GetStatsV1()
+        {
+            try
+            {
+                var result = await accessPointSerivce.GetStats();
+
+                if (result.Status() == ResultStatus.Sucess)
+                {
+                    var statsMapped = mapper.Map<AccessPointStatisticsGetView>(result.Result());
+                    return Ok(statsMapped);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"System failure on geting statistics!");
+                return Problem();
+            }
+        }
+
+        //TODO: Endpoints to get users posted and modified accesspoints
     }
 }

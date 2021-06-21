@@ -41,6 +41,7 @@ namespace AccessPointMap.Web
 
                 cfg.AddProfile<Web.Profiles.UserProfile>();
                 cfg.AddProfile<Web.Profiles.AccessPointProfile>();
+                cfg.AddProfile<Web.Profiles.AccessPointStatisticsProfile>();
             });
 
             //Database

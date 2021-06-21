@@ -21,6 +21,8 @@ namespace AccessPointMap.Web.ViewModels
         public string SerializedSecurityData { get; set; }
         public string Manufacturer { get; set; }
         public string DeviceType { get; set; }
+        public bool MasterGroup { get; set; }
+        public bool Display { get; set; }
         public virtual UserGetView UserAdded { get; set; }
         public virtual UserGetView UserModified { get; set; }
     }

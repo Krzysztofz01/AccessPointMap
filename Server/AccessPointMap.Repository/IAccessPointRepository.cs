@@ -16,5 +16,15 @@ namespace AccessPointMap.Repository
         IEnumerable<AccessPoint> SearchBySsid(string ssid);
         IEnumerable<AccessPoint> GetAllNoBrand();
         Task<AccessPoint> GetMasterWithGivenBssid(string bssid);
+
+        Task<int> AllRecordsCount();
+        Task<int> AllInsecureRecordsCount();
+        Task<IEnumerable<string>> TopOccuringBrandsSorted();
+        Task<IEnumerable<AccessPoint>> TopAreaAccessPointsSorted();
+        Task<IEnumerable<string>> TopOccuringSecurityTypes();
+        Task<IEnumerable<double>> TopOccuringFrequencies();
+
+        Task<IEnumerable<AccessPoint>> UserAddedAccessPoints(long userId);
+        Task<IEnumerable<AccessPoint>> UserModifiedAccessPoints(long userId);
     }
 }

@@ -13,6 +13,16 @@ namespace AccessPointMap.Repository
         {
         }
 
+        public Task<int> AllInsecureRecordsCount()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<int> AllRecordsCount()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public IEnumerable<AccessPoint> GetAllMaster()
         {
             return entities
@@ -105,6 +115,36 @@ namespace AccessPointMap.Repository
                 .Where(x => x.DeleteDate == null)
                 .Where(x => x.Ssid.ToLower().Contains(cleanedSsid))
                 .Take(10);
+        }
+
+        public Task<IEnumerable<AccessPoint>> TopAreaAccessPointsSorted()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<string>> TopOccuringBrandsSorted()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<double>> TopOccuringFrequencies()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<string>> TopOccuringSecurityTypes()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<AccessPoint>> UserAddedAccessPoints(long userId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<AccessPoint>> UserModifiedAccessPoints(long userId)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
