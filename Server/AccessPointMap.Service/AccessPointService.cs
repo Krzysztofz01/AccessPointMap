@@ -62,6 +62,8 @@ namespace AccessPointMap.Service
 
                 ap.SerializedSecurityData = SerializeSecurityDateV1(ap.FullSecurityData);
 
+                ap.IsSecure = CheckIsSecure(ap.FullSecurityData);
+
                 ap.DeviceType = DetectDeviceTypeV1(ap);
 
                 ap.MasterGroup = false;
@@ -308,6 +310,9 @@ namespace AccessPointMap.Service
                 {
                     masterAccessPoint.FullSecurityData = AppendFullSecurityDataV1(masterAccessPoint.FullSecurityData, queueAccessPoint.FullSecurityData);
                     masterAccessPoint.SerializedSecurityData = SerializeSecurityDateV1(masterAccessPoint.FullSecurityData);
+
+                    masterAccessPoint.IsSecure = CheckIsSecure(masterAccessPoint.FullSecurityData);
+
                     changes = true;
                 }
             }
@@ -474,6 +479,18 @@ namespace AccessPointMap.Service
             if (cleanedSsid.Contains("cctv") || cleanedSsid.Contains("cam")) return "CCTV";
             if (cleanedSsid.Contains("iot")) return "IoT";
             return null;
+        }
+
+        private bool CheckIsSecure(string fullSecurityData)
+        {
+            string[] secureEncryptionTypes = { "WPA", "WPA2", "WPA3" };
+            string security = fullSecurityData.ToUpper();
+
+            foreach(var type in secureEncryptionTypes)
+            {
+                if (security.Contains(type)) return true;
+            }
+            return false;
         }
 
         public Task<ServiceResult<AccessPointStatisticsDto>> GetStats()

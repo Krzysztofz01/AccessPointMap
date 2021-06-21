@@ -23,6 +23,7 @@ namespace AccessPointMap.Web.ViewModels
         public string DeviceType { get; set; }
         public bool MasterGroup { get; set; }
         public bool Display { get; set; }
+        public bool IsSecure { get; set; }
         public virtual UserGetView UserAdded { get; set; }
         public virtual UserGetView UserModified { get; set; }
     }

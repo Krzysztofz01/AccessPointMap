@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Domain;
 using AccessPointMap.Repository.Context;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,14 +14,19 @@ namespace AccessPointMap.Repository
         {
         }
 
-        public Task<int> AllInsecureRecordsCount()
+        public async Task<int> AllInsecureRecordsCount()
         {
-            throw new System.NotImplementedException();
+            return await entities
+                .Where(x => x.DeleteDate == null)
+                .Where(x => !x.IsSecure)
+                .CountAsync();
         }
 
-        public Task<int> AllRecordsCount()
+        public async Task<int> AllRecordsCount()
         {
-            throw new System.NotImplementedException();
+            return await entities
+                .Where(x => x.DeleteDate == null)
+                .CountAsync();
         }
 
         public IEnumerable<AccessPoint> GetAllMaster()
@@ -117,34 +123,82 @@ namespace AccessPointMap.Repository
                 .Take(10);
         }
 
-        public Task<IEnumerable<AccessPoint>> TopAreaAccessPointsSorted()
+        public IEnumerable<AccessPoint> TopAreaAccessPointsSorted()
         {
-            throw new System.NotImplementedException();
+            return entities
+                .Where(x => x.DeleteDate == null)
+                .OrderByDescending(x => x.SignalArea)
+                .Take(5);
         }
 
-        public Task<IEnumerable<string>> TopOccuringBrandsSorted()
+        public IEnumerable<Tuple<string, int>> TopOccuringBrandsSorted()
         {
-            throw new System.NotImplementedException();
+            return entities
+                .Where(x => x.DeleteDate == null)
+                .Where(x => !string.IsNullOrEmpty(x.Manufacturer))
+                .GroupBy(x => x.Manufacturer)
+                .OrderByDescending(x => x.Count())
+                .Take(5)
+                .Select(x => new Tuple<string, int>(x.Key, x.Count()));
         }
 
-        public Task<IEnumerable<double>> TopOccuringFrequencies()
+        public IEnumerable<Tuple<double, int>> TopOccuringFrequencies()
         {
-            throw new System.NotImplementedException();
+            return entities
+                .Where(x => x.DeleteDate == null)
+                .GroupBy(x => x.Frequency)
+                .OrderByDescending(x => x.Count())
+                .Take(5)
+                .Select(x => new Tuple<double, int>(x.Key, x.Count()));
         }
 
-        public Task<IEnumerable<string>> TopOccuringSecurityTypes()
+        public IEnumerable<Tuple<string, int>> TopOccuringSecurityTypes(IEnumerable<string> securityTypes)
         {
-            throw new System.NotImplementedException();
+            //Probably not the most efficient way to do this task
+            //
+            // Complexity
+            // n - records
+            // m - security types
+            // O(m + n * m) => O( m(n + 1) )
+            var securityCount = new Dictionary<string, int>();
+
+            foreach(var type in securityTypes) securityCount.Add(type, 0);
+
+            var accessPoints = entities
+                .Where(x => x.DeleteDate == null);
+
+            foreach(var ap in accessPoints)
+            {
+                foreach (var type in securityTypes)
+                {
+                    if (ap.FullSecurityData.Contains(type) && securityCount.ContainsKey(type))
+                    {
+                        securityCount[type]++;
+                    }
+                }
+            }
+
+            return securityCount
+                .Take(5)
+                .Select(x => new Tuple<string, int>(x.Key, x.Value));
         }
 
-        public Task<IEnumerable<AccessPoint>> UserAddedAccessPoints(long userId)
+        public IEnumerable<AccessPoint> UserAddedAccessPoints(long userId)
         {
-            throw new System.NotImplementedException();
+            return entities
+                .Include(x => x.UserAdded)
+                .Include(x => x.UserModified)
+                .Where(x => x.DeleteDate == null)
+                .Where(x => x.UserAddedId == userId);
         }
 
-        public Task<IEnumerable<AccessPoint>> UserModifiedAccessPoints(long userId)
+        public IEnumerable<AccessPoint> UserModifiedAccessPoints(long userId)
         {
-            throw new System.NotImplementedException();
+            return entities
+                .Include(x => x.UserAdded)
+                .Include(x => x.UserModified)
+                .Where(x => x.DeleteDate == null)
+                .Where(x => x.UserModifiedId == userId);
         }
     }
 }

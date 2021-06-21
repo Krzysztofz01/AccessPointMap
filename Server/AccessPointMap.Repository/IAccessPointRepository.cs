@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Domain;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,12 +20,12 @@ namespace AccessPointMap.Repository
 
         Task<int> AllRecordsCount();
         Task<int> AllInsecureRecordsCount();
-        Task<IEnumerable<string>> TopOccuringBrandsSorted();
-        Task<IEnumerable<AccessPoint>> TopAreaAccessPointsSorted();
-        Task<IEnumerable<string>> TopOccuringSecurityTypes();
-        Task<IEnumerable<double>> TopOccuringFrequencies();
+        IEnumerable<Tuple<string, int>> TopOccuringBrandsSorted();
+        IEnumerable<AccessPoint> TopAreaAccessPointsSorted();
+        IEnumerable<Tuple<string, int>> TopOccuringSecurityTypes(IEnumerable<string> securityTypes);
+        IEnumerable<Tuple<double, int>> TopOccuringFrequencies();
 
-        Task<IEnumerable<AccessPoint>> UserAddedAccessPoints(long userId);
-        Task<IEnumerable<AccessPoint>> UserModifiedAccessPoints(long userId);
+        IEnumerable<AccessPoint> UserAddedAccessPoints(long userId);
+        IEnumerable<AccessPoint> UserModifiedAccessPoints(long userId);
     }
 }

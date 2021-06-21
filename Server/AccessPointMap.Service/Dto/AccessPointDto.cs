@@ -27,6 +27,7 @@ namespace AccessPointMap.Service.Dto
         public bool MasterGroup { get; set; }
         public bool Display { get; set; }
         public string Note { get; set; }
+        public bool IsSecure { get; set; }
         public long? UserAddedId { get; set; }
         public UserDto UserAdded { get; set; }
         public long? UserModifiedId { get; set; }
