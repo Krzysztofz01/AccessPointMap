@@ -32,6 +32,8 @@ namespace AccessPointMap.Web
         {
             //Settings
             services.Configure<AdminSettings>(Configuration.GetSection(nameof(AdminSettings)));
+            services.Configure<EncryptionTypeSettings>(Configuration.GetSection(nameof(EncryptionTypeSettings)));
+            services.Configure<DeviceTypeSettings>(Configuration.GetSection(nameof(DeviceTypeSettings)));
 
             //Automapper
             services.AddAutoMapper(cfg =>

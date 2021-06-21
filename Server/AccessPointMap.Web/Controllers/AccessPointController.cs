@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AccessPointMap.Service;
 using AccessPointMap.Service.Dto;
@@ -8,7 +7,6 @@ using AccessPointMap.Service.Handlers;
 using AccessPointMap.Web.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -368,6 +366,56 @@ namespace AccessPointMap.Web.Controllers
             }
         }
 
-        //TODO: Endpoints to get users posted and modified accesspoints
+        [HttpGet("user/added")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetUserAddedV1()
+        {
+            var userId = userService.GetUserIdFromPayload(User.Claims);
+
+            try
+            {
+                var result = await accessPointSerivce.GetUserAddedAccessPoints(userId);
+                
+                if (result.Status() == ResultStatus.Sucess)
+                {
+                    var accessPointsMapped = mapper.Map<AccessPointGetView>(result.Result());
+
+                    return Ok(accessPointsMapped);
+                }
+
+                return BadRequest();
+            }
+            catch(Exception e)
+            {
+                logger.LogError(e, $"System failure on geting added accesspoints from user with id: { userId }!");
+                return Problem();
+            }
+        }
+
+        [HttpGet("user/modified")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetUserModifiedV1()
+        {
+            var userId = userService.GetUserIdFromPayload(User.Claims);
+
+            try
+            {
+                var result = await accessPointSerivce.GetUserModifiedAccessPoints(userId);
+
+                if (result.Status() == ResultStatus.Sucess)
+                {
+                    var accessPointsMapped = mapper.Map<AccessPointGetView>(result.Result());
+
+                    return Ok(accessPointsMapped);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"System failure on geting modified accesspoints from user with id: { userId }!");
+                return Problem();
+            }
+        }
     }
 }

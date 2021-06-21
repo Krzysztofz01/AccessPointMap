@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AccessPointMap.Web.ViewModels
 {
@@ -9,9 +7,9 @@ namespace AccessPointMap.Web.ViewModels
     {
         public int AllRecords { get; set; }
         public int InsecureRecords { get; set; }
-        public IEnumerable<string> TopBrands { get; set; }
+        public IEnumerable<Tuple<string, int>> TopBrands { get; set; }
         public IEnumerable<AccessPointGetView> TopAreaAccessPoints { get; set; }
-        public IEnumerable<string> TopSecurityTypes { get; set; }
-        public IEnumerable<double> TopFrequencies { get; set; }
+        public IEnumerable<Tuple<string, int>> TopSecurityTypes { get; set; }
+        public IEnumerable<Tuple<double, int>> TopFrequencies { get; set; }
     }
 }

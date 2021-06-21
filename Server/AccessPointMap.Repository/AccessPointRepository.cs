@@ -164,17 +164,24 @@ namespace AccessPointMap.Repository
 
             foreach(var type in securityTypes) securityCount.Add(type, 0);
 
+            securityCount.Add("None", 0);
+
             var accessPoints = entities
                 .Where(x => x.DeleteDate == null);
 
             foreach(var ap in accessPoints)
             {
+                bool hasSecurity = false;
+
                 foreach (var type in securityTypes)
                 {
                     if (ap.FullSecurityData.Contains(type) && securityCount.ContainsKey(type))
                     {
                         securityCount[type]++;
+                        hasSecurity = true;
                     }
+
+                    if (!hasSecurity) securityCount["None"]++;
                 }
             }
 

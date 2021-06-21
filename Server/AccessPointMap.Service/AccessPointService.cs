@@ -2,11 +2,14 @@
 using AccessPointMap.Repository;
 using AccessPointMap.Service.Dto;
 using AccessPointMap.Service.Handlers;
+using AccessPointMap.Service.Settings;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,6 +24,8 @@ namespace AccessPointMap.Service
         private readonly IGeoCalculationService geoCalculationService;
         private readonly IMacResolveService macResolveService;
         private readonly IMapper mapper;
+        private readonly EncryptionTypeSettings encryptionTypeSettings;
+        private readonly DeviceTypeSettings deviceTypeSettings;
         private readonly ILogger<AccessPointService> logger;
 
         public AccessPointService(
@@ -28,6 +33,8 @@ namespace AccessPointMap.Service
             IGeoCalculationService geoCalculationService,
             IMacResolveService macResolveService,
             IMapper mapper,
+            IOptions<EncryptionTypeSettings> encryptionTypeSettings,
+            IOptions<DeviceTypeSettings> deviceTypeSettings,
             ILogger<AccessPointService> logger)
         {
             this.accessPointRepository = accessPointRepository ??
@@ -41,6 +48,12 @@ namespace AccessPointMap.Service
 
             this.mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
+
+            this.encryptionTypeSettings = encryptionTypeSettings.Value ??
+                throw new ArgumentNullException(nameof(encryptionTypeSettings));
+
+            this.deviceTypeSettings = deviceTypeSettings.Value ??
+                throw new ArgumentNullException(nameof(deviceTypeSettings));
 
             this.logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
@@ -437,7 +450,7 @@ namespace AccessPointMap.Service
 
         private string SerializeSecurityDateV1(string fullSecurityData)
         {
-            string[] encryptionTypes = { "BSS", "ESS", "WEP", "WPA", "WPA2", "WPA3", "WPS", "PSK", "CCMP", "TKIP" };
+            var encryptionTypes = encryptionTypeSettings.EncryptionStandardsAndTypes;
             var types = new List<string>();
 
             foreach(var type in encryptionTypes)
@@ -472,18 +485,21 @@ namespace AccessPointMap.Service
 
         private string DetectDeviceTypeV1(AccessPointDto accessPoint)
         {
-            string cleanedSsid = accessPoint.Ssid.ToLower().Trim();
+            string ssid = accessPoint.Ssid.ToLower().Trim();
 
-            if (cleanedSsid.Contains("printer") || cleanedSsid.Contains("print") || cleanedSsid.Contains("laser")) return "Printer";
-            if (cleanedSsid.Contains("tv")) return "TV";
-            if (cleanedSsid.Contains("cctv") || cleanedSsid.Contains("cam")) return "CCTV";
-            if (cleanedSsid.Contains("iot")) return "IoT";
+            if (deviceTypeSettings.PrinterKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Printer";
+            if (deviceTypeSettings.AccessPointKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Access point";
+            if (deviceTypeSettings.TvKeywords.Any(x => ssid.Contains(x.ToLower()))) return "TV";
+            if (deviceTypeSettings.CctvKeywords.Any(x => ssid.Contains(x.ToLower()))) return "CCTV";
+            if (deviceTypeSettings.RepeaterKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Repeater";
+            if (deviceTypeSettings.IotKeywords.Any(x => ssid.Contains(x.ToLower()))) return "IoT";
+
             return null;
         }
 
         private bool CheckIsSecure(string fullSecurityData)
         {
-            string[] secureEncryptionTypes = { "WPA", "WPA2", "WPA3" };
+            var secureEncryptionTypes = encryptionTypeSettings.SafeEncryptionStandards;
             string security = fullSecurityData.ToUpper();
 
             foreach(var type in secureEncryptionTypes)
@@ -493,19 +509,39 @@ namespace AccessPointMap.Service
             return false;
         }
 
-        public Task<ServiceResult<AccessPointStatisticsDto>> GetStats()
+        public async Task<ServiceResult<AccessPointStatisticsDto>> GetStats()
         {
-            throw new NotImplementedException();
+            var encryptionTypes = encryptionTypeSettings.EncryptionStandardsForStatistics;
+
+            var statistics = new AccessPointStatisticsDto
+            {
+                AllRecords = await accessPointRepository.AllRecordsCount(),
+                InsecureRecords = await accessPointRepository.AllInsecureRecordsCount(),
+                TopBrands = accessPointRepository.TopOccuringBrandsSorted(),
+                TopAreaAccessPoints = mapper.Map<IEnumerable<AccessPointDto>>(accessPointRepository.TopAreaAccessPointsSorted()),
+                TopSecurityTypes = accessPointRepository.TopOccuringSecurityTypes(encryptionTypes),
+                TopFrequencies = accessPointRepository.TopOccuringFrequencies()
+            };
+
+            return new ServiceResult<AccessPointStatisticsDto>(statistics);
         }
 
-        public Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserAddedAccessPoints(long userId)
+        public async Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserAddedAccessPoints(long userId)
         {
-            throw new NotImplementedException();
+            var accessPoints = accessPointRepository.UserAddedAccessPoints(userId);
+            if (accessPoints is null) return new ServiceResult<IEnumerable<AccessPointDto>>(ResultStatus.NotFound);
+
+            var accessPointsMapped = mapper.Map<IEnumerable<AccessPointDto>>(accessPoints);
+            return new ServiceResult<IEnumerable<AccessPointDto>>(accessPointsMapped);
         }
 
-        public Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserModifiedAccessPoints(long userId)
+        public async Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserModifiedAccessPoints(long userId)
         {
-            throw new NotImplementedException();
+            var accessPoints = accessPointRepository.UserModifiedAccessPoints(userId);
+            if (accessPoints is null) return new ServiceResult<IEnumerable<AccessPointDto>>(ResultStatus.NotFound);
+
+            var accessPointsMapped = mapper.Map<IEnumerable<AccessPointDto>>(accessPoints);
+            return new ServiceResult<IEnumerable<AccessPointDto>>(accessPointsMapped);
         }
     }
 }
