@@ -475,5 +475,20 @@ namespace AccessPointMap.Service
             if (cleanedSsid.Contains("iot")) return "IoT";
             return null;
         }
+
+        public Task<ServiceResult<AccessPointStatisticsDto>> GetStats()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserAddedAccessPoints(long userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserModifiedAccessPoints(long userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
