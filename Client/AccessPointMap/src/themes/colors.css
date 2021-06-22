@@ -1,0 +1,12 @@
+/*  AccessPointMap project default color scheme */
+:root {
+    --apm-primary: #000046;
+    --apm-secondary: #1CB5E0;
+    --apm-third: #1582B5;
+    --apm-fourth: #000000;
+    --apm-background-bright: #ffffff;
+    --apm-background-dark: #292929;
+    --apm-success: #1CE047;
+    --apm-danger: #ee4d4d;
+    --apm-warning: #FBDF4F;
+}

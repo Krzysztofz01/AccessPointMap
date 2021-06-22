@@ -1,0 +1,6 @@
+.container-fluid {
+    padding-left: 0rem;
+    padding-right: 0rem;
+    overflow: hidden;
+    max-width: 100%;
+}

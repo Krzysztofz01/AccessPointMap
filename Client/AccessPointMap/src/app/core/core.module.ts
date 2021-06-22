@@ -16,7 +16,6 @@ import { LocalStorageService } from './services/local-storage.service';
     CommonModule
   ],
   providers: [
-    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AuthService]},
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: PermissionErrorInterceptor, multi: true },
 
