@@ -1,7 +1,7 @@
 import { User } from "./user.model";
 
 export interface AccessPoint {
-    dd: number;
+    id: number;
     addDate: Date;
     editDate: Date;
     bssid: string;
@@ -18,6 +18,9 @@ export interface AccessPoint {
     serializedSecurityData: string;
     manufacturer: string;
     deviceType: string;
+    masterGroup: boolean;
+    display: boolean;
+    isSecure: boolean;
     userAdded: User;
     userModified: User;
 }
