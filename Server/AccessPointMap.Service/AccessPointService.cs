@@ -67,6 +67,12 @@ namespace AccessPointMap.Service
             {
                 var ap = Normalize(accessPoint);
 
+                if (string.IsNullOrEmpty(ap.Ssid))
+                {
+                    ap.Ssid = "Hidden network";
+                    ap.IsHidden = true;
+                }
+
                 ap.Fingerprint = GenerateFingerprintV1(ap);
 
                 ap.SignalRadius = geoCalculationService.GetDistance(ap.MaxSignalLatitude, ap.MinSignalLatitude, ap.MaxSignalLongitude, ap.MinSignalLongitude);
@@ -109,6 +115,12 @@ namespace AccessPointMap.Service
             {
                 var ap = Normalize(accessPoint);
 
+                if (string.IsNullOrEmpty(ap.Ssid))
+                {
+                    ap.Ssid = "Hidden network";
+                    ap.IsHidden = true;
+                }
+
                 ap.Fingerprint = GenerateFingerprintV1(ap);
 
                 ap.SignalRadius = geoCalculationService.GetDistance(ap.MaxSignalLatitude, ap.MinSignalLatitude, ap.MaxSignalLongitude, ap.MinSignalLongitude);
@@ -116,6 +128,8 @@ namespace AccessPointMap.Service
                 ap.SignalArea = geoCalculationService.GetArea(ap.SignalRadius);
 
                 ap.SerializedSecurityData = SerializeSecurityDateV1(ap.FullSecurityData);
+
+                ap.IsSecure = CheckIsSecure(ap.FullSecurityData);
 
                 ap.DeviceType = DetectDeviceTypeV1(ap);
 
@@ -127,7 +141,7 @@ namespace AccessPointMap.Service
 
                 ap.UserModifiedId = userId;
 
-                if (accessPointRepository.GetMasterWithGivenBssid(ap.Bssid) == null)
+                if (await accessPointRepository.GetMasterWithGivenBssid(ap.Bssid) == null)
                 {
                     ap.MasterGroup = true;
 

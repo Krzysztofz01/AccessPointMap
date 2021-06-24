@@ -24,6 +24,7 @@ namespace AccessPointMap.Web.ViewModels
         public bool MasterGroup { get; set; }
         public bool Display { get; set; }
         public bool IsSecure { get; set; }
+        public bool IsHidden { get; set; }
         public virtual UserGetView UserAdded { get; set; }
         public virtual UserGetView UserModified { get; set; }
     }

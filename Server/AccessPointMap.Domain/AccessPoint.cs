@@ -17,6 +17,7 @@
         public string FullSecurityData { get; set; }
         public string SerializedSecurityData { get; set; }
         public bool IsSecure { get; set; }
+        public bool IsHidden { get; set; }
         public string Manufacturer { get; set; }
         public string DeviceType { get; set; }
         public bool MasterGroup { get; set; }

@@ -21,6 +21,7 @@ export interface AccessPoint {
     masterGroup: boolean;
     display: boolean;
     isSecure: boolean;
+    isHidden: boolean;
     userAdded: User;
     userModified: User;
 }

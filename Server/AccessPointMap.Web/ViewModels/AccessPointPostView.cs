@@ -7,7 +7,6 @@ namespace AccessPointMap.Web.ViewModels
         [Required]
         public string Bssid { get; set; }
 
-        [Required]
         public string Ssid { get; set; }
 
         [Required]

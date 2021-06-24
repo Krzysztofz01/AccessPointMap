@@ -36,6 +36,7 @@ namespace AccessPointMap.Repository.Maps
             entityBuilder.Property(p => p.Display).IsRequired().HasDefaultValue(false);
             entityBuilder.Property(p => p.Note).HasDefaultValue(string.Empty);
             entityBuilder.Property(p => p.IsSecure).IsRequired().HasDefaultValue(false);
+            entityBuilder.Property(p => p.IsHidden).IsRequired().HasDefaultValue(false);
 
             //Relations
             entityBuilder

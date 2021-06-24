@@ -2,3 +2,8 @@
 body {
     font-family: 'Montserrat', sans-serif !important;
 }
+
+/* Modal gradient background */
+.fade {
+    background: linear-gradient(315deg, var(--apm-primary-fade) 0%, var(--apm-secondary-fade) 100%);
+}
