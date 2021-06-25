@@ -12,13 +12,14 @@ import TileLayer from 'ol/layer/Tile';
 import * as olProj from 'ol/proj';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements AfterViewInit{
+export class MapComponent implements OnInit, AfterViewInit{
   @Input() accessPointsObservable: Observable<Array<AccessPoint>>;
   @Input() mapId: string;
   @Input() mapHeight: string;
@@ -30,6 +31,20 @@ export class MapComponent implements AfterViewInit{
   private accessPoints: Array<AccessPoint>;
   private map: Map;
 
+  public securityTypeForm: FormGroup;
+  public securityTypesOptions: Array<string> = [ "All", "WPA3", "WPA2", "WPA", "WEP", "WPS", "None" ];
+
+  ngOnInit(): void {
+    this.securityTypeForm = new FormGroup({
+      selectType: new FormControl('All')
+    });
+
+    this.securityTypeForm.get('selectType').valueChanges.subscribe(val => {
+      const features = this.generateMapFeatures(this.accessPoints, val);
+      this.swapVector(features);
+    });
+  }
+
   ngAfterViewInit(): void {
     this.accessPointsObservable.subscribe((res) => {
       this.accessPoints = res;
@@ -37,11 +52,6 @@ export class MapComponent implements AfterViewInit{
       const features = this.generateMapFeatures(this.accessPoints);
       this.initializeMap(features);
     });
-  }
-
-  public securityTypeFilterChange(type: string): void {
-    const features = this.generateMapFeatures(this.accessPoints, type);
-    this.swapVector(features);
   }
 
   //Initializing the vector layer, map and marker click event
@@ -72,12 +82,15 @@ export class MapComponent implements AfterViewInit{
     //Map click event
     this.map.on('click', (e) => {
       const selection: Array<AccessPoint> = new Array<AccessPoint>();
-      this.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
+      this.map.forEachFeatureAtPixel(e.pixel, (feature) => {
         selection.push(feature.get('accessPoint') as AccessPoint);
       });
 
       //Emit the selection array (distinct by id)
-      this.markerClick.emit(selection.filter((a, i) => selection.findIndex((s) => a.id === s.id) === i));
+      const distinctSelection = selection.filter((a, i) => selection.findIndex((s) => a.id === s.id) === i);
+      if(distinctSelection.length) {
+        this.markerClick.emit(distinctSelection);
+      }
     });
   }
 
@@ -94,6 +107,8 @@ export class MapComponent implements AfterViewInit{
     const vector: VectorLayer = new VectorLayer({
       source: new VectorSource({ features })
     });
+
+    vector.set('name', 'marker_layer');
 
     this.map.addLayer(vector);
   }
@@ -147,8 +162,11 @@ export class MapComponent implements AfterViewInit{
     const security: Array<string> = JSON.parse(accessPoint.serializedSecurityData);
 
     if(accessPoint.isHidden) return environment.PIN_ICON_ALTERNATIVE;
-    if(accessPoint.isSecure) return environment.PIN_ICON_GOOD;
-    if(security.includes('WEP') || security.includes('WPS')) return environment.PIN_ICON_AVERAGE;
+    if(accessPoint.isSecure) {
+      return environment.PIN_ICON_GOOD;
+    } else {
+      if(security.includes('WEP') || security.includes('WPS')) return environment.PIN_ICON_AVERAGE;
+    }
     return environment.PIN_ICON_BAD;
   }
 }

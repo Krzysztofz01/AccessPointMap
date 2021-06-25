@@ -13,11 +13,11 @@ import { AccessPointDeatilModalService } from 'src/app/shared/access-point-detai
 export class MainComponent implements OnInit {
   public accessPointsObservable: Observable<Array<AccessPoint>>;
   public mapId: string = 'mainMap';
-  public mapHeight: string = '75vh';
+  public mapHeight: string = '85vh';
   public zoom: number = 16;
 
   private urlParam: string;
-
+  
   constructor(private accessPointService: AccessPointService, private route: ActivatedRoute, private accessPointModal: AccessPointDeatilModalService) { }
 
   ngOnInit(): void {

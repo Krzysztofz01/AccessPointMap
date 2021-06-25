@@ -1,1 +1,46 @@
-<p>search works!</p>
+<div class="container-fluid">
+    <div class="row justify-content-center" style="margin-top: 25vh;">
+        <div class="col-lg-5 col-md-12">
+            <div class="search-container text-center py-2 px-2">
+                <h1 class="my-0">I'm safe?</h1>
+                <p class="my-0">Type your wifi name and find out!</p>
+
+                <div class="row justify-content-center my-4">
+                    <div class="col-8">
+                        <form [formGroup]="searchForm" (ngSubmit)="search()">
+                            <input class="form-control" type="text" placeholder="Type your wifi name" aria-label="Your wifi name" formControlName="ssid">
+                            <button type="submit" class="btn btn-primary col-12 mt-2" [disabled]="searchDisabled == true">Search</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="row justify-content-center">
+                    <div class="col-8">
+                        <div *ngIf="results == true">
+                            <p *ngIf="tooMany == true">Too many matching results. Give a more precise name.</p>
+                            <p *ngIf="empty == true">Not found. It is possible that your access point is yet to be approved by administrations. Please try to search one more time later.</p>
+                            <div *ngIf="tooMany == false && empty == false" class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let ap of accessPoints; let i = index">
+                                            <th scope="col">{{ i+1 }}</th>
+                                            <td><a class="detailLink" (click)="navigateToDetails(ap)">{{ ap.ssid }}</a></td>
+                                            <td [style.color]="securityStatusColor(ap)">{{ securityStatusText(ap) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

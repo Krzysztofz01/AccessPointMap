@@ -1,1 +1,35 @@
-<p>access-point-details works!</p>
+<div class="modal-body">
+    <div class="container-fluid">
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-12 col-md-12 text-center">
+                <div *ngIf="singleAccessPoint == true">
+                    <h3>{{ accessPoints[0].ssid }}</h3>
+                </div>
+                <div *ngIf="singleAccessPoint != true">
+                    <p class="my-0">Several access points at this point, select which you want to see:</p>
+                    <select class="form-select my-0" aria-label="Accesspoint modal select" [(ngModel)]="selectedAccessPointId" (ngModelChange)="selectedAccessPointChange($event)">
+                        <option *ngFor="let ap of accessPoints" [value]="ap.id">{{ ap.ssid }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center mt-3">         
+            <div class="col-lg-6 col-md-12">
+                <div class="apm-ol-detail-map" id="detail-map"></div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <h4>BSSID: {{ selectedAccessPoint.bssid }}</h4>
+                <h5 *ngIf="selectedAccessPoint.isHidden == true">This network is hidden. The SSID is not broadcasted!</h5>
+                <h5>Manufacturer: {{ parseManufacturer() }}</h5>
+                <h5>Device type: {{ parseDeviceType() }}</h5>
+                <h5>Signal area: {{ selectedAccessPoint.signalArea }}m<sup>2</sup></h5>
+                <h5>Frequency: {{ selectedAccessPoint.frequency }}</h5>
+                <h5>Security: <span [style.color]="getSecurityColor()">{{ getSecurityText() }}</span></h5>
+                <h5>{{ parseAddInfo() }}</h5>
+                <h5>{{ parseModifyInfo() }}</h5>
+            </div>
+        </div>
+    </div>
+</div>

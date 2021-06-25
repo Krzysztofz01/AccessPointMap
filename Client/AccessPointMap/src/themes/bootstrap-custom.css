@@ -7,3 +7,55 @@ body {
 .fade {
     background: linear-gradient(315deg, var(--apm-primary-fade) 0%, var(--apm-secondary-fade) 100%);
 }
+
+/* Custom select styling */
+select {
+    color: var(--apm-secondary) !important;
+    border: 1px var(--apm-secondary) solid !important;
+}
+
+select:focus {
+    box-shadow: none !important;
+}
+
+/* Custom button styling */
+.btn-primary {
+    font-family: 'Montserrat', sans-serif !important;
+    background-color: transparent !important;
+    border-color: var(--apm-background-bright) !important;
+    color: var(--apm-background-bright) !important;
+}
+.btn-primary:hover,
+.btn-primary:focus:hover {
+    background-color: transparent !important;
+    border-color: var(--apm-secondary) !important;
+    color: var(--apm-secondary) !important;
+    box-shadow: none !important;
+}
+
+.btn-primary:active,
+.btn-primary:visited,
+.btn-primary:focus {
+    background-color: transparent !important;
+    border-color: var(--apm-background-bright) !important;
+    color: var(--apm-background-bright) !important;
+    box-shadow: none !important;
+}
+
+/* Custom input styling */
+input[type=password],
+input[type=email],
+input[type=text],
+textarea {
+    font-family: 'Montserrat', sans-serif !important;
+    background: transparent !important;
+    color: var(--apm-background-bright) !important;
+    border-color: var(--apm-background-bright) !important;
+    text-align: center;
+}
+
+::placeholder,
+::-moz-placeholder,
+::-webkit-input-placeholder {
+    color: red;
+}

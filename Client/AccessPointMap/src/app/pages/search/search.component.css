@@ -1,0 +1,20 @@
+.search-container {
+    background: linear-gradient(315deg, var(--apm-primary) 0%, var(--apm-secondary) 100%);
+}
+
+h1, p {
+    color: var(--apm-background-bright);
+}
+
+h1 {
+    font-size: 4em;
+}
+
+.table {
+    color: var(--apm-background-bright);
+}
+
+.detailLink {
+    color: var(--apm-background-bright);
+    cursor: pointer;
+}

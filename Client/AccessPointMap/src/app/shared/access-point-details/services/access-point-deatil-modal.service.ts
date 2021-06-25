@@ -11,7 +11,7 @@ export class AccessPointDeatilModalService {
   constructor(private modalSerivce: NgbModal) { }
 
   public open(accessPoint: AccessPoint | Array<AccessPoint>): any {
-    const ref = this.modalSerivce.open(AccessPointDetailsComponent);
+    const ref = this.modalSerivce.open(AccessPointDetailsComponent, { modalDialogClass: 'modal-xl'});
 
     if(Array.isArray(accessPoint)) {
       ref.componentInstance.accessPoints = accessPoint;

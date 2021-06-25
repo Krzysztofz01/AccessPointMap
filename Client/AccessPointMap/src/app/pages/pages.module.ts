@@ -5,6 +5,7 @@ import { LoginModule } from './login/login.module';
 import { MainModule } from './main/main.module';
 import { SearchModule } from './search/search.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [],
@@ -14,7 +15,8 @@ import { StatisticsModule } from './statistics/statistics.module';
     LoginModule,
     MainModule,
     SearchModule,
-    StatisticsModule
+    StatisticsModule,
+    RouterModule
   ],
   exports: [
     ListModule,
