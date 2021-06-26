@@ -187,7 +187,8 @@ namespace AccessPointMap.Repository
 
             return securityCount
                 .Take(5)
-                .Select(x => new Tuple<string, int>(x.Key, x.Value));
+                .Select(x => new Tuple<string, int>(x.Key, x.Value))
+                .OrderByDescending(x => x.Item2);
         }
 
         public IEnumerable<AccessPoint> UserAddedAccessPoints(long userId)

@@ -1,0 +1,12 @@
+.chart-container {
+    display: block;
+    border: 1px solid var(--apm-primary);
+}
+
+h4 {
+    color: var(--apm-secondary);
+}
+
+.danger {
+    color: var(--apm-danger);
+}
