@@ -557,5 +557,22 @@ namespace AccessPointMap.Service
             var accessPointsMapped = mapper.Map<IEnumerable<AccessPointDto>>(accessPoints);
             return new ServiceResult<IEnumerable<AccessPointDto>>(accessPointsMapped);
         }
+
+        public async Task<IServiceResult> UpdateSingleAccessPointManufacturer(long accessPointId)
+        {
+            var accessPoint = await accessPointRepository.GetByIdGlobal(accessPointId);
+            if (accessPoint is null) return new ServiceResult(ResultStatus.NotFound);
+
+            if (!string.IsNullOrEmpty(accessPoint.Manufacturer)) return new ServiceResult(ResultStatus.Conflict);
+
+            string manufacturer = await macResolveService.GetVendorV1(accessPoint.Bssid);
+            if (manufacturer == "#ERROR" || manufacturer is null) return new ServiceResult(ResultStatus.Failed);
+
+            accessPoint.Manufacturer = manufacturer;
+            accessPointRepository.UpdateState(accessPoint);
+
+            if (await accessPointRepository.Save() > 0) return new ServiceResult(ResultStatus.Sucess);
+            return new ServiceResult(ResultStatus.Failed);
+        }
     }
 }

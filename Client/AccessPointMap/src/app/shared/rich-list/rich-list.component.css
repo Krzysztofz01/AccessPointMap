@@ -1,0 +1,26 @@
+.custom-input-filed {
+    color: var(--apm-secondary) !important;
+    border: 1px var(--apm-secondary) solid !important;
+}
+
+.custom-input-filed:hover,
+.custom-input-filed:focus {
+    box-shadow: none;
+}
+
+.col-sortable,
+.deatils {
+    cursor: pointer !important;
+}
+
+.deatils {
+    font-weight: bold;
+}
+
+thead {
+    color: var(--apm-primary) !important;
+}
+
+tbody {
+    color: var(--apm-secondary) !important;
+}

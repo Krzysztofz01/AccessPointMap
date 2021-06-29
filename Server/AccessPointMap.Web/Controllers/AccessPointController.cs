@@ -197,6 +197,27 @@ namespace AccessPointMap.Web.Controllers
             }
         }
 
+        [HttpPatch("{accessPointId}/manufacturer")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateManufacturerByIdV1(long accessPointId)
+        {
+            try
+            {
+                var result = await accessPointSerivce.UpdateSingleAccessPointManufacturer(accessPointId);
+
+                if (result.Status() == ResultStatus.NotFound) return NotFound();
+
+                if (result.Status() == ResultStatus.Sucess) return Ok();
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"System failure on updating manufacturer of accesspoint with id: {accessPointId}.");
+                return Problem();
+            }
+        }
+
         [HttpGet("master")]
         [Authorize(Roles = "Admin, Mod")]
         public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetAllMasterV1()

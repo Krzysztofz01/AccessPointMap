@@ -23,6 +23,7 @@ namespace AccessPointMap.Service
         Task<ServiceResult<AccessPointStatisticsDto>> GetStats();
         Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserAddedAccessPoints(long userId);
         Task<ServiceResult<IEnumerable<AccessPointDto>>> GetUserModifiedAccessPoints(long userId);
+        Task<IServiceResult> UpdateSingleAccessPointManufacturer(long accessPointId);
 
         Task UpdateBrands();
     }

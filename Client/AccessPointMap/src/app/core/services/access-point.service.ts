@@ -46,6 +46,10 @@ export class AccessPointService {
     return this.httpClient.patch<void>(`${ this.preparePath(apiVersion) }/${ accessPointId }/merge`, {});
   }
 
+  public fetchManufacturer(accessPointId: number, apiVersion: number): Observable<void> {
+    return this.httpClient.patch<void>(`${ this.preparePath(apiVersion) }/${ accessPointId }/manufacturer`, {});
+  }
+
   public getAllMaster(apiVersion: number): Observable<Array<AccessPoint>> {
     return this.httpClient.get<Array<AccessPoint>>(`${ this.preparePath(apiVersion) }/master`);
   }
