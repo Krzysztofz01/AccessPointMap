@@ -31,5 +31,16 @@
                 <h5>{{ parseModifyInfo() }}</h5>
             </div>
         </div>
+        <div *ngIf="isAdmin()" class="row justify-content-center mt-3 text-center">
+            <div class="col-lg-2 col-md-12">
+                <button type="button" class="btn btn-secondary mx-1 col-12" (click)="changeDisplay(selectedAccessPoint)">{{ (selectedAccessPoint.display) ? "Hide" : "Show" }}</button>
+            </div>
+            <div class="col-lg-2 col-md-12">
+                <button type="button" class="btn btn-secondary mx-1 col-12" (click)="delete(selectedAccessPoint)">Delete</button> 
+            </div>
+            <div class="col-lg-2 col-md-12">
+                <button type="button" class="btn btn-secondary mx-1 col-12" (click)="fetchManufacturer(selectedAccessPoint)">Brand fetch</button>
+            </div>
+        </div>
     </div>
 </div>

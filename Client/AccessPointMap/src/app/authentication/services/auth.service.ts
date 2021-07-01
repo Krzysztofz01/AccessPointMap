@@ -58,7 +58,7 @@ export class AuthService {
   public refreshToken(): Observable<any> {
     return this.httpClient.post<any>(`${ this.preparePath() }/refresh`, {}, { withCredentials: true })
       .pipe(map(res => {
-        const authUser = this.mapAuthUser(res.bearerToken);
+        const authUser = this.mapAuthUser(res.jsonWebToken);
         
         this.userSubject.next(authUser);
         this.startRefreshTokenTimer();

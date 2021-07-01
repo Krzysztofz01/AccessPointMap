@@ -57,5 +57,6 @@ textarea {
 ::placeholder,
 ::-moz-placeholder,
 ::-webkit-input-placeholder {
-    color: red;
+    font-style:italic!important;
+    color: #ffffffaa!important
 }

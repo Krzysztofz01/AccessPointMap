@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AccessPoint } from 'src/app/core/models/access-point.model';
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -9,6 +9,9 @@ import { OSM, Vector as VectorSource } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
 import * as olProj from 'ol/proj';
 import { DateParserService } from 'src/app/core/services/date-parser.service';
+import { AuthService } from 'src/app/authentication/services/auth.service';
+import { AccessPointService } from 'src/app/core/services/access-point.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-access-point-details',
@@ -22,13 +25,14 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
   public selectedAccessPointId: number;
   public selectedAccessPoint: AccessPoint;
 
+  @Output() changeEvent = new EventEmitter<AccessPoint>();
+  @Output() deleteEvent = new EventEmitter<AccessPoint>();
+
   private map: Map;
 
-  constructor(private dps: DateParserService) { }
+  constructor(private dps: DateParserService, private modal: NgbActiveModal, private authService: AuthService, private accessPointService: AccessPointService) { }
 
   ngOnInit(): void {
-    console.log(this.accessPoints);
-
     if(this.accessPoints.length > 1) {
       this.singleAccessPoint = false;
       this.selectedAccessPointId = this.accessPoints[0].id;
@@ -43,6 +47,7 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     this.initializeMap();
   }
 
+  //Selected accesspoint event method
   public selectedAccessPointChange(e: any): void {
     this.selectedAccessPointId = e;
     this.selectedAccessPoint = this.accessPoints.find(x => x.id == this.selectedAccessPointId);
@@ -50,6 +55,7 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     this.swapVector();
   }
 
+  //Generate vector based on accesspoint data
   private generateVector(): VectorLayer {
     const circle = new Circle(olProj.fromLonLat([ this.selectedAccessPoint.maxSignalLongitude, this.selectedAccessPoint.maxSignalLatitude ]),
       (this.selectedAccessPoint.signalRadius < 16) ? 16 : this.selectedAccessPoint.signalRadius);
@@ -66,6 +72,7 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     return vector;
   }
 
+  //Swap the vectors based on selected accesspoint
   private swapVector(): void {
     this.map.getLayers().forEach(layer => {
       if(layer.get('name') == 'circle_layer') {
@@ -77,6 +84,7 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     this.map.getView().setCenter(olProj.fromLonLat([ this.selectedAccessPoint.maxSignalLongitude, this.selectedAccessPoint.maxSignalLatitude ]));
   }
 
+  //Initialize the layers and the map
   private initializeMap(): void {
     const vector = this.generateVector();
 
@@ -96,22 +104,27 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     });
   }
 
+  //Prepare the date string
   public parseAddInfo(): string {
     return `First registered by: ${ this.selectedAccessPoint.userAdded.name } on ${ this.dps.parseDate(this.selectedAccessPoint.addDate, false) }`;
   }
 
+  //Prepare the date string
   public parseModifyInfo(): string {
     return `Last update by: ${ this.selectedAccessPoint.userModified.name } on ${ this.dps.parseDate(this.selectedAccessPoint.editDate, false) }`;
   }
   
+  //Prepare the manufacturer string
   public parseManufacturer(): string {
     return (this.selectedAccessPoint.manufacturer == null) ? 'No informations' : this.selectedAccessPoint.manufacturer;
   }
 
+  //Prepare the device type string
   public parseDeviceType(): string {
     return (this.selectedAccessPoint.deviceType == null) ? 'Unknown device type' : this.selectedAccessPoint.deviceType;
   }
 
+  //Parse the security data to extract the security type
   public getSecurityText(): string {
     const sd: Array<string> = JSON.parse(this.selectedAccessPoint.serializedSecurityData);
 
@@ -123,6 +136,7 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     return 'Your wifi is open. Anyone can infiltrate your network. Attackers can see your every move, they can easily intercept login details, bank details etc. You must secure your network!';
   }
 
+  //Parse the security data to get the correct color
   public getSecurityColor(): string {
     const sd: Array<string> = JSON.parse(this.selectedAccessPoint.serializedSecurityData);
 
@@ -132,5 +146,64 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     if(sd.includes('WPS')) return 'var(--apm-warning)';
     if(sd.includes('WEP')) return 'var(--apm-warning)';
     return 'var(--apm-danger)';
+  }
+
+  //Check if the current user has a admin role
+  public isAdmin(): boolean {
+    if(this.authService.userValue != null) {
+      return this.authService.userValue.role == 'Admin';
+    }
+    return false;
+  }
+
+  //Replce the accessPoint from list and selection with the updated one
+  private replaceAccessPoint(accessPoint: AccessPoint): void {
+    const index = this.accessPoints.findIndex(x => x.id == accessPoint.id);
+    if(index !== -1) this.accessPoints[index] = accessPoint;
+
+    this.selectedAccessPoint = accessPoint;
+  }
+
+  //Update the display prop, fetch the accesspoint with changes and and emit the change to the parent
+  public changeDisplay(accessPoint: AccessPoint): void {
+    this.accessPointService.changeDisplayById(accessPoint.id, 1).subscribe(() => {
+      this.accessPointService.getByIdMaster(accessPoint.id, 1).subscribe((res) => {
+        this.replaceAccessPoint(res);
+        this.changeEvent.next(res);
+      },
+      (error) => {
+        console.error(error);
+      });
+    },
+    (error) => {
+      console.error(error);
+    });
+  }
+
+  //Delete the accesspoint and emit the change to the parent
+  public delete(accessPoint: AccessPoint): void {
+    this.accessPointService.deleteById(accessPoint.id, 1).subscribe((res) => {
+      this.deleteEvent.next(accessPoint);
+      this.modal.dismiss();
+    },
+    (error) => {
+      console.error(error);
+    });
+  }
+
+  //Update the manufacturer, than fetch updated record and emit it to the parent
+  public fetchManufacturer(accessPoint: AccessPoint): void {
+    this.accessPointService.fetchManufacturer(accessPoint.id, 1).subscribe(() => {
+      this.accessPointService.getByIdMaster(accessPoint.id, 1).subscribe((res) => {
+        this.replaceAccessPoint(res);
+        this.changeEvent.next(res);
+      },
+      (error) => {
+        console.error(error);
+      });
+    },
+    (error) => {
+      console.error(error);
+    });
   }
 }

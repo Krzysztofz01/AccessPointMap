@@ -9,6 +9,7 @@ import { AccessPointService } from './services/access-point.service';
 import { UserService } from './services/user.service';
 import { DateParserService } from './services/date-parser.service';
 import { LocalStorageService } from './services/local-storage.service';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [],
@@ -16,13 +17,15 @@ import { LocalStorageService } from './services/local-storage.service';
     CommonModule
   ],
   providers: [
+    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AuthService ] },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: PermissionErrorInterceptor, multi: true },
 
     AccessPointService,
     UserService,
     DateParserService,
-    LocalStorageService
+    LocalStorageService,
+    RouterModule
   ]
 })
 export class CoreModule {

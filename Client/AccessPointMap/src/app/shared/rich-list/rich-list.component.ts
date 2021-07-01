@@ -1,8 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subscription } from 'rxjs';
 import { AccessPoint } from 'src/app/core/models/access-point.model';
+import { AccessPointService } from 'src/app/core/services/access-point.service';
 import { DateParserService } from 'src/app/core/services/date-parser.service';
-import { AccessPointDeatilModalService } from '../access-point-details/services/access-point-deatil-modal.service';
+import { AccessPointDetailsComponent } from '../access-point-details/access-point-details.component';
 
 @Component({
   selector: 'app-rich-list',
@@ -19,18 +21,19 @@ export class RichListComponent implements OnInit {
   public page: number = 1;
   public pageSize: number = 18;
 
-  constructor(private dateSerivce: DateParserService, private accessPointDetails: AccessPointDeatilModalService) { }
+  constructor(private dateSerivce: DateParserService, private accessPointService: AccessPointService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.initializeData();
   }
 
+  //Initialize the data form the observable passed to component
   private initializeData(): void {
     this.aps = new Array<AccessPoint>();
     this.accessPoints.subscribe((res) => {
       this.aps = res;
 
-      this.aps = this.aps.map((accessPoint, i) => ({ 
+      this.aps = this.aps.map((accessPoint) => ({ 
         securityColor: this.parseSecurityColor(accessPoint), 
         securityName: this.parseSecurityName(accessPoint),
         safeManufacturer: this.parseManufacturer(accessPoint),
@@ -43,6 +46,19 @@ export class RichListComponent implements OnInit {
     });
   }
 
+  //Prepare additional props required by the table
+  private preapareAdditionalProps(accessPoint: AccessPoint): any {
+    //TODO Implement this to the initialization method
+    return { 
+      securityColor: this.parseSecurityColor(accessPoint), 
+      securityName: this.parseSecurityName(accessPoint),
+      safeManufacturer: this.parseManufacturer(accessPoint),
+      users: this.parseUsers(accessPoint),
+      ...accessPoint 
+    }
+  }
+
+  //Search system implementation
   public search(): void {
     const query = (param: string, key: string) => {
       return (param != null) ? param.toLowerCase().trim().match(key) : ''.match(key);
@@ -58,15 +74,45 @@ export class RichListComponent implements OnInit {
     }
   }
 
+  //Table sort implementation
   public sort(key: string): void {
     this.key = key;
     this.reverse = !this.reverse;
   }
 
+  //Show detail modal with prop change listeners
   public showDetails(accessPoint: AccessPoint): void {
-    this.accessPointDetails.open(accessPoint);
+    const ref = this.modalService.open(AccessPointDetailsComponent, { modalDialogClass: 'modal-xl'});
+
+    ref.componentInstance.accessPoints = [ accessPoint ];
+
+    const changesSubscription: Subscription = ref.componentInstance.changeEvent.subscribe((result : AccessPoint) => {
+      this.replaceAccessPoint(this.preapareAdditionalProps(result));
+    });
+
+    const deleteSubscription: Subscription = ref.componentInstance.deleteEvent.subscribe((res: AccessPoint) => {
+      this.removeAccessPoint(res);
+    });
+
+    ref.result.then(() => {
+      changesSubscription.unsubscribe();
+      deleteSubscription.unsubscribe();
+    }, () => {});
   }
 
+  //Replace a accesspoint in the main container
+  private replaceAccessPoint(accessPoint: AccessPoint): void {
+    const index = this.aps.findIndex(x => x.id == accessPoint.id);
+    if(index !== -1) this.aps[index] = accessPoint;
+  }
+
+  //Remove a accesspoint from the main container
+  private removeAccessPoint(accessPoint: AccessPoint): void {
+    const index = this.aps.findIndex(x => x.id == accessPoint.id);
+    if(index !== -1) this.aps.splice(index, 1);
+  }
+
+  //Parse the security color for a accesspoint
   public parseSecurityColor(accessPoint: AccessPoint): string {
     const sd: Array<string> = JSON.parse(accessPoint.serializedSecurityData);
 
@@ -78,6 +124,7 @@ export class RichListComponent implements OnInit {
     return 'var(--apm-danger)';
   }
 
+  //Parse the security name for a accesspoint
   public parseSecurityName(accessPoint: AccessPoint): string {
     const sd: Array<string> = JSON.parse(accessPoint.serializedSecurityData);
 
@@ -90,14 +137,17 @@ export class RichListComponent implements OnInit {
   
   }
 
+  //Prepare manufacturer data string
   public parseManufacturer(accessPoint: AccessPoint): string {
     return (accessPoint.manufacturer == null) ? 'Unknown' : accessPoint.manufacturer;
   }
 
+  //Prepare user data string
   public parseUsers(accessPoint: AccessPoint): string {
     return `${accessPoint.userAdded.name} / ${ accessPoint.userModified.name }`;
   }
 
+  //Prepare date data string
   public parseUpdateDate(accessPoint: AccessPoint): string {
     return this.dateSerivce.parseDate(accessPoint.editDate);
   } 

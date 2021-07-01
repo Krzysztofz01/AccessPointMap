@@ -1,0 +1,15 @@
+.form-container {
+    background: linear-gradient(315deg, var(--apm-primary) 0%, var(--apm-secondary) 100%);
+}
+
+h2 {
+    color: var(--apm-background-bright);
+}
+
+.register {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #fff;
+    font-size: .8em;
+    font-style: italic;
+}

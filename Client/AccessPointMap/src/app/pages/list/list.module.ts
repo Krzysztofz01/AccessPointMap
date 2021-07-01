@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ListComponent } from './list.component';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -9,7 +10,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
   declarations: [ListComponent],
   imports: [
     CommonModule,
-    SharedModule
+    SharedModule,
+    NgbModule
   ]
 })
 export class ListModule { }
