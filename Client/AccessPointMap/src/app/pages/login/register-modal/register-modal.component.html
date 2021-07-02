@@ -1,0 +1,24 @@
+<div class="modal-container text-center">
+    <h2>Joining the AccessPointMap project</h2>
+    <p>After successful registration you will have to wait for your account to be approved by the administration.</p>
+
+    <app-alert [type]="notificationType" [text]="notificationText" [show]="notificationShow"></app-alert>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+        <div class="form-group">
+            <input type="email" class="form-control my-3" placeholder="Email" formControlName="email">
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control my-3" placeholder="Name" formControlName="name">
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control my-3" placeholder="Password" formControlName="password">
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control my-3" placeholder="Repeat password" formControlName="repeatPassword">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary mt-4 col-12">Sign in</button>
+        </div>
+    </form>
+</div>

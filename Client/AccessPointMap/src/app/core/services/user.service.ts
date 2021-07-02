@@ -32,4 +32,8 @@ export class UserService {
   public activateById(userId: number, apiVersion: number): Observable<void> {
     return this.httpClient.patch<void>(`${ this.preparePath(apiVersion) }/${ userId }/activation`, {});
   }
+
+  public getCurrent(apiVersion: number): Observable<User> {
+    return this.httpClient.get<User>(`${ this.preparePath(apiVersion) }/current`);
+  }
 }

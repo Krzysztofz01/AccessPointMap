@@ -4,16 +4,19 @@ import { LoginComponent } from './login.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { RegisterModalComponent } from './register-modal/register-modal.component';
 
 
 
 @NgModule({
-  declarations: [LoginComponent],
+  declarations: [LoginComponent, RegisterModalComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     NgbModule,
-    RouterModule
+    RouterModule,
+    SharedModule
   ]
 })
 export class LoginModule { }

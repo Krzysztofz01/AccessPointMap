@@ -42,6 +42,28 @@ select:focus {
     box-shadow: none !important;
 }
 
+.btn-secondary {
+    font-family: 'Montserrat', sans-serif !important;
+    background-color: var(--apm-secondary) !important;
+    border: none;
+    color: var(--apm-background-bright) !important;
+}
+.btn-secondary:hover,
+.btn-secondary:focus:hover {
+    background-color: var(--apm-primary) !important;
+    border: none;
+    box-shadow: none !important;
+}
+
+.btn-secondary:active,
+.btn-secondary:visited,
+.btn-secondary:focus {
+    background-color: var(--apm-secondary) !important;
+    border: none;
+    color: var(--apm-background-bright) !important;
+    box-shadow: none !important;
+}
+
 /* Custom input styling */
 input[type=password],
 input[type=email],
@@ -52,6 +74,13 @@ textarea {
     color: var(--apm-background-bright) !important;
     border-color: var(--apm-background-bright) !important;
     text-align: center;
+}
+
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=text]:focus,
+textarea:focus {
+    box-shadow: none;
 }
 
 ::placeholder,

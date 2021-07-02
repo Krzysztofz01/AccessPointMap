@@ -10,11 +10,12 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { OrderModule } from 'ngx-order-pipe';
+import { AlertComponent } from './alert/alert.component';
 
 
 
 @NgModule({
-  declarations: [NavbarComponent, MapComponent, AccessPointDetailsComponent, RichListComponent],
+  declarations: [NavbarComponent, MapComponent, AccessPointDetailsComponent, RichListComponent, AlertComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -28,7 +29,9 @@ import { OrderModule } from 'ngx-order-pipe';
   exports: [
     NavbarComponent,
     MapComponent,
-    RichListComponent
+    RichListComponent,
+    AlertComponent,
+    AccessPointDetailsComponent
   ]
 })
 export class SharedModule { }

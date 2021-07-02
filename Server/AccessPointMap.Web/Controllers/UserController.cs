@@ -54,6 +54,32 @@ namespace AccessPointMap.Web.Controllers
             }
         }
 
+        [HttpGet("current")]
+        [Authorize]
+        public async Task<ActionResult<UserGetView>> GetCurrentV1()
+        {
+            try
+            {
+                var userId = userService.GetUserIdFromPayload(User.Claims);
+
+                var result = await userService.Get(userId);
+
+                if(result.Status() == ResultStatus.Sucess)
+                {
+                    var userMapped = mapper.Map<UserGetView>(result.Result());
+
+                    return Ok(userMapped);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "System failure on current user!");
+                return Problem();
+            }
+        }
+
         [HttpGet("{userId}")]
         [Authorize(Roles = "Admin, Mod")]
         public async Task<ActionResult<UserGetView>> GetByIdV1(long userId)

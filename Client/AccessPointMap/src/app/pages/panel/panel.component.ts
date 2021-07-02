@@ -16,5 +16,4 @@ export class PanelComponent implements OnInit {
   public logout(): void {
     this.authService.logout();
   }
-
 }
