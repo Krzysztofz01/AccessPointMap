@@ -29,6 +29,7 @@
                 <h5>Security: <span [style.color]="getSecurityColor()">{{ getSecurityText() }}</span></h5>
                 <h5>{{ parseAddInfo() }}</h5>
                 <h5>{{ parseModifyInfo() }}</h5>
+                <h5 *ngIf="isAdminOrMod()">Display status: {{ (selectedAccessPoint.display) ? "Public" : "Hidden" }}</h5>
             </div>
         </div>
         <div *ngIf="isAdmin()" class="row justify-content-center mt-3 text-center">

@@ -156,6 +156,14 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
     return false;
   }
 
+  //Check if the current user has a admin or mod role
+  public isAdminOrMod(): boolean {
+    if(this.authService.userValue != null) {
+      return this.authService.userValue.role == 'Admin' || this.authService.userValue.role == 'Mod';
+    }
+    return false;
+  }
+
   //Replce the accessPoint from list and selection with the updated one
   private replaceAccessPoint(accessPoint: AccessPoint): void {
     const index = this.accessPoints.findIndex(x => x.id == accessPoint.id);

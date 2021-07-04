@@ -340,6 +340,32 @@ namespace AccessPointMap.Web.Controllers
             }
         }
 
+        [HttpPatch("queue/{accessPointId}")]
+        [Authorize(Roles = "Admin, Mod")]
+        public async Task<IActionResult> UpdateQueueByIdV1(long accessPointId)
+        {
+            try
+            {
+                var result = await accessPointSerivce.GetByIdQueue(accessPointId);
+
+                if (result.Status() == ResultStatus.NotFound) return NotFound();
+
+                if (result.Status() == ResultStatus.Sucess)
+                {
+                    var accessPointMapped = mapper.Map<AccessPointGetView>(result.Result());
+
+                    return Ok(accessPointMapped);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"System failure on updating accesspoint with id: {accessPointId}.");
+                return Problem();
+            }
+        }
+
         [HttpGet("search/{ssid}")]
         public async Task<ActionResult<IEnumerable<AccessPointGetView>>> SearchBySsidV1(string ssid)
         {

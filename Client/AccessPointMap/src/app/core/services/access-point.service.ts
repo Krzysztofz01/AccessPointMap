@@ -66,6 +66,10 @@ export class AccessPointService {
     return this.httpClient.get<AccessPoint>(`${ this.preparePath(apiVersion) }/queue/${ accessPointId }`);
   }
 
+  public patchByIdQueue(accessPointId: number, accessPoint: AccessPoint, apiVersion: number): Observable<void> {
+    return this.httpClient.patch<void>(`${ this.preparePath(apiVersion) }/queue/${ accessPointId }`, accessPoint);
+  }
+
   public searchBySsid(ssidKeyword: string, apiVersion: number): Observable<Array<AccessPoint>> {
     // TODO: ssidKeyword http encode and sanitize
     return this.httpClient.get<Array<AccessPoint>>(`${ this.preparePath(apiVersion) }/search/${ ssidKeyword }`);

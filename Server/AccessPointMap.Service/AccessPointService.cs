@@ -574,5 +574,39 @@ namespace AccessPointMap.Service
             if (await accessPointRepository.Save() > 0) return new ServiceResult(ResultStatus.Sucess);
             return new ServiceResult(ResultStatus.Failed);
         }
+
+        public async Task<IServiceResult> UpdateQueue(long accessPointId, AccessPointDto accessPoint)
+        {
+            var baseAccessPoint = await accessPointRepository.GetByIdQueue(accessPointId);
+            if (baseAccessPoint is null) return new ServiceResult(ResultStatus.NotFound);
+
+            bool changes = false;
+
+            if (!string.IsNullOrEmpty(accessPoint.Note) && accessPoint.Note != baseAccessPoint.Note)
+            {
+                baseAccessPoint.Note = accessPoint.Note;
+                changes = true;
+            }
+
+            if (!string.IsNullOrEmpty(accessPoint.DeviceType) && accessPoint.DeviceType != baseAccessPoint.DeviceType)
+            {
+                baseAccessPoint.DeviceType = accessPoint.DeviceType;
+                changes = true;
+            }
+
+            if (changes)
+            {
+                baseAccessPoint.EditDate = DateTime.Now;
+
+                accessPointRepository.UpdateState(baseAccessPoint);
+
+                if (await accessPointRepository.Save() > 0)
+                {
+                    return new ServiceResult(ResultStatus.Sucess);
+                }
+                return new ServiceResult(ResultStatus.Failed);
+            }
+            return new ServiceResult(ResultStatus.Sucess);
+        }
     }
 }

@@ -16,6 +16,7 @@ namespace AccessPointMap.Service
         Task<ServiceResult<AccessPointDto>> GetByIdMaster(long accessPointId);
         Task<IServiceResult> Delete(long accessPointId);
         Task<IServiceResult> Update(long accessPointId, AccessPointDto accessPoint);
+        Task<IServiceResult> UpdateQueue(long accessPointId, AccessPointDto accessPoint);
         Task<ServiceResult<IEnumerable<AccessPointDto>>> GetAllQueue();
         Task<ServiceResult<AccessPointDto>> GetByIdQueue(long accessPointId);
         Task<IServiceResult> MergeById(long accessPointId);
