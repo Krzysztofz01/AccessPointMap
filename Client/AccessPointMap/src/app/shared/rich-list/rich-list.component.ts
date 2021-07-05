@@ -148,7 +148,7 @@ export class RichListComponent implements OnInit {
   }
 
   //Prepare date data string
-  public parseUpdateDate(accessPoint: AccessPoint): string {
-    return this.dateSerivce.parseDate(accessPoint.editDate);
+  public dateParse(date: Date): string {
+    return this.dateSerivce.parseDate(date);
   } 
 }

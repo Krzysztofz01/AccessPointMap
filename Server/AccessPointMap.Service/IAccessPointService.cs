@@ -14,6 +14,7 @@ namespace AccessPointMap.Service
         Task<ServiceResult<IEnumerable<AccessPointDto>>> SearchBySsid(string ssid);
         Task<ServiceResult<IEnumerable<AccessPointDto>>> GetAllMaster();
         Task<ServiceResult<AccessPointDto>> GetByIdMaster(long accessPointId);
+        Task<ServiceResult<AccessPointDto>> GetByBssidMaster(string bssid);
         Task<IServiceResult> Delete(long accessPointId);
         Task<IServiceResult> Update(long accessPointId, AccessPointDto accessPoint);
         Task<IServiceResult> UpdateQueue(long accessPointId, AccessPointDto accessPoint);

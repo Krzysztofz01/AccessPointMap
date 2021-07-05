@@ -27,7 +27,7 @@
                             <td [style.color]="ap.securityColor">{{ ap.securityName }}</td>
                             <td>{{ ap.safeManufacturer }}</td>
                             <td>{{ ap.users }}</td>
-                            <td>{{ ap.editDate }}</td>
+                            <td>{{ dateParse(ap.editDate) }}</td>
                         </tr>
                     </tbody>
                 </table>

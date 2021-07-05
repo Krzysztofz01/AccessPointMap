@@ -290,6 +290,32 @@ namespace AccessPointMap.Web.Controllers
             }
         }
 
+        [HttpGet("master/bssid/{bssid}")]
+        [Authorize(Roles = "Admin, Mod")]
+        public async Task<ActionResult<AccessPointGetView>> GetMasterByBssidV1(string bssid)
+        {
+            try
+            {
+                var result = await accessPointSerivce.GetByBssidMaster(bssid);
+
+                if (result.Status() == ResultStatus.NotFound) return NotFound();
+
+                if (result.Status() == ResultStatus.Sucess)
+                {
+                    var accessPointMapped = mapper.Map<AccessPointGetView>(result.Result());
+
+                    return Ok(accessPointMapped);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"System failure on geting accesspoint with bssid: {bssid}.");
+                return Problem();
+            }
+        }
+
         [HttpGet("queue")]
         [Authorize(Roles = "Admin, Mod")]
         public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetAllQueueV1()

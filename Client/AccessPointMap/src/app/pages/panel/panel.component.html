@@ -1,9 +1,9 @@
 <div class="container-fluid">
-    <div class="row mt-2">
+    <div class="row mt-1 mb-3">
         <div class="col-lg-12 col-md-12 text-center">
             <button type="button" class="btn btn-secondary my-1 mx-1">Mobile app</button>
-            <button type="button" class="btn btn-secondary my-1 mx-1">My statistics</button>
-            <button type="button" class="btn btn-secondary my-1 mx-1">Accesspoint queue</button>
+            <button (click)="setComp(1)" type="button" class="btn btn-secondary my-1 mx-1">My statistics</button>
+            <button (click)="setComp(4)" type="button" class="btn btn-secondary my-1 mx-1">Accesspoint queue</button>
             <button type="button" class="btn btn-secondary my-1 mx-1">AccessPoint master</button>
             <button type="button" class="btn btn-secondary my-1 mx-1">Users</button>
             <button type="button" class="btn btn-secondary my-1 mx-1">Account settings</button>
@@ -11,3 +11,5 @@
         </div>
     </div>
 </div>
+
+<app-queue-list *ngIf="getComp(4) == true"></app-queue-list>

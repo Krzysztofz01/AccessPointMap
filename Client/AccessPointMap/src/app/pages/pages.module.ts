@@ -6,6 +6,7 @@ import { MainModule } from './main/main.module';
 import { SearchModule } from './search/search.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { RouterModule } from '@angular/router';
+import { PanelModule } from './panel/panel.module';
 
 @NgModule({
   declarations: [],
@@ -16,14 +17,16 @@ import { RouterModule } from '@angular/router';
     MainModule,
     SearchModule,
     StatisticsModule,
-    RouterModule
+    RouterModule,
+    PanelModule
   ],
   exports: [
     ListModule,
     LoginModule,
     MainModule,
     SearchModule,
-    StatisticsModule
+    StatisticsModule,
+    PanelModule
   ]
 })
 export class PagesModule { }

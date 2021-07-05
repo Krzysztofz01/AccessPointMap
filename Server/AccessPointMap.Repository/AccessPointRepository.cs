@@ -63,6 +63,15 @@ namespace AccessPointMap.Repository
                 .Where(x => !x.MasterGroup);
         }
 
+        public async Task<AccessPoint> GetByBssidMaster(string bssid)
+        {
+            return await entities
+                .Include(x => x.UserAdded)
+                .Include(x => x.UserModified)
+                .Where(x => x.DeleteDate == null)
+                .SingleOrDefaultAsync(x => x.Bssid == bssid);
+        }
+
         public async Task<AccessPoint> GetByIdGlobal(long accessPointId)
         {
             return await entities

@@ -12,6 +12,7 @@ namespace AccessPointMap.Repository
         IEnumerable<AccessPoint> GetAllQueue();
         Task<AccessPoint> GetByIdPublic(long accessPointId);
         Task<AccessPoint> GetByIdMaster(long accessPointId);
+        Task<AccessPoint> GetByBssidMaster(string bssid);
         Task<AccessPoint> GetByIdQueue(long accessPointId);
         Task<AccessPoint> GetByIdGlobal(long accessPointId);
         IEnumerable<AccessPoint> SearchBySsid(string ssid);

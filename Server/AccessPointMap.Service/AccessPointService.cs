@@ -608,5 +608,14 @@ namespace AccessPointMap.Service
             }
             return new ServiceResult(ResultStatus.Sucess);
         }
+
+        public async Task<ServiceResult<AccessPointDto>> GetByBssidMaster(string bssid)
+        {
+            var accessPoint = await accessPointRepository.GetByBssidMaster(bssid);
+            if (accessPoint is null) return new ServiceResult<AccessPointDto>(ResultStatus.NotFound);
+
+            var accessPointMapped = mapper.Map<AccessPointDto>(accessPoint);
+            return new ServiceResult<AccessPointDto>(accessPointMapped);
+        }
     }
 }
