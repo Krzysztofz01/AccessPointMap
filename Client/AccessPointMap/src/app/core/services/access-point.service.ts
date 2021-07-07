@@ -58,6 +58,10 @@ export class AccessPointService {
     return this.httpClient.get<AccessPoint>(`${ this.preparePath(apiVersion) }/master/${ accessPointId }`);
   }
 
+  public getByBssidMaster(accessPointBssid: string, apiVersion: number): Observable<AccessPoint> {
+    return this.httpClient.get<AccessPoint>(`${ this.preparePath(apiVersion) }/master/bssid/${ accessPointBssid }`);
+  }
+
   public getAllQueue(apiVersion: number): Observable<Array<AccessPoint>> {
     return this.httpClient.get<Array<AccessPoint>>(`${ this.preparePath(apiVersion) }/queue`);
   }

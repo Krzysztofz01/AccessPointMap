@@ -23,7 +23,7 @@
                     <tbody>
                         <tr *ngFor="let ap of aps | orderBy: key: reverse | paginate: { itemsPerPage:pageSize, currentPage: page };">
                             <th scope="row">{{ ap.id }}</th>
-                            <td class="deatils" (click)="showDetails(ap)">{{ ap.ssid }}</td>
+                            <td>{{ ap.ssid }}</td>
                             <td [style.color]="ap.securityColor">{{ ap.securityName }}</td>
                             <td>{{ ap.user }}</td>
                             <td>{{ dateParse(ap.addDate) }}</td>

@@ -1,1 +1,46 @@
-<p>merge-modal works!</p>
+<div class="modal-body">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 col-md-12 text-center">
+                <h3>Merge for: {{ queueAccessPoint.bssid }}</h3>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-3">         
+            <div class="col-lg-6 col-md-12">
+                <div class="apm-ol-merge-map" id="merge-map"></div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div *ngIf="noMaster == true">
+                    <h5 *ngIf="queueAccessPoint.isHidden == false">SSID: {{ queueAccessPoint.ssid }}</h5>
+                    <h5 *ngIf="queueAccessPoint.isHidden == true">This network is hidden. The SSID is not broadcasted!</h5>
+                    <h5>Device type: {{ parseDeviceType(queueAccessPoint) }}</h5>
+                    <h5>Signal area: {{ queueAccessPoint.signalArea }}m<sup>2</sup></h5>
+                    <h5>Frequency: {{ queueAccessPoint.frequency }}</h5>
+                    <h5>Security: <span [style.color]="getSecurityColor(queueAccessPoint)">{{ queueAccessPoint.serializedSecurityData }}</span></h5>
+                    <h5>Added on:{{ parseAddInfo(queueAccessPoint) }}</h5>
+                </div>
+
+                <div *ngIf="noMaster == false">
+                    <h5 *ngIf="queueAccessPoint.isHidden == false">SSID: {{ queueAccessPoint.ssid }} <span class="master">({{ masterAccessPoint.ssid }})</span></h5>
+                    <h5 *ngIf="queueAccessPoint.isHidden == true">This network is hidden. The SSID is not broadcasted!</h5>
+                    <h5>Device type: {{ parseDeviceType(queueAccessPoint) }} <span class="master">({{ parseDeviceType(masterAccessPoint) }})</span></h5>
+                    <h5>Signal area: {{ queueAccessPoint.signalArea }}m<sup>2</sup> <span class="master"> ({{ masterAccessPoint.signalArea }}m<sup>2</sup>)</span></h5>
+                    <h5>Frequency: {{ queueAccessPoint.frequency }} <span class="master">({{ masterAccessPoint.frequency }})</span></h5>
+                    <h5>Security: <span [style.color]="getSecurityColor(queueAccessPoint)">{{ queueAccessPoint.serializedSecurityData }}</span> <span class="master">(<span [style.color]="getSecurityColor(queueAccessPoint)">{{ masterAccessPoint.serializedSecurityData }}</span>)</span></h5>
+                    <h5>Added on: {{ parseAddInfo(queueAccessPoint) }} <span class="master">({{ parseAddInfo(masterAccessPoint) }})</span></h5>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="isAdmin()" class="row justify-content-center mt-3 text-center">
+            <div class="col-lg-5 col-md-12">
+                <button type="button" class="btn btn-secondary col-12" (click)="merge()">Merge</button>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-lg-12 col-md-12">
+                <textarea class="form-control" [(ngModel)]="note" (keyup)="noteUpdate()"></textarea>
+            </div>
+        </div>
+    </div>
+</div>

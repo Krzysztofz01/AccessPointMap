@@ -368,21 +368,16 @@ namespace AccessPointMap.Web.Controllers
 
         [HttpPatch("queue/{accessPointId}")]
         [Authorize(Roles = "Admin, Mod")]
-        public async Task<IActionResult> UpdateQueueByIdV1(long accessPointId)
+        public async Task<IActionResult> UpdateQueueByIdV1(long accessPointId, [FromBody]AccessPointPatchView accessPoint)
         {
             try
             {
-                var result = await accessPointSerivce.GetByIdQueue(accessPointId);
+                var accessPointMapped = mapper.Map<AccessPointDto>(accessPoint);
+
+                var result = await accessPointSerivce.UpdateQueue(accessPointId, accessPointMapped);
 
                 if (result.Status() == ResultStatus.NotFound) return NotFound();
-
-                if (result.Status() == ResultStatus.Sucess)
-                {
-                    var accessPointMapped = mapper.Map<AccessPointGetView>(result.Result());
-
-                    return Ok(accessPointMapped);
-                }
-
+                if (result.Status() == ResultStatus.Sucess) return Ok();
                 return BadRequest();
             }
             catch (Exception e)

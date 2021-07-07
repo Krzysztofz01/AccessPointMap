@@ -21,6 +21,7 @@ namespace AccessPointMap.Web.ViewModels
         public string SerializedSecurityData { get; set; }
         public string Manufacturer { get; set; }
         public string DeviceType { get; set; }
+        public string Note { get; set; }
         public bool MasterGroup { get; set; }
         public bool Display { get; set; }
         public bool IsSecure { get; set; }

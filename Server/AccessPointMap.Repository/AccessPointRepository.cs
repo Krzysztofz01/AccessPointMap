@@ -69,7 +69,7 @@ namespace AccessPointMap.Repository
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
                 .Where(x => x.DeleteDate == null)
-                .SingleOrDefaultAsync(x => x.Bssid == bssid);
+                .SingleOrDefaultAsync(x => x.Bssid == bssid && x.MasterGroup);
         }
 
         public async Task<AccessPoint> GetByIdGlobal(long accessPointId)

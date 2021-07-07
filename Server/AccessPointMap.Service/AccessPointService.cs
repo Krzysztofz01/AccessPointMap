@@ -284,7 +284,7 @@ namespace AccessPointMap.Service
                     queueAccessPoint.Manufacturer = manufacturerResult;
                 }
 
-                masterAccessPoint.EditDate = DateTime.Now;
+                queueAccessPoint.EditDate = DateTime.Now;
 
                 accessPointRepository.UpdateState(queueAccessPoint);
 
@@ -350,15 +350,15 @@ namespace AccessPointMap.Service
                 masterAccessPoint.EditDate = DateTime.Now;
 
                 accessPointRepository.UpdateState(masterAccessPoint);
-                accessPointRepository.Remove(queueAccessPoint);
-                
-                if (await accessPointRepository.Save() > 0)
-                {
-                    return new ServiceResult(ResultStatus.Sucess);
-                }
-                return new ServiceResult(ResultStatus.Failed);
             }
-            return new ServiceResult(ResultStatus.Sucess);
+
+            accessPointRepository.Remove(queueAccessPoint);
+
+            if (await accessPointRepository.Save() > 0)
+            {
+                return new ServiceResult(ResultStatus.Sucess);
+            }
+            return new ServiceResult(ResultStatus.Failed);
         }
 
         public async Task<ServiceResult<IEnumerable<AccessPointDto>>> SearchBySsid(string ssid)

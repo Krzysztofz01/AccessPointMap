@@ -20,6 +20,7 @@ export interface AccessPoint {
     deviceType: string;
     masterGroup: boolean;
     display: boolean;
+    note: string;
     isSecure: boolean;
     isHidden: boolean;
     userAdded: User;
