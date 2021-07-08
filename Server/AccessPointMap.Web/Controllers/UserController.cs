@@ -56,17 +56,18 @@ namespace AccessPointMap.Web.Controllers
 
         [HttpGet("current")]
         [Authorize]
-        public async Task<ActionResult<UserGetView>> GetCurrentV1()
+        [NonAction]
+        public async Task<ActionResult<UserCurrentGetView>> GetCurrentV1()
         {
             try
             {
                 var userId = userService.GetUserIdFromPayload(User.Claims);
 
-                var result = await userService.Get(userId);
+                var result = await userService.GetCurrent(userId);
 
                 if(result.Status() == ResultStatus.Sucess)
                 {
-                    var userMapped = mapper.Map<UserGetView>(result.Result());
+                    var userMapped = mapper.Map<UserCurrentGetView>(result.Result());
 
                     return Ok(userMapped);
                 }

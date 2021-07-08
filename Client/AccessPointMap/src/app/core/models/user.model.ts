@@ -1,3 +1,5 @@
+import { AccessPoint } from "./access-point.model";
+
 export interface User {
     id: number;
     name: string;
@@ -5,4 +7,6 @@ export interface User {
     adminPermission: boolean;
     modPermission: boolean;
     isActivated: boolean;
+    addedAccessPoints: Array<AccessPoint>;
+    modifiedAccessPoints: Array<AccessPoint>;
 }

@@ -8,9 +8,11 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { OrderModule } from 'ngx-order-pipe';
 import { CommonModule } from '@angular/common';
+import { UsersListComponent } from './users-list/users-list.component';
+import { UserStatComponent } from './user-stat/user-stat.component';
 
 @NgModule({
-  declarations: [PanelComponent, QueueListComponent, MergeModalComponent],
+  declarations: [PanelComponent, QueueListComponent, MergeModalComponent, UsersListComponent, UserStatComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

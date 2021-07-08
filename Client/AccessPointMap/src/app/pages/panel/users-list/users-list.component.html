@@ -1,0 +1,48 @@
+<div class="container-fluid">
+    <div class="row justify-content-center mt-3 text-center">
+        <div class="col-lg-5 col-md-12">
+            <div class="search-bar-container">
+                <input class="form-control custom-input-filed" type="text" name="searchKeyword" [(ngModel)]="searchKeyword" (ngModelChange)="search()" placeholder="Seach for specific name, email...">
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-3">
+        <div class="col-lg-10 col-md-12">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-sortable" (click)="sort('id')"># ↕</th>
+                            <th scope="col" class="col-sortable" (click)="sort('name')">Name ↕</th>
+                            <th scope="col" class="col-sortable" (click)="sort('email')">Email ↕</th>
+                            <th scope="col" class="col-sortable" (click)="sort('adminPermission')">Admin ↕</th>
+                            <th scope="col" class="col-sortable" (click)="sort('modPermission')">Moderator ↕</th>
+                            <th scope="col" class="col-sortable" (click)="sort('isActivated')">Active ↕</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let u of users | orderBy: key: reverse | paginate: { itemsPerPage:pageSize, currentPage: page };">
+                            <th scope="row">{{ u.id }}</th>
+                            <td>{{ u.name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ (u.adminPermission==true) ? 'True' : 'False' }}</td>
+                            <td>{{ (u.modPermission==true) ? 'True' : 'False' }}</td>
+                            <td>{{ (u.isActivated==true) ? 'Active' : 'Inactive' }}</td>
+                            
+                            <td>
+                                <button *ngIf="isAdmin()" type="button" class="btn btn-secondary mx-1" (click)="activation(u)">{{ (u.isActivated==true) ? 'Deactivate' : 'Activate' }}</button>
+                                <button *ngIf="isAdmin()" type="button" class="btn btn-secondary mx-1" (click)="delete(u)">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-5 col-md-12">
+            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </div>
+    </div>
+</div>

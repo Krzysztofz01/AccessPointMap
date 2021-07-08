@@ -25,6 +25,15 @@ namespace AccessPointMap.Repository
                 .Where(u => u.DeleteDate == null);
         }
 
+        public Task<User> GetCurrentSingleUser(long userId)
+        {
+            return entities
+                .Include(x => x.AddedAccessPoints)
+                .Include(x => x.ModifiedAccessPoints)
+                .Where(u => u.DeleteDate == null)
+                .SingleOrDefaultAsync(x => x.Id == userId);
+        }
+
         public async Task<User> GetSingleUser(long userId)
         {
             return await entities

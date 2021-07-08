@@ -16,6 +16,7 @@ namespace AccessPointMap.Service
 
         Task<ServiceResult<IEnumerable<UserDto>>> GetAll();
         Task<ServiceResult<UserDto>> Get(long userId);
+        Task<ServiceResult<UserDto>> GetCurrent(long userId);
         Task<IServiceResult> Delete(long userId);
         Task<IServiceResult> Activation(long userId);
         Task<IServiceResult> Update(UserDto user, long userId);

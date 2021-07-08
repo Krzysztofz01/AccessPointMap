@@ -318,5 +318,18 @@ namespace AccessPointMap.Service
                 Email = emailClaim.Value
             };
         }
+
+        public async Task<ServiceResult<UserDto>> GetCurrent(long userId)
+        {
+            var user = await userRepository.GetCurrentSingleUser(userId);
+            if (user is null) return new ServiceResult<UserDto>(ResultStatus.NotFound);
+
+            var userMapped = mapper.Map<UserDto>(user);
+
+            userMapped.AddedAccessPoints = userMapped.AddedAccessPoints.Where(x => x.MasterGroup && x.Display);
+            userMapped.ModifiedAccessPoints = userMapped.ModifiedAccessPoints.Where(x => x.MasterGroup && x.Display);
+
+            return new ServiceResult<UserDto>(userMapped);
+        }
     }
 }
