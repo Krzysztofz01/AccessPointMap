@@ -111,15 +111,6 @@ namespace AccessPointMap.Repository
                 .SingleOrDefaultAsync(x => x.Id == accessPointId);
         }
 
-        public async Task<AccessPoint> GetMasterWithGivenBssid(string bssid)
-        {
-            return await entities
-                .Include(x => x.UserAdded)
-                .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
-                .SingleOrDefaultAsync(x => x.MasterGroup && x.Bssid == bssid);
-        }
-
         public IEnumerable<AccessPoint> SearchBySsid(string ssid)
         {
             string cleanedSsid = ssid.ToLower().Trim();
@@ -206,7 +197,8 @@ namespace AccessPointMap.Repository
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
                 .Where(x => x.DeleteDate == null)
-                .Where(x => x.UserAddedId == userId);
+                .Where(x => x.UserAddedId == userId)
+                .Where(x => x.Display && x.MasterGroup);
         }
 
         public IEnumerable<AccessPoint> UserModifiedAccessPoints(long userId)
@@ -215,7 +207,8 @@ namespace AccessPointMap.Repository
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
                 .Where(x => x.DeleteDate == null)
-                .Where(x => x.UserModifiedId == userId);
+                .Where(x => x.UserModifiedId == userId)
+                .Where(x => x.Display && x.MasterGroup);
         }
     }
 }

@@ -1,0 +1,8 @@
+input {
+    border: 1px solid var(--apm-secondary) !important;
+    color: var(--apm-secondary) !important;
+}
+
+p {
+    color: var(--apm-secondary) !important;
+}

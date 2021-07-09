@@ -141,7 +141,7 @@ namespace AccessPointMap.Service
 
                 ap.UserModifiedId = userId;
 
-                if (await accessPointRepository.GetMasterWithGivenBssid(ap.Bssid) == null)
+                if (await accessPointRepository.GetByBssidMaster(ap.Bssid) == null)
                 {
                     ap.MasterGroup = true;
 
@@ -271,7 +271,7 @@ namespace AccessPointMap.Service
             var queueAccessPoint = await accessPointRepository.GetByIdQueue(accessPointId);
             if (queueAccessPoint is null) return new ServiceResult(ResultStatus.NotFound);
 
-            var masterAccessPoint = await accessPointRepository.GetMasterWithGivenBssid(queueAccessPoint.Bssid);
+            var masterAccessPoint = await accessPointRepository.GetByBssidMaster(queueAccessPoint.Bssid);
             
             //The queue accesspoint will become the master
             if (masterAccessPoint is null)

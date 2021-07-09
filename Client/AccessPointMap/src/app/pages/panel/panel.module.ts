@@ -10,9 +10,11 @@ import { OrderModule } from 'ngx-order-pipe';
 import { CommonModule } from '@angular/common';
 import { UsersListComponent } from './users-list/users-list.component';
 import { UserStatComponent } from './user-stat/user-stat.component';
+import { MobileAppComponent } from './mobile-app/mobile-app.component';
+import { WorkshopComponent } from './workshop/workshop.component';
 
 @NgModule({
-  declarations: [PanelComponent, QueueListComponent, MergeModalComponent, UsersListComponent, UserStatComponent],
+  declarations: [PanelComponent, QueueListComponent, MergeModalComponent, UsersListComponent, UserStatComponent, MobileAppComponent, WorkshopComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

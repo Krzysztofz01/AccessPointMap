@@ -15,8 +15,8 @@
                             <th scope="col" class="col-sortable" (click)="sort('id')"># ↕</th>
                             <th scope="col" class="col-sortable" (click)="sort('ssid')">SSID ↕</th>
                             <th scope="col" class="col-sortable" (click)="sort('addDate')">Added on ↕</th>
-                            <th scope="col" class="col-sortable" (click)="sort('usernameAdd')">Added by ↕</th>
-                            <th scope="col" class="col-sortable" (click)="sort('usernameEdit')">Updated by ↕</th>
+                            <th scope="col" class="col-sortable">Added by</th>
+                            <th scope="col" class="col-sortable">Updated by</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,8 +24,8 @@
                             <th scope="row">{{ ap.id }}</th>
                             <td>{{ ap.ssid }}</td>
                             <td>{{ dateParse(ap.addDate) }}</td>
-                            <td>{{ ap.usernameAdd }}</td>
-                            <td>{{ ap.usernameEdit }}</td> 
+                            <td [ngClass]="nameColorAdded(ap)">{{ userNameAdded(ap) }}</td>
+                            <td [ngClass]="nameColorModified(ap)">{{ userNameModified(ap) }}</td> 
                         </tr>
                     </tbody>
                 </table>

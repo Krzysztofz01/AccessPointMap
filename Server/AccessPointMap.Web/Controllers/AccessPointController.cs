@@ -446,7 +446,7 @@ namespace AccessPointMap.Web.Controllers
                 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointsMapped = mapper.Map<AccessPointGetView>(result.Result());
+                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetView>>(result.Result());
 
                     return Ok(accessPointsMapped);
                 }
@@ -472,7 +472,7 @@ namespace AccessPointMap.Web.Controllers
 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointsMapped = mapper.Map<AccessPointGetView>(result.Result());
+                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetView>>(result.Result());
 
                     return Ok(accessPointsMapped);
                 }

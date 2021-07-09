@@ -17,7 +17,6 @@ namespace AccessPointMap.Repository
         Task<AccessPoint> GetByIdGlobal(long accessPointId);
         IEnumerable<AccessPoint> SearchBySsid(string ssid);
         IEnumerable<AccessPoint> GetAllNoBrand();
-        Task<AccessPoint> GetMasterWithGivenBssid(string bssid);
 
         Task<int> AllRecordsCount();
         Task<int> AllInsecureRecordsCount();

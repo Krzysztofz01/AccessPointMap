@@ -1,0 +1,12 @@
+a {
+    color: var(--apm-background-bright) !important;
+    text-decoration: none;
+}
+
+h2 {
+    color: var(--apm-secondary) !important;
+}
+
+p {
+    color: var(--apm-primary) !important;
+}

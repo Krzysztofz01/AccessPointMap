@@ -1,16 +1,19 @@
 <div class="container-fluid">
     <div class="row mt-1 mb-3">
         <div class="col-lg-12 col-md-12 text-center">
-            <button type="button" class="btn btn-secondary my-1 mx-1">Mobile app</button>
-            <button (click)="setComp(1)" type="button" class="btn btn-secondary my-1 mx-1" disabled>My statistics (coming soon)</button>
-            <button (click)="setComp(4)" type="button" class="btn btn-secondary my-1 mx-1">Accesspoint queue</button>
-            <button (click)="setComp(5)" type="button" class="btn btn-secondary my-1 mx-1">Users</button>
+            <button (click)="setComp(2) "type="button" class="btn btn-secondary my-1 mx-1">Mobile app</button>
+            <button (click)="setComp(1)" type="button" class="btn btn-secondary my-1 mx-1">My statistics</button>
+            <button *ngIf="isAdminOrMod()" (click)="setComp(4)" type="button" class="btn btn-secondary my-1 mx-1">Accesspoint queue</button>
+            <button *ngIf="isAdminOrMod()" (click)="setComp(3)" type="button" class="btn btn-secondary my-1 mx-1">Workshop (AccessPointLab)</button>
+            <button *ngIf="isAdminOrMod()" (click)="setComp(5)" type="button" class="btn btn-secondary my-1 mx-1">Users</button>
             <button type="button" class="btn btn-secondary my-1 mx-1">Account settings</button>
-            <button type="button" class="btn btn-secondary my-1 mx-5" (click)="logout()">Logut</button>
+            <button type="button" class="btn btn-secondary my-1 mx-5" (click)="logout()">Logout</button>
         </div>
     </div>
 </div>
 
-<!-- <app-user-stat *ngIf="getComp(1) == true"></app-user-stat> -->
+<app-user-stat *ngIf="getComp(1) == true"></app-user-stat>
+<app-mobile-app *ngIf="getComp(2) == true"></app-mobile-app>
+<app-workshop *ngIf="getComp(3) == true"></app-workshop>
 <app-queue-list *ngIf="getComp(4) == true"></app-queue-list>
 <app-users-list *ngIf="getComp(5) == true"></app-users-list>
