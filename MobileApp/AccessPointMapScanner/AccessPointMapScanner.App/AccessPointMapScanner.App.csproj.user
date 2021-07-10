@@ -3,6 +3,6 @@
   <PropertyGroup>
     <AndroidDesignerPreferredTheme>AppTheme</AndroidDesignerPreferredTheme>
     <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
-    <SelectedDevice>Xiaomi Redmi Note 8 Pro</SelectedDevice>
+    <SelectedDevice>Samsung SM-T310</SelectedDevice>
   </PropertyGroup>
 </Project>
