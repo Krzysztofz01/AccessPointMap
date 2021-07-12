@@ -214,4 +214,9 @@ export class AccessPointDetailsComponent implements AfterViewInit, OnInit {
       console.error(error);
     });
   }
+
+  //Dismiss button for mobile devices
+  public dismiss(): void {
+    this.modal.dismiss();
+  }
 }

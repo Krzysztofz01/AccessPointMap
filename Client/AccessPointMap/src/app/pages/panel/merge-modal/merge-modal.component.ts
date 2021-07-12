@@ -20,7 +20,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './merge-modal.component.html',
   styleUrls: ['./merge-modal.component.css']
 })
-export class MergeModalComponent implements AfterViewInit {
+export class MergeModalComponent implements OnInit, AfterViewInit {
   @Output() changeEvent = new EventEmitter<AccessPoint>();
   @Output() deleteEvent = new EventEmitter<AccessPoint>();
 
@@ -31,14 +31,16 @@ export class MergeModalComponent implements AfterViewInit {
 
   public noMaster: boolean;
 
-  public note: string = '';
+  public note: string;
   private updateTimeout: any;
 
   constructor(private authService: AuthService, private accessPointsService: AccessPointService, private dps: DateParserService, private modal: NgbActiveModal) { }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.note = this.queueAccessPoint.note;
-    
+  }
+
+  ngAfterViewInit(): void {
     this.initializeData();
   }
 
@@ -177,5 +179,10 @@ export class MergeModalComponent implements AfterViewInit {
         console.error(error);
       });
     }, 800);
+  }
+
+  //Dismiss button for mobile devices
+  public dismiss(): void {
+    this.modal.dismiss();
   }
 }

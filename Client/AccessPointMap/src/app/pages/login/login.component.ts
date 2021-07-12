@@ -49,6 +49,8 @@ export class LoginComponent implements OnInit {
       this.notificationType = 'danger';
       this.notificationText = 'Provided data invalid!';
     }
+
+    this.loginForm.reset();
   }
 
   public register(): void {

@@ -1,13 +1,30 @@
 <div class="container-fluid">
     <div class="row mt-1 mb-3">
         <div class="col-lg-12 col-md-12 text-center">
-            <button (click)="setComp(2) "type="button" class="btn btn-secondary my-1 mx-1">Mobile app</button>
-            <button (click)="setComp(1)" type="button" class="btn btn-secondary my-1 mx-1">My statistics</button>
-            <button *ngIf="isAdminOrMod()" (click)="setComp(4)" type="button" class="btn btn-secondary my-1 mx-1">Accesspoint queue</button>
-            <button *ngIf="isAdminOrMod()" (click)="setComp(3)" type="button" class="btn btn-secondary my-1 mx-1">Workshop (AccessPointLab)</button>
-            <button *ngIf="isAdminOrMod()" (click)="setComp(5)" type="button" class="btn btn-secondary my-1 mx-1">Users</button>
-            <button type="button" class="btn btn-secondary my-1 mx-1">Account settings</button>
-            <button type="button" class="btn btn-secondary my-1 mx-5" (click)="logout()">Logout</button>
+            <div class="d-none d-lg-block d-xl-block">
+                <button (click)="setComp(2) "type="button" class="btn btn-secondary my-1 mx-1">Mobile app</button>
+                <button (click)="setComp(1)" type="button" class="btn btn-secondary my-1 mx-1">My statistics</button>
+                <button *ngIf="isAdminOrMod()" (click)="setComp(4)" type="button" class="btn btn-secondary my-1 mx-1">Accesspoint queue</button>
+                <button *ngIf="isAdminOrMod()" (click)="setComp(3)" type="button" class="btn btn-secondary my-1 mx-1">Workshop (AccessPointLab)</button>
+                <button *ngIf="isAdminOrMod()" (click)="setComp(5)" type="button" class="btn btn-secondary my-1 mx-1">Users</button>
+                <button (click)="setComp(6)" type="button" class="btn btn-secondary my-1 mx-1">Account settings</button>
+                <button type="button" class="btn btn-secondary my-1 mx-5" (click)="logout()">Logout</button>
+            </div>
+
+            <div class="d-block d-lg-none">
+                <div ngbDropdown class="d-inline-block">
+                    <button class="btn btn-secondary dropdown-toggle my-1" type="button" id="panelNavDropdown" ngbDropdownToggle>Menu</button>
+                    <div class="px-3 text-center" ngbDropdownMenu aria-labelledby="panelNavDropdown">
+                        <button ngbDropdownItem (click)="setComp(2) "type="button" class="btn btn-secondary my-2">Mobile app</button>
+                        <button ngbDropdownItem (click)="setComp(1)" type="button" class="btn btn-secondary my-2">My statistics</button>
+                        <button ngbDropdownItem *ngIf="isAdminOrMod()" (click)="setComp(4)" type="button" class="btn btn-secondary my-2">Accesspoint queue</button>
+                        <button ngbDropdownItem *ngIf="isAdminOrMod()" (click)="setComp(3)" type="button" class="btn btn-secondary my-2">Workshop (AccessPointLab)</button>
+                        <button ngbDropdownItem *ngIf="isAdminOrMod()" (click)="setComp(5)" type="button" class="btn btn-secondary my-2">Users</button>
+                        <button ngbDropdownItem (click)="setComp(6)" type="button" class="btn btn-secondary my-2">Account settings</button>
+                        <button ngbDropdownItem type="button" class="btn btn-secondary my-2" (click)="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -17,3 +34,4 @@
 <app-workshop *ngIf="getComp(3) == true"></app-workshop>
 <app-queue-list *ngIf="getComp(4) == true"></app-queue-list>
 <app-users-list *ngIf="getComp(5) == true"></app-users-list>
+<app-settings *ngIf="getComp(6) == true"></app-settings> 
