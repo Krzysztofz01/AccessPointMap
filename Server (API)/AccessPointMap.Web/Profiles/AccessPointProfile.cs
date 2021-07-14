@@ -13,6 +13,8 @@ namespace AccessPointMap.Web.Profiles
             CreateMap<AccessPointDto, AccessPointPostView>().ReverseMap();
 
             CreateMap<AccessPointDto, AccessPointPatchView>().ReverseMap();
+
+            CreateMap<AccessPointDto, AccessPointGetViewPublic>().ReverseMap();
         }
     }
 }

@@ -64,7 +64,7 @@ namespace AccessPointMap.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetAllPublicV1()
+        public async Task<ActionResult<IEnumerable<AccessPointGetViewPublic>>> GetAllPublicV1()
         {
             try
             {
@@ -72,7 +72,7 @@ namespace AccessPointMap.Web.Controllers
 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetView>>(result.Result());
+                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetViewPublic>>(result.Result());
 
                     return Ok(accessPointsMapped);
                 }
@@ -87,7 +87,7 @@ namespace AccessPointMap.Web.Controllers
         }
 
         [HttpGet("{accessPointId}")]
-        public async Task<ActionResult<AccessPointGetView>> GetPublicByIdV1(long accessPointId)
+        public async Task<ActionResult<AccessPointGetViewPublic>> GetPublicByIdV1(long accessPointId)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace AccessPointMap.Web.Controllers
 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointMapped = mapper.Map<AccessPointGetView>(result.Result());
+                    var accessPointMapped = mapper.Map<AccessPointGetViewPublic>(result.Result());
 
                     return Ok(accessPointMapped);
                 }
@@ -388,7 +388,7 @@ namespace AccessPointMap.Web.Controllers
         }
 
         [HttpGet("search/{ssid}")]
-        public async Task<ActionResult<IEnumerable<AccessPointGetView>>> SearchBySsidV1(string ssid)
+        public async Task<ActionResult<IEnumerable<AccessPointGetViewPublic>>> SearchBySsidV1(string ssid)
         {
             try
             {
@@ -398,7 +398,7 @@ namespace AccessPointMap.Web.Controllers
 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetView>>(result.Result());
+                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetViewPublic>>(result.Result());
 
                     return Ok(accessPointsMapped);
                 }
@@ -436,7 +436,7 @@ namespace AccessPointMap.Web.Controllers
 
         [HttpGet("user/added")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetUserAddedV1()
+        public async Task<ActionResult<IEnumerable<AccessPointGetViewPublic>>> GetUserAddedV1()
         {
             var userId = userService.GetUserIdFromPayload(User.Claims);
 
@@ -446,7 +446,7 @@ namespace AccessPointMap.Web.Controllers
                 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetView>>(result.Result());
+                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetViewPublic>>(result.Result());
 
                     return Ok(accessPointsMapped);
                 }
@@ -462,7 +462,7 @@ namespace AccessPointMap.Web.Controllers
 
         [HttpGet("user/modified")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<AccessPointGetView>>> GetUserModifiedV1()
+        public async Task<ActionResult<IEnumerable<AccessPointGetViewPublic>>> GetUserModifiedV1()
         {
             var userId = userService.GetUserIdFromPayload(User.Claims);
 
@@ -472,7 +472,7 @@ namespace AccessPointMap.Web.Controllers
 
                 if (result.Status() == ResultStatus.Sucess)
                 {
-                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetView>>(result.Result());
+                    var accessPointsMapped = mapper.Map<IEnumerable<AccessPointGetViewPublic>>(result.Result());
 
                     return Ok(accessPointsMapped);
                 }

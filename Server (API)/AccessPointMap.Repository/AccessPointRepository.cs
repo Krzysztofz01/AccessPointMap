@@ -119,6 +119,7 @@ namespace AccessPointMap.Repository
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
                 .Where(x => x.DeleteDate == null)
+                .Where(x => x.MasterGroup && x.Display)
                 .Where(x => x.Ssid.ToLower().Contains(cleanedSsid))
                 .Take(10);
         }

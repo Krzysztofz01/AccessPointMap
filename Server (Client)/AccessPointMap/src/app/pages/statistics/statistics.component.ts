@@ -26,7 +26,6 @@ export class StatisticsComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.accessPointService.getStatistics(1).subscribe((res) => {
-      console.log(res);
       this.initializeCharts(res);
       this.initialized = true;
     },
