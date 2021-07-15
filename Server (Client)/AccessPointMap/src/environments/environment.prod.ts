@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  SERVER_URL: 'http://localhost:',
+  SERVER_URL: 'http://localhost:5001',
   CLIENT_VERSION: '3.0-alpha',
   SERVER_VERSION: '4.0',
   PIN_ICON_GOOD: 'http://cdn.mapmarker.io/api/v1/pin?size=50&hoffset=1&background=%2368BC00',

@@ -1,0 +1,25 @@
+version: '3'
+services:
+    apm-sql-database:
+        build: ./Database
+        volumes:
+            - ./volume-database:/var/opt/mssql/data
+        ports:
+            - "5002:1433"
+    apm-web-api:
+        build: ./Server(API)
+        volumes:
+            - ./volume-web-api:/var/Logs
+        ports:
+            - "5001:80"
+        depends_on: 
+            - apm-sql-database
+    apm-web-app:
+        build: ./Server(Client)/AccessPointMap
+        ports:
+            - "5000:80"
+        depends_on: 
+            - apm-web-api
+volumes:
+    volume-database:
+    volume-web-api:
