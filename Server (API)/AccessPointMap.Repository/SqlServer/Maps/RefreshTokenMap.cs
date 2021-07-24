@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AccessPointMap.Repository.Maps
+namespace AccessPointMap.Repository.SqlServer.Maps
 {
     public class RefreshTokenMap
     {

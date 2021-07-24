@@ -1,16 +1,16 @@
 ﻿using AccessPointMap.Domain;
-using AccessPointMap.Repository.Maps;
+using AccessPointMap.Repository.MySql.Maps;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccessPointMap.Repository.Context
+namespace AccessPointMap.Repository.MySql.Context
 {
-    public class AccessPointMapDbContext : DbContext
+    public class AccessPointMapMySqlDbContext : DbContext
     {
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<AccessPoint> AccessPoints { get; set; }
 
-        public AccessPointMapDbContext(DbContextOptions options) : base(options)
+        public AccessPointMapMySqlDbContext(DbContextOptions options) : base(options)
         {
         }
 

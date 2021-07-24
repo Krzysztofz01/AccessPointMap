@@ -1,14 +1,12 @@
-using AccessPointMap.Repository;
-using AccessPointMap.Repository.Context;
 using AccessPointMap.Service;
 using AccessPointMap.Service.Settings;
+using AccessPointMap.Web.Initialization;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,13 +44,9 @@ namespace AccessPointMap.Web
                 cfg.AddProfile<Web.Profiles.AccessPointStatisticsProfile>();
             });
 
-            //Database
-            services.AddDbContext<AccessPointMapDbContext>(opt =>
-                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionStringSql")));
-
-            //Repositories
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IAccessPointRepository, AccessPointRepository>();
+            //Context
+            services.AddMySqlContext(Configuration);
+            services.AddSqlServerContext(Configuration);
 
             //Services
             services.AddScoped<IUserService, UserService>();

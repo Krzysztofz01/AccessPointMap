@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace AccessPointMap.Repository.Migrations
+namespace AccessPointMap.Repository.SqlServer.Migrations
 {
     public partial class InitialMigration : Migration
     {

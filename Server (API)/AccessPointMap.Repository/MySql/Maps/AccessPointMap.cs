@@ -1,9 +1,8 @@
 ﻿using AccessPointMap.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AccessPointMap.Repository.Maps
+namespace AccessPointMap.Repository.MySql.Maps
 {
     public class AccessPointMap
     {
@@ -11,9 +10,8 @@ namespace AccessPointMap.Repository.Maps
         {
             //Base
             entityBuilder.HasKey(p => p.Id);
-            entityBuilder.Property(p => p.Id).UseIdentityColumn().Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
-            entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("getdate()");
+            entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
             entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
 
             entityBuilder.Property(p => p.Bssid).IsRequired();

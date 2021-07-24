@@ -1,12 +1,12 @@
 ﻿using AccessPointMap.Domain;
-using AccessPointMap.Repository.Context;
+using AccessPointMap.Repository.SqlServer.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AccessPointMap.Repository
+namespace AccessPointMap.Repository.SqlServer
 {
     public class AccessPointRepository : Repository<AccessPoint>, IAccessPointRepository
     {
