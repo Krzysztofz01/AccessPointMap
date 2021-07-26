@@ -18,8 +18,8 @@ namespace AccessPointMap.Repository.MySql.Maps
             entityBuilder.Property(p => p.Token).IsRequired();
             entityBuilder.Property(p => p.Expires).IsRequired();
             entityBuilder.Property(p => p.Created).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entityBuilder.Property(p => p.CreatedByIp).IsRequired().HasDefaultValue(string.Empty);
-            entityBuilder.Property(p => p.RevokedByIp).IsRequired().HasDefaultValue(string.Empty);
+            entityBuilder.Property(p => p.CreatedByIp).HasDefaultValue(string.Empty);
+            entityBuilder.Property(p => p.RevokedByIp).HasDefaultValue(string.Empty);
             entityBuilder.Property(p => p.IsRevoked).IsRequired().HasDefaultValue(false);
 
             //Relations

@@ -1,19 +1,26 @@
 version: '3'
 services:
-    apm-sql-database:
-        build: ./Database
+#    apm-mssql-database:
+#        build: ./Database/SqlServer
+#        volumes:
+#            - ./volume-mssql-database:/var/opt/mssql/data
+#        ports:
+#            - "5002:1433"
+    apm-mysql-database:
+        build: ./Database/MySql
         volumes:
-            - ./volume-database:/var/opt/mssql/data
+            - ./volume-mysql-database:/var/lib/mysql
         ports:
-            - "5002:1433"
+            - "5003:3306"
     apm-web-api:
         build: ./Server(API)
         volumes:
             - ./volume-web-api:/var/Logs
         ports:
             - "5001:80"
-        depends_on: 
-            - apm-sql-database
+        depends_on:
+#            - apm-mssql-database
+            - apm-mysql-database 
     apm-web-app:
         build: ./Server(Client)/AccessPointMap
         ports:
@@ -21,5 +28,6 @@ services:
         depends_on: 
             - apm-web-api
 volumes:
-    volume-database:
+#    volume-mssql-database:
+    volume-mysql-database:
     volume-web-api:
