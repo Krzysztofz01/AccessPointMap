@@ -18,7 +18,7 @@ namespace AccessPointMap.Web.Initialization
             {
                 //Database context
                 services.AddDbContext<AccessPointMapMySqlDbContext>(opt =>
-                    opt.UseMySql(dbSettings.MySqlConnectionString));
+                    opt.UseMySql(dbSettings.MySqlConnectionString, ServerVersion.AutoDetect(dbSettings.MySqlConnectionString)));
 
                 //Repositories
                 services.AddScoped<IUserRepository, UserRepository>();
