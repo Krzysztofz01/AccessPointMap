@@ -85,6 +85,9 @@ namespace AccessPointMap.Service
                 user.LastLoginDate = DateTime.Now;
                 user.LastLoginIp = ipAddress;
                 user.RefreshTokens.Add(refreshToken);
+
+                CleanupRefreshTokens(user);
+
                 userRepository.UpdateState(user);
 
                 if(await userRepository.Save() > 0)
@@ -151,6 +154,9 @@ namespace AccessPointMap.Service
             refreshToken.ReplacedByToken = newRefreshToken.Token;
 
             user.RefreshTokens.Add(newRefreshToken);
+
+            CleanupRefreshTokens(user);
+
             userRepository.UpdateState(user);
 
             if(await userRepository.Save() > 0)
@@ -317,6 +323,18 @@ namespace AccessPointMap.Service
                 Id = Convert.ToInt64(idClaim.Value),
                 Email = emailClaim.Value
             };
+        }
+
+        public void CleanupRefreshTokens(User user)
+        {
+            var refreshTokens = user.RefreshTokens
+                .Where(t => t.Revoked != null && t.IsRevoked)
+                .Where(t => t.Revoked > DateTime.Now.AddDays(-3));
+
+            foreach (var token in refreshTokens)
+            {
+                user.RefreshTokens.Remove(token);
+            }
         }
     }
 }
