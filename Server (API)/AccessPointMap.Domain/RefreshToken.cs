@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessPointMap.Domain.Common;
+using System;
 
 namespace AccessPointMap.Domain
 {
@@ -16,5 +17,9 @@ namespace AccessPointMap.Domain
         public bool IsActive => Revoked == null && !IsExpired;
         public long? UserId { get; set; }
         public virtual User User { get; set; }
+
+        public override void Validate()
+        {
+        }
     }
 }

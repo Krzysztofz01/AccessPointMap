@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessPointMap.Domain.Common;
+using System;
 using System.Collections.Generic;
 
 namespace AccessPointMap.Domain
@@ -16,5 +17,9 @@ namespace AccessPointMap.Domain
         public virtual ICollection<AccessPoint> AddedAccessPoints { get; set; }
         public virtual ICollection<AccessPoint> ModifiedAccessPoints { get; set; }
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
+
+        public override void Validate()
+        {
+        }
     }
 }
