@@ -10,9 +10,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +18,6 @@ namespace AccessPointMap.Service
     public class AccessPointService : IAccessPointService
     {
         private readonly IAccessPointRepository accessPointRepository;
-        private readonly IGeoCalculationService geoCalculationService;
         private readonly IMacResolveService macResolveService;
         private readonly IMapper mapper;
         private readonly EncryptionTypeSettings encryptionTypeSettings;
@@ -30,7 +26,6 @@ namespace AccessPointMap.Service
 
         public AccessPointService(
             IAccessPointRepository accessPointRepository,
-            IGeoCalculationService geoCalculationService,
             IMacResolveService macResolveService,
             IMapper mapper,
             IOptions<EncryptionTypeSettings> encryptionTypeSettings,
@@ -39,9 +34,6 @@ namespace AccessPointMap.Service
         {
             this.accessPointRepository = accessPointRepository ??
                 throw new ArgumentNullException(nameof(accessPointRepository));
-
-            this.geoCalculationService = geoCalculationService ??
-                throw new ArgumentNullException(nameof(geoCalculationService));
 
             this.macResolveService = macResolveService ??
                 throw new ArgumentNullException(nameof(macResolveService));
@@ -61,118 +53,105 @@ namespace AccessPointMap.Service
 
         public async Task<IServiceResult> Add(IEnumerable<AccessPointDto> accessPoints, long userId)
         {
-            var computedAccessPoints = new List<AccessPointDto>();
+            var computedAccessPoints = new List<AccessPoint>();
 
-            foreach(var accessPoint in accessPoints)
+            foreach(var ap in accessPoints)
             {
-                var ap = Normalize(accessPoint);
+                var accesspoint = AccessPoint.Factory.Create(
+                    ap.Bssid,
+                    ap.Ssid,
+                    ap.Frequency,
+                    ap.MaxSignalLevel,
+                    ap.MaxSignalLatitude,
+                    ap.MaxSignalLongitude,
+                    ap.MinSignalLevel,
+                    ap.MinSignalLatitude,
+                    ap.MinSignalLongitude,
+                    ap.FullSecurityData,
+                    userId);
 
-                if (string.IsNullOrEmpty(ap.Ssid))
-                {
-                    ap.Ssid = "Hidden network";
-                    ap.IsHidden = true;
-                }
+                accesspoint.SetSerializedSecurityData(SerializeSecurityDataV1(ap.FullSecurityData));
 
-                ap.Fingerprint = GenerateFingerprintV1(ap);
+                accesspoint.SetSecurityStatus(CheckIsSecure(ap.FullSecurityData));
 
-                ap.SignalRadius = geoCalculationService.GetDistance(ap.MaxSignalLatitude, ap.MinSignalLatitude, ap.MaxSignalLongitude, ap.MinSignalLongitude);
+                accesspoint.SetDeviceType(DetectDeviceTypeV1(ap.Ssid));
 
-                ap.SignalArea = geoCalculationService.GetArea(ap.SignalRadius);
-
-                ap.SerializedSecurityData = SerializeSecurityDateV1(ap.FullSecurityData);
-
-                ap.IsSecure = CheckIsSecure(ap.FullSecurityData);
-
-                ap.DeviceType = DetectDeviceTypeV1(ap);
-
-                ap.MasterGroup = false;
-
-                ap.Display = false;
-
-                ap.UserAddedId = userId;
-
-                ap.UserModifiedId = userId;
-
-                computedAccessPoints.Add(ap);
+                computedAccessPoints.Add(accesspoint);
             }
 
-            var accessPointsMapped = mapper.Map<IEnumerable<AccessPoint>>(computedAccessPoints);
-            await accessPointRepository.AddRange(accessPointsMapped);
+            await accessPointRepository.AddRange(computedAccessPoints);
 
             if (await accessPointRepository.Save() > 0)
             {
+                logger.LogDebug($"User: {userId} added {computedAccessPoints.Count} accesspoints.");
                 return new ServiceResult(ResultStatus.Sucess);
             }
+
+            logger.LogDebug($"User: {userId} failed to add {computedAccessPoints.Count} accesspoints.");
             return new ServiceResult(ResultStatus.Failed);
         }
 
         public async Task<IServiceResult> AddMaster(IEnumerable<AccessPointDto> accessPoints, long userId)
         {
             bool macResolveLimit = false;
-            var computedAccessPoints = new List<AccessPointDto>();
+            var computedAccessPoints = new List<AccessPoint>();
 
-            foreach(var accessPoint in accessPoints)
+            foreach (var ap in accessPoints)
             {
-                var ap = Normalize(accessPoint);
+                var accesspoint = AccessPoint.Factory.Create(
+                    ap.Bssid,
+                    ap.Ssid,
+                    ap.Frequency,
+                    ap.MaxSignalLevel,
+                    ap.MaxSignalLatitude,
+                    ap.MaxSignalLongitude,
+                    ap.MinSignalLevel,
+                    ap.MinSignalLatitude,
+                    ap.MinSignalLongitude,
+                    ap.FullSecurityData,
+                    userId);
 
-                if (string.IsNullOrEmpty(ap.Ssid))
+                accesspoint.SetSerializedSecurityData(SerializeSecurityDataV1(ap.FullSecurityData));
+
+                accesspoint.SetSecurityStatus(CheckIsSecure(ap.FullSecurityData));
+
+                accesspoint.SetDeviceType(DetectDeviceTypeV1(ap.Ssid));
+
+                //Check if accesspoint with given bssid exists before merging to master
+                if (await accessPointRepository.GetByBssidMaster(accesspoint.Bssid) == null)
                 {
-                    ap.Ssid = "Hidden network";
-                    ap.IsHidden = true;
-                }
-
-                ap.Fingerprint = GenerateFingerprintV1(ap);
-
-                ap.SignalRadius = geoCalculationService.GetDistance(ap.MaxSignalLatitude, ap.MinSignalLatitude, ap.MaxSignalLongitude, ap.MinSignalLongitude);
-
-                ap.SignalArea = geoCalculationService.GetArea(ap.SignalRadius);
-
-                ap.SerializedSecurityData = SerializeSecurityDateV1(ap.FullSecurityData);
-
-                ap.IsSecure = CheckIsSecure(ap.FullSecurityData);
-
-                ap.DeviceType = DetectDeviceTypeV1(ap);
-
-                ap.MasterGroup = false;
-
-                ap.Display = false;
-
-                ap.UserAddedId = userId;
-
-                ap.UserModifiedId = userId;
-
-                if (await accessPointRepository.GetByBssidMaster(ap.Bssid) == null)
-                {
-                    ap.MasterGroup = true;
+                    accesspoint.SetMasterGroup(true);
 
                     if (!macResolveLimit)
                     {
                         string manufacturerResult = await macResolveService.GetVendorV1(ap.Bssid);
 
-                        if(manufacturerResult == "#ERROR")
+                        if (manufacturerResult == "#ERROR")
                         {
                             macResolveLimit = true;
                         }
                         else
                         {
-                            if(!string.IsNullOrEmpty(manufacturerResult))
+                            if (!string.IsNullOrEmpty(manufacturerResult))
                             {
-                                ap.Manufacturer = manufacturerResult;
+                                accesspoint.SetManufacturer(manufacturerResult);
                             }
                         }
                     }
                 }
 
-                computedAccessPoints.Add(ap);
+                computedAccessPoints.Add(accesspoint);
             }
 
-            var accessPointsMapped = mapper.Map<IEnumerable<AccessPoint>>(computedAccessPoints);
-            await accessPointRepository.AddRange(accessPointsMapped);
+            await accessPointRepository.AddRange(computedAccessPoints);
 
             if (await accessPointRepository.Save() > 0)
             {
+                logger.LogDebug($"User: {userId} added {computedAccessPoints.Count} accesspoints as master.");
                 return new ServiceResult(ResultStatus.Sucess);
             }
+
+            logger.LogDebug($"User: {userId} failed to add {computedAccessPoints.Count} accesspoints as master.");
             return new ServiceResult(ResultStatus.Failed);
         }
 
@@ -181,14 +160,17 @@ namespace AccessPointMap.Service
             var accessPoint = await accessPointRepository.GetByIdMaster(accessPointId);
             if (accessPoint is null) return new ServiceResult(ResultStatus.NotFound);
 
-            accessPoint.Display = !accessPoint.Display;
+            accessPoint.SetDisplay(accessPoint.Display);
 
             accessPointRepository.UpdateState(accessPoint);
 
             if(await accessPointRepository.Save() > 0)
             {
+                logger.LogDebug($"Changed display for accesspoint {accessPoint.Id} to {accessPoint.Display}.");
                 return new ServiceResult(ResultStatus.Sucess);
             }
+
+            logger.LogDebug($"Display change failed for accesspoint {accessPoint.Id} to {accessPoint.Display}.");
             return new ServiceResult(ResultStatus.Failed);
         }
 
@@ -201,8 +183,11 @@ namespace AccessPointMap.Service
 
             if (await accessPointRepository.Save() > 0)
             {
+                logger.LogDebug($"Accesspoint {accessPoint.Id} deleted.");
                 return new ServiceResult(ResultStatus.Sucess);
             }
+
+            logger.LogDebug($"Accesspoint {accessPoint.Id} deleting failed.");
             return new ServiceResult(ResultStatus.Failed);
         }
 
@@ -276,88 +261,63 @@ namespace AccessPointMap.Service
             //The queue accesspoint will become the master
             if (masterAccessPoint is null)
             {
-                queueAccessPoint.MasterGroup = true;
+                queueAccessPoint.SetMasterGroup(true);
 
                 string manufacturerResult = await macResolveService.GetVendorV1(queueAccessPoint.Bssid);
                 if (manufacturerResult != "#ERROR" && manufacturerResult != null)
                 {
-                    queueAccessPoint.Manufacturer = manufacturerResult;
+                    queueAccessPoint.SetManufacturer(manufacturerResult);
                 }
-
-                queueAccessPoint.EditDate = DateTime.Now;
 
                 accessPointRepository.UpdateState(queueAccessPoint);
 
                 if (await accessPointRepository.Save() > 0)
                 {
+                    logger.LogDebug($"Accesspoint {queueAccessPoint.Id} merged without conflict.");
                     return new ServiceResult(ResultStatus.Sucess);
                 }
+
+                logger.LogDebug($"Accesspoint {queueAccessPoint.Id} merge without conflict failed.");
                 return new ServiceResult(ResultStatus.Failed);
             }
 
             //The master accesspoint will be updated with the queue accesspoints values
 
-            bool changes = false;
-
-            if (queueAccessPoint.MinSignalLevel < masterAccessPoint.MinSignalLevel)
-            {
-                masterAccessPoint.MinSignalLevel = queueAccessPoint.MinSignalLevel;
-                masterAccessPoint.MinSignalLatitude = queueAccessPoint.MinSignalLatitude;
-                masterAccessPoint.MinSignalLongitude = queueAccessPoint.MinSignalLongitude;
-                changes = true;
-            }
-
-            if (queueAccessPoint.MaxSignalLevel > masterAccessPoint.MaxSignalLevel)
-            {
-                masterAccessPoint.MaxSignalLevel = queueAccessPoint.MaxSignalLevel;
-                masterAccessPoint.MaxSignalLatitude = queueAccessPoint.MaxSignalLatitude;
-                masterAccessPoint.MaxSignalLongitude = queueAccessPoint.MaxSignalLongitude;
-                changes = true;
-            }
-
-            if (changes)
-            {
-                masterAccessPoint.SignalRadius = geoCalculationService
-                    .GetDistance(masterAccessPoint.MinSignalLatitude, masterAccessPoint.MaxSignalLatitude, masterAccessPoint.MinSignalLongitude, masterAccessPoint.MaxSignalLongitude);
-
-                masterAccessPoint.SignalArea = geoCalculationService.GetArea(masterAccessPoint.SignalRadius);
-
-                masterAccessPoint.Fingerprint = GenerateFingerprintV1(mapper.Map<AccessPointDto>(masterAccessPoint));
-            }
+            masterAccessPoint.UpdateLocation(
+                queueAccessPoint.MinSignalLevel,
+                queueAccessPoint.MinSignalLatitude,
+                queueAccessPoint.MinSignalLongitude,
+                queueAccessPoint.MaxSignalLevel,
+                queueAccessPoint.MaxSignalLatitude,
+                queueAccessPoint.MaxSignalLongitude);
 
             if (masterAccessPoint.AddDate < queueAccessPoint.AddDate)
             {
-                if (masterAccessPoint.Ssid != queueAccessPoint.Ssid)
-                {
-                    masterAccessPoint.Ssid = queueAccessPoint.Ssid;
-                    changes = true;
-                }
+                masterAccessPoint.SetSsid(queueAccessPoint.Ssid);
 
                 if (masterAccessPoint.SerializedSecurityData != queueAccessPoint.SerializedSecurityData)
                 {
-                    masterAccessPoint.FullSecurityData = AppendFullSecurityDataV1(masterAccessPoint.FullSecurityData, queueAccessPoint.FullSecurityData);
-                    masterAccessPoint.SerializedSecurityData = SerializeSecurityDateV1(masterAccessPoint.FullSecurityData);
+                    masterAccessPoint.SetSecurityData(queueAccessPoint.FullSecurityData);
 
-                    masterAccessPoint.IsSecure = CheckIsSecure(masterAccessPoint.FullSecurityData);
+                    masterAccessPoint.SetSerializedSecurityData(SerializeSecurityDataV1(masterAccessPoint.FullSecurityData));
 
-                    changes = true;
+                    masterAccessPoint.SetSecurityStatus(CheckIsSecure(masterAccessPoint.FullSecurityData));
                 }
+
+                masterAccessPoint.SetUserModified(queueAccessPoint.UserAddedId.Value);
             }
 
-            if (changes)
-            {
-                masterAccessPoint.UserModified = queueAccessPoint.UserAdded;
-                masterAccessPoint.EditDate = DateTime.Now;
-
-                accessPointRepository.UpdateState(masterAccessPoint);
-            }
+            accessPointRepository.UpdateState(masterAccessPoint);
 
             accessPointRepository.Remove(queueAccessPoint);
 
             if (await accessPointRepository.Save() > 0)
             {
+                logger.LogDebug($"Accesspoint ${masterAccessPoint.Id} merged with conflict resolved.");
                 return new ServiceResult(ResultStatus.Sucess);
             }
+
+            logger.LogDebug($"Accesspoint ${masterAccessPoint.Id} merge with conflict resolve failed.");
             return new ServiceResult(ResultStatus.Failed);
         }
 
@@ -381,28 +341,31 @@ namespace AccessPointMap.Service
 
             if (!string.IsNullOrEmpty(accessPoint.Note) && accessPoint.Note != baseAccessPoint.Note)
             {
-                baseAccessPoint.Note = accessPoint.Note;
+                baseAccessPoint.SetNote(accessPoint.Note);
                 changes = true;
             }
 
             if (!string.IsNullOrEmpty(accessPoint.DeviceType) && accessPoint.DeviceType != baseAccessPoint.DeviceType)
             {
-                baseAccessPoint.DeviceType = accessPoint.DeviceType;
+                baseAccessPoint.SetDeviceType(accessPoint.DeviceType);
                 changes = true;
             }
 
             if (changes)
             {
-                baseAccessPoint.EditDate = DateTime.Now;
-
                 accessPointRepository.UpdateState(baseAccessPoint);
 
                 if(await accessPointRepository.Save() > 0)
                 {
+                    logger.LogDebug($"Accesspoint {accessPointId} informations updated.");
                     return new ServiceResult(ResultStatus.Sucess);
                 }
+
+                logger.LogDebug($"Accesspoint {accessPointId} information update failed.");
                 return new ServiceResult(ResultStatus.Failed);
             }
+
+            logger.LogDebug($"Accesspoint {accessPointId} information update with no changes.");
             return new ServiceResult(ResultStatus.Sucess);
         }
 
@@ -419,7 +382,7 @@ namespace AccessPointMap.Service
                 if (manufacturerResult == "#ERROR") break;
                 if (manufacturerResult == null) continue;
 
-                ap.Manufacturer = manufacturerResult;
+                ap.SetManufacturer(manufacturerResult);
                 accessPointRepository.UpdateState(ap);
 
                 updated = true;
@@ -431,38 +394,7 @@ namespace AccessPointMap.Service
             }
         }
 
-        private AccessPointDto Normalize(AccessPointDto accessPoint)
-        {
-            accessPoint.Ssid = accessPoint.Ssid.Trim();
-            accessPoint.Bssid = accessPoint.Bssid.Trim();
-            accessPoint.MaxSignalLatitude = Math.Round(accessPoint.MaxSignalLatitude, 7);
-            accessPoint.MaxSignalLongitude = Math.Round(accessPoint.MaxSignalLongitude, 7);
-            accessPoint.MinSignalLatitude = Math.Round(accessPoint.MinSignalLatitude, 7);
-            accessPoint.MinSignalLongitude = Math.Round(accessPoint.MinSignalLongitude, 7);
-
-            return accessPoint;
-        }
-
-        private string GenerateFingerprintV1(AccessPointDto accessPoint)
-        {
-            string latFactor = Math.Round((accessPoint.MinSignalLatitude + accessPoint.MaxSignalLatitude) / 2.0, 4).ToString();
-            string lonFactor = Math.Round((accessPoint.MinSignalLongitude + accessPoint.MaxSignalLongitude) / 2.0, 4).ToString();
-
-            using (var sha1 = SHA1.Create())
-            {
-                byte[] data = sha1.ComputeHash(Encoding.UTF8.GetBytes($"{latFactor}{lonFactor}"));
-
-                var sb = new StringBuilder();
-
-                for(int i=0; i < data.Length; i++)
-                {
-                    sb.Append(data[i].ToString("x2"));
-                }
-                return sb.ToString();
-            }
-        }
-
-        private string SerializeSecurityDateV1(string fullSecurityData)
+        private string SerializeSecurityDataV1(string fullSecurityData)
         {
             var encryptionTypes = encryptionTypeSettings.EncryptionStandardsAndTypes;
             var types = new List<string>();
@@ -475,31 +407,9 @@ namespace AccessPointMap.Service
             return JsonConvert.SerializeObject(types);
         }
 
-        private string AppendFullSecurityDataV1(string baseSecurityData, string newSecurityData)
+        private string DetectDeviceTypeV1(string ssid)
         {
-            var newSecurityDataArr = newSecurityData.Split('[');
-            var newDataToBeAdded = new List<string>();
-
-            foreach(var part in newSecurityDataArr)
-            {
-                if(!baseSecurityData.Contains(part))
-                {
-                    newDataToBeAdded.Add(Regex.Replace(part, @"[\[\]']+", string.Empty));
-                }
-            }
-
-            var sb = new StringBuilder(baseSecurityData);
-            foreach(var element in newDataToBeAdded)
-            {
-                sb.Append($"[{element}]");
-            }
-
-            return sb.ToString();
-        }
-
-        private string DetectDeviceTypeV1(AccessPointDto accessPoint)
-        {
-            string ssid = accessPoint.Ssid.ToLower().Trim();
+            ssid = ssid.ToLower().Trim();
 
             if (deviceTypeSettings.PrinterKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Printer";
             if (deviceTypeSettings.AccessPointKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Access point";
@@ -568,10 +478,16 @@ namespace AccessPointMap.Service
             string manufacturer = await macResolveService.GetVendorV1(accessPoint.Bssid);
             if (manufacturer == "#ERROR" || manufacturer is null) return new ServiceResult(ResultStatus.Failed);
 
-            accessPoint.Manufacturer = manufacturer;
+            accessPoint.SetManufacturer(manufacturer);
             accessPointRepository.UpdateState(accessPoint);
 
-            if (await accessPointRepository.Save() > 0) return new ServiceResult(ResultStatus.Sucess);
+            if (await accessPointRepository.Save() > 0)
+            {
+                logger.LogDebug($"Accesspoint {accessPoint.Id} manufacturer name updated.");
+                return new ServiceResult(ResultStatus.Sucess);
+            }
+
+            logger.LogDebug($"Accesspoint {accessPoint.Id} manufacturer name update failed.");
             return new ServiceResult(ResultStatus.Failed);
         }
 
@@ -584,28 +500,31 @@ namespace AccessPointMap.Service
 
             if (!string.IsNullOrEmpty(accessPoint.Note) && accessPoint.Note != baseAccessPoint.Note)
             {
-                baseAccessPoint.Note = accessPoint.Note;
+                baseAccessPoint.SetNote(accessPoint.Note);
                 changes = true;
             }
 
             if (!string.IsNullOrEmpty(accessPoint.DeviceType) && accessPoint.DeviceType != baseAccessPoint.DeviceType)
             {
-                baseAccessPoint.DeviceType = accessPoint.DeviceType;
+                baseAccessPoint.SetDeviceType(accessPoint.DeviceType);
                 changes = true;
             }
 
             if (changes)
             {
-                baseAccessPoint.EditDate = DateTime.Now;
-
                 accessPointRepository.UpdateState(baseAccessPoint);
 
                 if (await accessPointRepository.Save() > 0)
                 {
+                    logger.LogDebug($"Accesspoint {accessPointId} informations updated (queue).");
                     return new ServiceResult(ResultStatus.Sucess);
                 }
+
+                logger.LogDebug($"Accesspoint {accessPointId} information update failed (queue).");
                 return new ServiceResult(ResultStatus.Failed);
             }
+
+            logger.LogDebug($"Accesspoint {accessPointId} information update with no changes (queue).");
             return new ServiceResult(ResultStatus.Sucess);
         }
 
