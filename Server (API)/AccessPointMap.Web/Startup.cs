@@ -1,147 +1,76 @@
-using AccessPointMap.Service;
-using AccessPointMap.Service.Settings;
 using AccessPointMap.Web.Initialization;
 using Hangfire;
-using Hangfire.MemoryStorage;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System;
-using System.Text;
 
 namespace AccessPointMap.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
-
+        private readonly string _corsPolicyName = "DefaultPolicy";
+        public Startup(IConfiguration configuration) =>
+            Configuration = configuration;
         public void ConfigureServices(IServiceCollection services)
         {
             //Settings
-            services.Configure<AdminSettings>(Configuration.GetSection(nameof(AdminSettings)));
-            services.Configure<EncryptionTypeSettings>(Configuration.GetSection(nameof(EncryptionTypeSettings)));
-            services.Configure<DeviceTypeSettings>(Configuration.GetSection(nameof(DeviceTypeSettings)));
+            services.AddSettings(Configuration);
 
             //Automapper
-            services.AddAutoMapper(cfg =>
-            {
-                cfg.AddProfile<Service.Profiles.UserProfile>();
-                cfg.AddProfile<Service.Profiles.AccessPointProfile>();
-
-                cfg.AddProfile<Web.Profiles.UserProfile>();
-                cfg.AddProfile<Web.Profiles.AccessPointProfile>();
-                cfg.AddProfile<Web.Profiles.AccessPointStatisticsProfile>();
-            });
+            services.AddMapper();
 
             //Context
             services.AddMySqlContext(Configuration);
             services.AddSqlServerContext(Configuration);
 
             //Services
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IAccessPointService, AccessPointService>();
-
-            services.AddScoped<IMacResolveService, MacResolveService>();
-            services.AddScoped<IGeoCalculationService, GeoCalculationService>();
+            services.AddServices();
 
             //Cross-Origin Resource Sharing
-            services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
+            services.AddCors(o => o.AddPolicy(_corsPolicyName, builder =>
             {
                 builder.AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(o => true).AllowCredentials();
             }));
 
             //JWT Authentication
-            var jwtSettingsSection = Configuration.GetSection(nameof(JWTSettings));
-            services.Configure<JWTSettings>(jwtSettingsSection);
-
-            var jwtSettings = jwtSettingsSection.Get<JWTSettings>();
-            var secret = Encoding.ASCII.GetBytes(jwtSettings.Secret);
-
-            services.AddAuthentication(cfg =>
-            {
-                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(cfg =>
-            {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken = true;
-                cfg.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(secret),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
-
-            //Endpoint versioning
-            services.AddApiVersioning(opt =>
-            {
-                opt.AssumeDefaultVersionWhenUnspecified = true;
-                opt.DefaultApiVersion = new ApiVersion(1, 0);
-            });
-
-            //Swagger
-            services.AddSwaggerGen(cfg =>
-            {
-                cfg.SwaggerDoc("v1", new OpenApiInfo { Title = "AccessPointMap WebAPI", Version = "v1" });
-            });
+            services.AddAuthentication();
 
             //Hangfire
-            services.AddHangfire(cfg =>
-            {
-                cfg.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseDefaultTypeSerializer()
-                    .UseMemoryStorage();
-            });
+            services.AddBackgroundJobs();
 
-            //Http Client Factory
-            services.AddHttpClient();
-
-            //Controllers
-            services.AddControllers();
+            //Web
+            services.AddWebServices();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IRecurringJobManager recurringJobManager, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IRecurringJobManager job, IServiceProvider service)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseSwagger();
+
+                app.UseSwaggerUI(cfg =>
+                {
+                    cfg.SwaggerEndpoint("/swagger/v1/swagger.json", "AccessPointMap WebAPI v1");
+                });
             }
+
+            app.UseCustomMiddleware();
 
             app.UseRouting();
 
-            app.UseCors("DefaultPolicy");
+            app.UseCors(_corsPolicyName);
 
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(cfg =>
-            {
-                cfg.SwaggerEndpoint("/swagger/v1/swagger.json", "AccessPointMap WebAPI v1");
-            });
-
-            app.UseHangfireServer();
-
-            recurringJobManager.AddOrUpdate("Update manufacturer information",
-                () => serviceProvider.GetService<IAccessPointService>().UpdateBrands(), Cron.Weekly);
+            app.UseBackgroundJobs(job, service);
 
             app.UseEndpoints(endpoints =>
             {
