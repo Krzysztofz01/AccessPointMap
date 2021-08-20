@@ -11,10 +11,8 @@ namespace AccessPointMap.Repository.SqlServer.Maps
         {
             //Base
             entityBuilder.HasKey(p => p.Id);
-            entityBuilder.Property(p => p.Id).UseIdentityColumn().Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
-            entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
+            entityBuilder.Property(p => p.AddDate).IsRequired();
+            entityBuilder.Property(p => p.EditDate).IsRequired();
 
             entityBuilder.Property(p => p.Bssid).IsRequired();
             entityBuilder.Property(p => p.Ssid).IsRequired();
@@ -50,6 +48,9 @@ namespace AccessPointMap.Repository.SqlServer.Maps
                 .WithMany(p => p.ModifiedAccessPoints)
                 .HasForeignKey(p => p.UserModifiedId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            //Query filter
+            entityBuilder.HasQueryFilter(e => !e.IsDeleted());
         }
     }
 }

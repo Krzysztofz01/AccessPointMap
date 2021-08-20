@@ -17,7 +17,6 @@ namespace AccessPointMap.Repository.MySql
         public async Task<int> AllInsecureRecordsCount()
         {
             return await entities
-                .Where(x => x.DeleteDate == null)
                 .Where(x => !x.IsSecure)
                 .CountAsync();
         }
@@ -25,8 +24,13 @@ namespace AccessPointMap.Repository.MySql
         public async Task<int> AllRecordsCount()
         {
             return await entities
-                .Where(x => x.DeleteDate == null)
                 .CountAsync();
+        }
+
+        public IEnumerable<AccessPoint> GetAllIntegration()
+        {
+            return entities
+                .AsNoTracking();
         }
 
         public IEnumerable<AccessPoint> GetAllMaster()
@@ -34,14 +38,12 @@ namespace AccessPointMap.Repository.MySql
             return entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.MasterGroup);
         }
 
         public IEnumerable<AccessPoint> GetAllNoBrand()
         {
             return entities
-                .Where(x => x.DeleteDate == null)
                 .Where(x => string.IsNullOrEmpty(x.Manufacturer) && x.MasterGroup);
         }
 
@@ -50,7 +52,6 @@ namespace AccessPointMap.Repository.MySql
             return entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.MasterGroup && x.Display);
         }
 
@@ -59,7 +60,6 @@ namespace AccessPointMap.Repository.MySql
             return entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => !x.MasterGroup);
         }
 
@@ -68,7 +68,6 @@ namespace AccessPointMap.Repository.MySql
             return await entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .SingleOrDefaultAsync(x => x.Bssid == bssid && x.MasterGroup);
         }
 
@@ -77,7 +76,6 @@ namespace AccessPointMap.Repository.MySql
             return await entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .SingleOrDefaultAsync(x => x.Id == accessPointId);
         }
 
@@ -86,7 +84,6 @@ namespace AccessPointMap.Repository.MySql
             return await entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.MasterGroup)
                 .SingleOrDefaultAsync(x => x.Id == accessPointId);
         }
@@ -96,7 +93,6 @@ namespace AccessPointMap.Repository.MySql
             return await entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.MasterGroup && x.Display)
                 .SingleOrDefaultAsync(x => x.Id == accessPointId);
         }
@@ -106,7 +102,6 @@ namespace AccessPointMap.Repository.MySql
             return await entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => !x.MasterGroup)
                 .SingleOrDefaultAsync(x => x.Id == accessPointId);
         }
@@ -118,7 +113,6 @@ namespace AccessPointMap.Repository.MySql
             return entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.MasterGroup && x.Display)
                 .Where(x => x.Ssid.ToLower().Contains(cleanedSsid))
                 .Take(10);
@@ -127,7 +121,6 @@ namespace AccessPointMap.Repository.MySql
         public IEnumerable<AccessPoint> TopAreaAccessPointsSorted()
         {
             return entities
-                .Where(x => x.DeleteDate == null)
                 .OrderByDescending(x => x.SignalArea)
                 .Take(5);
         }
@@ -135,7 +128,6 @@ namespace AccessPointMap.Repository.MySql
         public IEnumerable<Tuple<string, int>> TopOccuringBrandsSorted()
         {
             return entities
-                .Where(x => x.DeleteDate == null)
                 .Where(x => !string.IsNullOrEmpty(x.Manufacturer))
                 .GroupBy(x => x.Manufacturer)
                 .OrderByDescending(x => x.Count())
@@ -146,7 +138,6 @@ namespace AccessPointMap.Repository.MySql
         public IEnumerable<Tuple<double, int>> TopOccuringFrequencies()
         {
             return entities
-                .Where(x => x.DeleteDate == null)
                 .GroupBy(x => x.Frequency)
                 .OrderByDescending(x => x.Count())
                 .Take(5)
@@ -167,10 +158,7 @@ namespace AccessPointMap.Repository.MySql
 
             securityCount.Add("None", 0);
 
-            var accessPoints = entities
-                .Where(x => x.DeleteDate == null);
-
-            foreach (var ap in accessPoints)
+            foreach (var ap in entities)
             {
                 bool hasSecurity = false;
 
@@ -197,7 +185,6 @@ namespace AccessPointMap.Repository.MySql
             return entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.UserAddedId == userId)
                 .Where(x => x.Display && x.MasterGroup);
         }
@@ -207,7 +194,6 @@ namespace AccessPointMap.Repository.MySql
             return entities
                 .Include(x => x.UserAdded)
                 .Include(x => x.UserModified)
-                .Where(x => x.DeleteDate == null)
                 .Where(x => x.UserModifiedId == userId)
                 .Where(x => x.Display && x.MasterGroup);
         }

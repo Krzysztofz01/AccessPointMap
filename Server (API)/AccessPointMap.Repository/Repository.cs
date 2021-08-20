@@ -1,8 +1,6 @@
-﻿using AccessPointMap.Domain;
+﻿using AccessPointMap.Domain.Common;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Repository
@@ -30,12 +28,12 @@ namespace AccessPointMap.Repository
 
         public async Task<TEntity> Get(long id)
         {
-            return await entities.FirstOrDefaultAsync(e => e.DeleteDate == null && e.Id == id);
+            return await entities.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<TEntity>> GetAll()
         {
-            return await entities.Where(e => e.DeleteDate == null).ToListAsync();
+            return await entities.ToListAsync();
         }
 
         public void Remove(TEntity entity, bool hard = false)
@@ -46,9 +44,8 @@ namespace AccessPointMap.Repository
                 return;
             }
 
-            entity.DeleteDate = DateTime.Now;
+            entity.Delete();
             context.Entry(entity).State = EntityState.Modified;
-            
         }
 
         public void RemoveRange(IEnumerable<TEntity> entitiesCollection, bool hard = false)
@@ -61,7 +58,7 @@ namespace AccessPointMap.Repository
 
             foreach(var entity in entitiesCollection)
             {
-                entity.DeleteDate = DateTime.Now;
+                entity.Delete();
                 context.Entry(entity).State = EntityState.Modified;
             }
         }
@@ -73,7 +70,6 @@ namespace AccessPointMap.Repository
 
         public void UpdateState(TEntity entity)
         {
-            entity.EditDate = DateTime.Now;
             context.Entry(entity).State = EntityState.Modified;
         }
     }

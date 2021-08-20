@@ -1,4 +1,4 @@
-﻿using AccessPointMap.Domain;
+﻿using AccessPointMap.Domain.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

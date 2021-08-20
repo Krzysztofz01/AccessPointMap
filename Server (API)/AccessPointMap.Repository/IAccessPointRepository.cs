@@ -10,6 +10,7 @@ namespace AccessPointMap.Repository
         IEnumerable<AccessPoint> GetAllPublic();
         IEnumerable<AccessPoint> GetAllMaster();
         IEnumerable<AccessPoint> GetAllQueue();
+        IEnumerable<AccessPoint> GetAllIntegration();
         Task<AccessPoint> GetByIdPublic(long accessPointId);
         Task<AccessPoint> GetByIdMaster(long accessPointId);
         Task<AccessPoint> GetByBssidMaster(string bssid);

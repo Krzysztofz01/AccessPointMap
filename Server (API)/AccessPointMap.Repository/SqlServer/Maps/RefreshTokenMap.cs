@@ -10,10 +10,8 @@ namespace AccessPointMap.Repository.SqlServer.Maps
         {
             //Base
             entityBuilder.HasKey(p => p.Id);
-            entityBuilder.Property(p => p.Id).HasAnnotation("MySql:ValueGeneratedOnAdd", true).ValueGeneratedOnAdd();
-            entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("getdate()");
-            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
+            entityBuilder.Property(p => p.AddDate).IsRequired();
+            entityBuilder.Property(p => p.EditDate).IsRequired();
 
             //Props
             entityBuilder.Property(p => p.Token).IsRequired();
@@ -29,6 +27,9 @@ namespace AccessPointMap.Repository.SqlServer.Maps
                 .WithMany(p => p.RefreshTokens)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            //Query filter
+            entityBuilder.HasQueryFilter(e => !e.IsDeleted());
         }
     }
 }

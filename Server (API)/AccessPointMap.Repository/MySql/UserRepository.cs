@@ -21,28 +21,27 @@ namespace AccessPointMap.Repository.MySql
 
         public IEnumerable<User> GetAllUsers()
         {
-            return entities
-                .Where(u => u.DeleteDate == null);
+            return entities;
         }
 
         public async Task<User> GetSingleUser(long userId)
         {
             return await entities
-                .SingleOrDefaultAsync(u => u.DeleteDate == null && u.Id == userId);
+                .SingleOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User> GetSingleUserByEmail(string email)
         {
             return await entities
                 .Include(u => u.RefreshTokens)
-                .SingleOrDefaultAsync(u => u.Email == email && u.DeleteDate == null);
+                .SingleOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<User> GetUserWithToken(string token)
         {
             return await entities
                 .Include(u => u.RefreshTokens)
-                .SingleOrDefaultAsync(u => u.DeleteDate == null && u.RefreshTokens.Any(t => t.Token == token));
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
         }
     }
 }

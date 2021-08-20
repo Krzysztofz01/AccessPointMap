@@ -10,9 +10,8 @@ namespace AccessPointMap.Repository.MySql.Maps
         {
             //Base
             entityBuilder.HasKey(p => p.Id);
-            entityBuilder.Property(p => p.AddDate).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entityBuilder.Property(p => p.EditDate).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
+            entityBuilder.Property(p => p.AddDate).IsRequired();
+            entityBuilder.Property(p => p.EditDate).IsRequired();
 
             //Props
             entityBuilder.Property(p => p.Token).IsRequired();
@@ -28,6 +27,9 @@ namespace AccessPointMap.Repository.MySql.Maps
                 .WithMany(p => p.RefreshTokens)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            //Query filter
+            entityBuilder.HasQueryFilter(e => !e.IsDeleted());
         }
     }
 }

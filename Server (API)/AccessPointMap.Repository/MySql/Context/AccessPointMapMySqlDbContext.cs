@@ -1,6 +1,10 @@
 ﻿using AccessPointMap.Domain;
+using AccessPointMap.Domain.Common;
 using AccessPointMap.Repository.MySql.Maps;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AccessPointMap.Repository.MySql.Context
 {
@@ -24,6 +28,28 @@ namespace AccessPointMap.Repository.MySql.Context
 
             //AccessPoint mapping
             new Maps.AccessPointMap(modelBuilder.Entity<AccessPoint>());
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entires = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is BaseEntity &&
+                    (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+            foreach (var entity in entires)
+            {
+                ((BaseEntity)entity.Entity).SetModified();
+
+                if (entity.State == EntityState.Added)
+                {
+                    ((BaseEntity)entity.Entity).SetCreated();
+                }
+
+                ((BaseEntity)entity.Entity).Validate();
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }
