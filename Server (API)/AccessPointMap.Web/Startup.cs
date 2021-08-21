@@ -13,8 +13,10 @@ namespace AccessPointMap.Web
     {
         public IConfiguration Configuration { get; }
         private readonly string _corsPolicyName = "DefaultPolicy";
+
         public Startup(IConfiguration configuration) =>
             Configuration = configuration;
+
         public void ConfigureServices(IServiceCollection services)
         {
             //Settings
@@ -41,6 +43,9 @@ namespace AccessPointMap.Web
 
             //Hangfire
             services.AddBackgroundJobs();
+
+            //Integrations
+            services.AddIntegrations();
 
             //Web
             services.AddWebServices();
