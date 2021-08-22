@@ -1,5 +1,5 @@
 ﻿using AccessPointMap.Service.Integration.Aircrackng;
-using AccessPointMap.Service.Integration.Wiggle;
+using AccessPointMap.Service.Integration.Wigle;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.Web.Initialization
@@ -8,7 +8,7 @@ namespace AccessPointMap.Web.Initialization
     {
         public static IServiceCollection AddIntegrations(this IServiceCollection services)
         {
-            services.AddScoped<IWiggleIntegration, WiggleIntegration>();
+            services.AddScoped<IWigleIntegration, WigleIntegration>();
 
             services.AddScoped<IAircrackngIntegration, AircrackngIntegration>();
 

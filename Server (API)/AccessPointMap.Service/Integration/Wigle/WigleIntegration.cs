@@ -1,6 +1,6 @@
 ﻿using AccessPointMap.Domain;
 using AccessPointMap.Repository;
-using AccessPointMap.Service.Integration.Wiggle.Models;
+using AccessPointMap.Service.Integration.Wigle.Models;
 using CsvHelper;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -9,15 +9,15 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace AccessPointMap.Service.Integration.Wiggle
+namespace AccessPointMap.Service.Integration.Wigle
 {
-    public class WiggleIntegration : IntegrationBase, IWiggleIntegration
+    public class WigleIntegration : IntegrationBase, IWigleIntegration
     {
         private static readonly string _integrationName = "Wiggle Integration";
 
         private readonly int _defaultFrequency = 0;
 
-        public WiggleIntegration(IAccessPointRepository accessPointRepository) : base(accessPointRepository, _integrationName)
+        public WigleIntegration(IAccessPointRepository accessPointRepository) : base(accessPointRepository, _integrationName)
         {
         }
 

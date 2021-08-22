@@ -1,6 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 
-namespace AccessPointMap.Service.Integration.Wiggle.Models
+namespace AccessPointMap.Service.Integration.Wigle.Models
 {
     public class AccessPointRecord
     {
