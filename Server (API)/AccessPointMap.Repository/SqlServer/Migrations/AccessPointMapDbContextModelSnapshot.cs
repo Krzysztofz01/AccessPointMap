@@ -15,8 +15,8 @@ namespace AccessPointMap.Repository.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "5.0.9")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("AccessPointMap.Domain.AccessPoint", b =>
@@ -24,28 +24,17 @@ namespace AccessPointMap.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
-                        .HasAnnotation("SqlServer:IdentitySeed", 1)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("AddDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Bssid")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DeleteDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(null);
-
                     b.Property<string>("DeviceType")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue(null);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Display")
                         .ValueGeneratedOnAdd()
@@ -53,9 +42,7 @@ namespace AccessPointMap.Repository.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("EditDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Fingerprint")
                         .IsRequired()
@@ -79,9 +66,7 @@ namespace AccessPointMap.Repository.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("Manufacturer")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue(null);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("MasterGroup")
                         .ValueGeneratedOnAdd()
@@ -145,13 +130,10 @@ namespace AccessPointMap.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("MySql:ValueGeneratedOnAdd", true)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("AddDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Created")
                         .ValueGeneratedOnAdd()
@@ -164,15 +146,8 @@ namespace AccessPointMap.Repository.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("");
 
-                    b.Property<DateTime?>("DeleteDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(null);
-
                     b.Property<DateTime>("EditDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Expires")
                         .HasColumnType("datetime2");
@@ -213,28 +188,18 @@ namespace AccessPointMap.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("MySql:ValueGeneratedOnAdd", true)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("AddDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("AdminPermission")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<DateTime?>("DeleteDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(null);
-
                     b.Property<DateTime>("EditDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
@@ -288,6 +253,10 @@ namespace AccessPointMap.Repository.Migrations
                         .WithMany("ModifiedAccessPoints")
                         .HasForeignKey("UserModifiedId")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("UserAdded");
+
+                    b.Navigation("UserModified");
                 });
 
             modelBuilder.Entity("AccessPointMap.Domain.RefreshToken", b =>
@@ -296,6 +265,17 @@ namespace AccessPointMap.Repository.Migrations
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AccessPointMap.Domain.User", b =>
+                {
+                    b.Navigation("AddedAccessPoints");
+
+                    b.Navigation("ModifiedAccessPoints");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }
