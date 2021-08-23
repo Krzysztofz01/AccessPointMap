@@ -12,6 +12,7 @@ namespace AccessPointMap.Repository.MySql.Maps
             entityBuilder.HasKey(p => p.Id);
             entityBuilder.Property(p => p.AddDate).IsRequired();
             entityBuilder.Property(p => p.EditDate).IsRequired();
+            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
 
             entityBuilder.Property(p => p.Bssid).IsRequired();
             entityBuilder.Property(p => p.Ssid).IsRequired();
@@ -49,7 +50,7 @@ namespace AccessPointMap.Repository.MySql.Maps
                 .OnDelete(DeleteBehavior.NoAction);
 
             //Query filter
-            entityBuilder.HasQueryFilter(e => !e.IsDeleted());
+            entityBuilder.HasQueryFilter(e => e.DeleteDate == null);
         }
     }
 }

@@ -12,6 +12,7 @@ namespace AccessPointMap.Repository.SqlServer.Maps
             entityBuilder.HasKey(p => p.Id);
             entityBuilder.Property(p => p.AddDate).IsRequired();
             entityBuilder.Property(p => p.EditDate).IsRequired();
+            entityBuilder.Property(p => p.DeleteDate).HasDefaultValue(null);
 
             //Props
             entityBuilder.Property(p => p.Name).IsRequired();
@@ -24,7 +25,7 @@ namespace AccessPointMap.Repository.SqlServer.Maps
             entityBuilder.Property(p => p.IsActivated).IsRequired().HasDefaultValue(false);
 
             //Query filter
-            entityBuilder.HasQueryFilter(e => !e.IsDeleted());
+            entityBuilder.HasQueryFilter(e => e.DeleteDate == null);
         }
     }
 }

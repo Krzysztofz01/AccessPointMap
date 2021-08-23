@@ -33,6 +33,9 @@ namespace AccessPointMap.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("DeviceType")
                         .HasColumnType("nvarchar(max)");
 
@@ -146,6 +149,9 @@ namespace AccessPointMap.Repository.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("");
 
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("EditDate")
                         .HasColumnType("datetime2");
 
@@ -197,6 +203,9 @@ namespace AccessPointMap.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EditDate")
                         .HasColumnType("datetime2");

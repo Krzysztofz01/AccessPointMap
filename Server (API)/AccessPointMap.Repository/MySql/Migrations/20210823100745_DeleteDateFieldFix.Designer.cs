@@ -3,14 +3,16 @@ using System;
 using AccessPointMap.Repository.MySql.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AccessPointMap.Repository.MySql.Migrations
 {
     [DbContext(typeof(AccessPointMapMySqlDbContext))]
-    partial class AccessPointMapMySqlDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210823100745_DeleteDateFieldFix")]
+    partial class DeleteDateFieldFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
