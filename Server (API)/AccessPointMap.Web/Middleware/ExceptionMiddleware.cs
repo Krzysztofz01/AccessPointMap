@@ -13,25 +13,20 @@ namespace AccessPointMap.Web.Middleware
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ITelemetryService _telemetryService;
         private readonly ILogger<ExceptionMiddleware> _logger;
 
         public ExceptionMiddleware(
             RequestDelegate next,
-            ITelemetryService telemetryService,
             ILogger<ExceptionMiddleware> logger)
         {
             _next = next ??
                 throw new ArgumentNullException(nameof(next));
 
-            _telemetryService = telemetryService ??
-                throw new ArgumentNullException(nameof(telemetryService));
-
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, ITelemetryService telemetryService)
         {
             string requestUrl = context.Request.GetUri().ToString();
 
@@ -46,7 +41,7 @@ namespace AccessPointMap.Web.Middleware
 
                 await HandleException(context, e);
 
-                await _telemetryService.LogEvent(Report.Factory.Create(requestUrl, nameof(ExceptionMiddleware), e));
+                await telemetryService.LogEvent(Report.Factory.Create(requestUrl, nameof(ExceptionMiddleware), e));
             }
         }
 

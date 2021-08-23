@@ -10,26 +10,20 @@ namespace AccessPointMap.Web.Middleware
     public class TelemetryMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ITelemetryService _telemetryService;
-
-        public TelemetryMiddleware(
-            RequestDelegate next,
-            ITelemetryService telemetryService)
+        
+        public TelemetryMiddleware(RequestDelegate next)
         {
             _next = next ??
                 throw new ArgumentNullException(nameof(next));
-
-            _telemetryService = telemetryService ??
-                throw new ArgumentNullException(nameof(telemetryService));
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, ITelemetryService telemetryService)
         {
             string requestUrl = context.Request.GetUri().ToString();
 
             await _next(context);
 
-            await _telemetryService.LogEvent(Report.Factory.Create(requestUrl, nameof(TelemetryMiddleware)));
+            await telemetryService.LogEvent(Report.Factory.Create(requestUrl, nameof(TelemetryMiddleware)));
         }
     }
 }

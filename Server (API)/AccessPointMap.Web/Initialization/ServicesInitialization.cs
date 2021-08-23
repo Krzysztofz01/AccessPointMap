@@ -12,6 +12,8 @@ namespace AccessPointMap.Web.Initialization
             services.AddScoped<IAccessPointService, AccessPointService>();
 
             services.AddScoped<IMacResolveService, MacResolveService>();
+            
+            services.AddScoped<IAccessPointHelperService, AccessPointHelperService>();
 
             services.AddScoped<ITelemetryService, TelemetryService>();
 

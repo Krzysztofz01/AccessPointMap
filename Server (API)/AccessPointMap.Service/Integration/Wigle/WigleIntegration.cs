@@ -14,11 +14,14 @@ namespace AccessPointMap.Service.Integration.Wigle
     public class WigleIntegration : IntegrationBase, IWigleIntegration
     {
         private static readonly string _integrationName = "Wiggle Integration";
-
         private readonly int _defaultFrequency = 0;
 
-        public WigleIntegration(IAccessPointRepository accessPointRepository) : base(accessPointRepository, _integrationName)
+        private readonly IAccessPointHelperService _accessPointHelperService;
+
+        public WigleIntegration(IAccessPointRepository accessPointRepository, IAccessPointHelperService accessPointHelperService) : base(accessPointRepository, _integrationName)
         {
+            _accessPointHelperService = accessPointHelperService ??
+                throw new ArgumentNullException(nameof(accessPointHelperService));
         }
 
         public async Task Add(IFormFile file, long userId)
@@ -32,24 +35,26 @@ namespace AccessPointMap.Service.Integration.Wigle
             var accessPoints = new List<AccessPoint>();
             foreach (var record in csv.GetRecords<AccessPointRecord>())
             {
+                if (!RecordValidation(record)) continue;
+
                 var accessPoint = AccessPoint.Factory.Create(
-                    record.Bssid,
+                    record.Mac,
                     record.Ssid,
                     _defaultFrequency,
-                    record.MaxSignalLevel,
-                    record.MaxSignalLatitude,
-                    record.MaxSignalLongitude,
-                    record.MaxSignalLevel,
-                    record.MaxSignalLatitude,
-                    record.MaxSignalLongitude,
-                    record.FullSecurityData,
+                    record.Rssi,
+                    record.Latitude,
+                    record.Longitude,
+                    record.Rssi,
+                    record.Latitude,
+                    record.Longitude,
+                    record.AuthMode,
                     userId);
 
-                // Set serialized data
+                accessPoint.SetSerializedSecurityData(_accessPointHelperService.SerializeSecurityData(record.AuthMode));
+                
+                accessPoint.SetSecurityStatus(_accessPointHelperService.CheckIsSecure(record.AuthMode));
 
-                // Set is secure
-
-                accessPoint.SetDeviceType(record.DeviceType);
+                accessPoint.SetDeviceType(_accessPointHelperService.DetectDeviceType(record.Ssid));
 
                 accessPoints.Add(accessPoint);
             }
@@ -63,6 +68,13 @@ namespace AccessPointMap.Service.Integration.Wigle
         {
             if (!file.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException(nameof(file), "Invalid access point data file format.");
+        }
+
+        private bool RecordValidation(AccessPointRecord record)
+        {
+            if (record.Type != "WIFI") return false;
+
+            return true;
         }
     }
 }

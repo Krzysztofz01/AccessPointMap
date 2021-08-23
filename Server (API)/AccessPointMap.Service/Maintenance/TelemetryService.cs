@@ -12,7 +12,7 @@ namespace AccessPointMap.Service.Maintenance
         private readonly IHttpClientFactory _httpClientFactory;
 
         private readonly string _telemetryHeader = "apmtlm";
-        private readonly Uri _telemetryServerUri = new Uri("");
+        private readonly Uri _telemetryServerUri = new Uri("http://localhost:80/");
 
         public TelemetryService(IHttpClientFactory httpClientFactory)
         {

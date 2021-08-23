@@ -2,14 +2,10 @@
 using AccessPointMap.Repository;
 using AccessPointMap.Service.Dto;
 using AccessPointMap.Service.Handlers;
-using AccessPointMap.Service.Settings;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,16 +16,14 @@ namespace AccessPointMap.Service
         private readonly IAccessPointRepository accessPointRepository;
         private readonly IMacResolveService macResolveService;
         private readonly IMapper mapper;
-        private readonly EncryptionTypeSettings encryptionTypeSettings;
-        private readonly DeviceTypeSettings deviceTypeSettings;
+        private readonly IAccessPointHelperService accessPointHelperService;
         private readonly ILogger<AccessPointService> logger;
 
         public AccessPointService(
             IAccessPointRepository accessPointRepository,
             IMacResolveService macResolveService,
             IMapper mapper,
-            IOptions<EncryptionTypeSettings> encryptionTypeSettings,
-            IOptions<DeviceTypeSettings> deviceTypeSettings,
+            IAccessPointHelperService accessPointHelperService,
             ILogger<AccessPointService> logger)
         {
             this.accessPointRepository = accessPointRepository ??
@@ -41,11 +35,8 @@ namespace AccessPointMap.Service
             this.mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
 
-            this.encryptionTypeSettings = encryptionTypeSettings.Value ??
-                throw new ArgumentNullException(nameof(encryptionTypeSettings));
-
-            this.deviceTypeSettings = deviceTypeSettings.Value ??
-                throw new ArgumentNullException(nameof(deviceTypeSettings));
+            this.accessPointHelperService = accessPointHelperService ??
+                throw new ArgumentNullException(nameof(accessPointHelperService));
 
             this.logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
@@ -70,11 +61,11 @@ namespace AccessPointMap.Service
                     ap.FullSecurityData,
                     userId);
 
-                accesspoint.SetSerializedSecurityData(SerializeSecurityDataV1(ap.FullSecurityData));
+                accesspoint.SetSerializedSecurityData(accessPointHelperService.SerializeSecurityData(ap.FullSecurityData));
 
-                accesspoint.SetSecurityStatus(CheckIsSecure(ap.FullSecurityData));
+                accesspoint.SetSecurityStatus(accessPointHelperService.CheckIsSecure(ap.FullSecurityData));
 
-                accesspoint.SetDeviceType(DetectDeviceTypeV1(ap.Ssid));
+                accesspoint.SetDeviceType(accessPointHelperService.DetectDeviceType(ap.Ssid));
 
                 computedAccessPoints.Add(accesspoint);
             }
@@ -111,11 +102,11 @@ namespace AccessPointMap.Service
                     ap.FullSecurityData,
                     userId);
 
-                accesspoint.SetSerializedSecurityData(SerializeSecurityDataV1(ap.FullSecurityData));
+                accesspoint.SetSerializedSecurityData(accessPointHelperService.SerializeSecurityData(ap.FullSecurityData));
 
-                accesspoint.SetSecurityStatus(CheckIsSecure(ap.FullSecurityData));
+                accesspoint.SetSecurityStatus(accessPointHelperService.CheckIsSecure(ap.FullSecurityData));
 
-                accesspoint.SetDeviceType(DetectDeviceTypeV1(ap.Ssid));
+                accesspoint.SetDeviceType(accessPointHelperService.DetectDeviceType(ap.Ssid));
 
                 //Check if accesspoint with given bssid exists before merging to master
                 if (await accessPointRepository.GetByBssidMaster(accesspoint.Bssid) == null)
@@ -299,9 +290,9 @@ namespace AccessPointMap.Service
                 {
                     masterAccessPoint.SetSecurityData(queueAccessPoint.FullSecurityData);
 
-                    masterAccessPoint.SetSerializedSecurityData(SerializeSecurityDataV1(masterAccessPoint.FullSecurityData));
+                    masterAccessPoint.SetSerializedSecurityData(accessPointHelperService.SerializeSecurityData(masterAccessPoint.FullSecurityData));
 
-                    masterAccessPoint.SetSecurityStatus(CheckIsSecure(masterAccessPoint.FullSecurityData));
+                    masterAccessPoint.SetSecurityStatus(accessPointHelperService.CheckIsSecure(masterAccessPoint.FullSecurityData));
                 }
 
                 masterAccessPoint.SetUserModified(queueAccessPoint.UserAddedId.Value);
@@ -394,48 +385,9 @@ namespace AccessPointMap.Service
             }
         }
 
-        private string SerializeSecurityDataV1(string fullSecurityData)
-        {
-            var encryptionTypes = encryptionTypeSettings.EncryptionStandardsAndTypes;
-            var types = new List<string>();
-
-            foreach(var type in encryptionTypes)
-            {
-                if (fullSecurityData.Contains(type)) types.Add(type);
-            }
-
-            return JsonConvert.SerializeObject(types);
-        }
-
-        private string DetectDeviceTypeV1(string ssid)
-        {
-            ssid = ssid.ToLower().Trim();
-
-            if (deviceTypeSettings.PrinterKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Printer";
-            if (deviceTypeSettings.AccessPointKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Access point";
-            if (deviceTypeSettings.TvKeywords.Any(x => ssid.Contains(x.ToLower()))) return "TV";
-            if (deviceTypeSettings.CctvKeywords.Any(x => ssid.Contains(x.ToLower()))) return "CCTV";
-            if (deviceTypeSettings.RepeaterKeywords.Any(x => ssid.Contains(x.ToLower()))) return "Repeater";
-            if (deviceTypeSettings.IotKeywords.Any(x => ssid.Contains(x.ToLower()))) return "IoT";
-
-            return null;
-        }
-
-        private bool CheckIsSecure(string fullSecurityData)
-        {
-            var secureEncryptionTypes = encryptionTypeSettings.SafeEncryptionStandards;
-            string security = fullSecurityData.ToUpper();
-
-            foreach(var type in secureEncryptionTypes)
-            {
-                if (security.Contains(type)) return true;
-            }
-            return false;
-        }
-
         public async Task<ServiceResult<AccessPointStatisticsDto>> GetStats()
         {
-            var encryptionTypes = encryptionTypeSettings.EncryptionStandardsForStatistics;
+            var encryptionTypes = accessPointHelperService.GetEncryptionsForStatistics();
 
             var statistics = new AccessPointStatisticsDto
             {

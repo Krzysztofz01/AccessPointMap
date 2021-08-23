@@ -39,7 +39,7 @@ namespace AccessPointMap.Web
             }));
 
             //JWT Authentication
-            services.AddAuthentication();
+            services.AddAuthentication(Configuration);
 
             //Hangfire
             services.AddBackgroundJobs();

@@ -41,7 +41,7 @@ namespace AccessPointMap.Web.Controllers
 
         [HttpPost("wigle")]
         [Authorize]
-        public async Task<IActionResult> UploadWigleDataV1(AccessPointIntegrationPostView form)
+        public async Task<IActionResult> UploadWigleDataV1([FromForm] AccessPointIntegrationPostView form)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace AccessPointMap.Web.Controllers
 
         [HttpPost("aircrackng")]
         [Authorize]
-        public async Task<IActionResult> UploadAircrackngDataV1(AccessPointIntegrationPostView form)
+        public async Task<IActionResult> UploadAircrackngDataV1([FromForm] AccessPointIntegrationPostView form)
         {
             try
             {
