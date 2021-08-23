@@ -7,7 +7,7 @@ namespace AccessPointMap.Domain.Common
         public long Id { get; set; }
         public DateTime AddDate { get; set; }
         public DateTime EditDate { get; set; }
-        protected DateTime? DeleteDate { get; set; }
+        public DateTime? DeleteDate { get; set; }
 
         public abstract void Validate();
 

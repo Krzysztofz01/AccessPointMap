@@ -94,7 +94,7 @@ namespace AccessPointMap.Domain
 
         private void SetMinimalSignalPosition(int signalLevel, double latitude, double longitude)
         {
-            if (signalLevel > 100 || signalLevel < 0)
+            if (signalLevel > 0 || signalLevel < -100)
                 throw new ArgumentException(nameof(signalLevel), "Invalid signal strength values.");
 
             MinSignalLevel = signalLevel;
@@ -105,7 +105,7 @@ namespace AccessPointMap.Domain
 
         private void SetMaximalSignalPosition(int signalLevel, double latitude, double longitude)
         {
-            if (signalLevel > 100 || signalLevel < 0)
+            if (signalLevel > 0 || signalLevel < -100)
                 throw new ArgumentException(nameof(signalLevel), "Invalid signal strength values.");
 
             MaxSignalLevel = signalLevel;
