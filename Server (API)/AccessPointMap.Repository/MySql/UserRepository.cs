@@ -27,6 +27,7 @@ namespace AccessPointMap.Repository.MySql
         public async Task<User> GetSingleUser(long userId)
         {
             return await entities
+                .Include(u => u.RefreshTokens)
                 .SingleOrDefaultAsync(u => u.Id == userId);
         }
 

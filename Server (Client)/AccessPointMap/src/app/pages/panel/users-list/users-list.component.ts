@@ -84,4 +84,24 @@ export class UsersListComponent implements OnInit {
     }
     return false;
   }
+
+  //Change the state of admin permission
+  public promoteAdmin(user: User): void {
+    this.userService.administratorPromotion(user.id, 1).subscribe(() => {
+      this.users.find(u => u.id == user.id).adminPermission = !this.users.find(u => u.id == user.id).adminPermission;
+    },
+    (error) => {
+      console.error(error);
+    });
+  }
+
+  //Change the state of mod permission
+  public promoteMod(user: User): void {
+    this.userService.moderatorPromotion(user.id, 1).subscribe(() => {
+      this.users.find(u => u.id == user.id).modPermission = !this.users.find(u => u.id == user.id).modPermission;
+    },
+    (error) => {
+      console.error(error);
+    });
+  }
 }

@@ -36,4 +36,12 @@ export class UserService {
   public getCurrent(apiVersion: number): Observable<User> {
     return this.httpClient.get<User>(`${ this.preparePath(apiVersion) }/current`);
   }
+
+  public moderatorPromotion(userId: number, apiVersion: number): Observable<void> {
+    return this.httpClient.patch<void>(`${ this.preparePath(apiVersion) }/${ userId }/promotion/moderator`, {});
+  }
+
+  public administratorPromotion(userId: number, apiVersion: number): Observable<void> {
+    return this.httpClient.patch<void>(`${ this.preparePath(apiVersion) }/${ userId }/promotion/administrator`, {});
+  }
 }

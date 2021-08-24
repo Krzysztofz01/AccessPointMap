@@ -32,6 +32,8 @@
                             
                             <td>
                                 <button *ngIf="isAdmin()" type="button" class="btn btn-secondary mx-1" (click)="activation(u)">{{ (u.isActivated==true) ? 'Deactivate' : 'Activate' }}</button>
+                                <button *ngIf="isAdmin()" type="button" class="btn btn-secondary mx-1" (click)="promoteAdmin(u)">{{ (u.adminPermission==true) ? 'Demote admin' : 'Promote admin' }}</button>
+                                <button *ngIf="isAdmin()" type="button" class="btn btn-secondary mx-1" (click)="promoteMod(u)">{{ (u.modPermission==true) ? 'Demote mod' : 'Promote mod' }}</button>
                                 <button *ngIf="isAdmin()" type="button" class="btn btn-secondary mx-1" (click)="delete(u)">Delete</button>
                             </td>
                         </tr>
