@@ -20,21 +20,16 @@ namespace AccessPointMap.Service
     public class UserService : IUserService
     {
         private readonly JWTSettings jwtSettings;
-        private readonly AdminSettings adminSettings;
         private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
 
         public UserService(
             IOptions<JWTSettings> jwtSettings,
-            IOptions<AdminSettings> adminSettings,
             IUserRepository userRepository,
             IMapper mapper)
         {
             this.jwtSettings = jwtSettings.Value ??
                 throw new ArgumentNullException(nameof(jwtSettings));
-
-            this.adminSettings = adminSettings.Value ??
-                throw new ArgumentNullException(nameof(adminSettings));
 
             this.userRepository = userRepository ??
                 throw new ArgumentNullException(nameof(userRepository));
@@ -184,13 +179,6 @@ namespace AccessPointMap.Service
                     LastLoginDate = DateTime.Now,
                     LastLoginIp = ipAddress
                 };
-
-                //Check if user is a pre-selected admin
-                if (adminSettings.Emails.Any(x => x == email))
-                {
-                    user.AdminPermission = true;
-                    user.IsActivated = true;
-                }
 
                 string salt = BCrypt.Net.BCrypt.GenerateSalt(5);
                 user.Password = BCrypt.Net.BCrypt.HashPassword(password, salt);

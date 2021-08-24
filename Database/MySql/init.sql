@@ -1,8 +1,10 @@
 CREATE TABLE IF NOT EXISTS `__EFMigrationsHistory` (
-    `MigrationId` varchar(95) NOT NULL,
-    `ProductVersion` varchar(32) NOT NULL,
+    `MigrationId` varchar(150) CHARACTER SET utf8mb4 NOT NULL,
+    `ProductVersion` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
     CONSTRAINT `PK___EFMigrationsHistory` PRIMARY KEY (`MigrationId`)
-);
+) CHARACTER SET utf8mb4;
+
+START TRANSACTION;
 
 CREATE TABLE `Users` (
     `Id` bigint NOT NULL AUTO_INCREMENT,
@@ -10,7 +12,7 @@ CREATE TABLE `Users` (
     `EditDate` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `DeleteDate` datetime(6) NULL,
     `Name` longtext CHARACTER SET utf8mb4 NOT NULL,
-    `Email` varchar(255) CHARACTER SET utf8mb4 NULL,
+    `Email` varchar(255) NULL,
     `Password` longtext CHARACTER SET utf8mb4 NOT NULL,
     `LastLoginIp` longtext CHARACTER SET utf8mb4 NOT NULL,
     `LastLoginDate` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -80,7 +82,11 @@ CREATE INDEX `IX_RefreshTokens_UserId` ON `RefreshTokens` (`UserId`);
 CREATE UNIQUE INDEX `IX_Users_Email` ON `Users` (`Email`);
 
 INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
-VALUES ('20210724131531_Init', '3.1.16');
+VALUES ('20210724131531_Init', '5.0.9');
+
+COMMIT;
+
+START TRANSACTION;
 
 ALTER TABLE `Users` MODIFY COLUMN `LastLoginIp` longtext CHARACTER SET utf8mb4 NULL;
 
@@ -89,5 +95,85 @@ ALTER TABLE `RefreshTokens` MODIFY COLUMN `RevokedByIp` longtext CHARACTER SET u
 ALTER TABLE `RefreshTokens` MODIFY COLUMN `CreatedByIp` longtext CHARACTER SET utf8mb4 NULL;
 
 INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
-VALUES ('20210726110001_StringDefaultValues', '3.1.16');
+VALUES ('20210726110001_StringDefaultValues', '5.0.9');
+
+COMMIT;
+
+START TRANSACTION;
+
+ALTER TABLE `Users` DROP COLUMN `DeleteDate`;
+
+ALTER TABLE `RefreshTokens` DROP COLUMN `DeleteDate`;
+
+ALTER TABLE `AccessPoints` DROP COLUMN `DeleteDate`;
+
+ALTER TABLE `Users` MODIFY COLUMN `Password` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `Users` MODIFY COLUMN `Name` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `Users` MODIFY COLUMN `LastLoginIp` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `Users` MODIFY COLUMN `EditDate` datetime(6) NOT NULL;
+
+ALTER TABLE `Users` MODIFY COLUMN `AddDate` datetime(6) NOT NULL;
+
+ALTER TABLE `RefreshTokens` MODIFY COLUMN `Token` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `RefreshTokens` MODIFY COLUMN `RevokedByIp` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `RefreshTokens` MODIFY COLUMN `ReplacedByToken` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `RefreshTokens` MODIFY COLUMN `EditDate` datetime(6) NOT NULL;
+
+ALTER TABLE `RefreshTokens` MODIFY COLUMN `CreatedByIp` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `RefreshTokens` MODIFY COLUMN `AddDate` datetime(6) NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `Ssid` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `SerializedSecurityData` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `Note` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `Manufacturer` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `FullSecurityData` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `Fingerprint` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `EditDate` datetime(6) NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `DeviceType` longtext CHARACTER SET utf8mb4 NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `Bssid` longtext CHARACTER SET utf8mb4 NOT NULL;
+
+ALTER TABLE `AccessPoints` MODIFY COLUMN `AddDate` datetime(6) NOT NULL;
+
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20210822155716_DomainModelCleanup', '5.0.9');
+
+COMMIT;
+
+START TRANSACTION;
+
+ALTER TABLE `Users` ADD `DeleteDate` datetime(6) NULL;
+
+ALTER TABLE `RefreshTokens` ADD `DeleteDate` datetime(6) NULL;
+
+ALTER TABLE `AccessPoints` ADD `DeleteDate` datetime(6) NULL;
+
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20210823100745_DeleteDateFieldFix', '5.0.9');
+
+COMMIT;
+
+START TRANSACTION;
+
+INSERT INTO `Users` (`Id`, `AddDate`, `AdminPermission`, `DeleteDate`, `EditDate`, `Email`, `IsActivated`, `LastLoginDate`, `LastLoginIp`, `Name`, `Password`)
+VALUES (1, '2021-08-24 14:45:46', TRUE, NULL, '2021-08-24 14:45:46', 'admin@apm.com', TRUE, '2021-08-24 14:45:46', '', 'Administrator', '$05$feN415S/rRMOaPcaiobkEeo5JTPoxY7PPMCwVGkbrbItw/mj19CBS');
+
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20210824124547_DefaultAdminUser', '5.0.9');
+
+COMMIT;
 

@@ -8,7 +8,6 @@ namespace AccessPointMap.Web.Initialization
     {
         public static IServiceCollection AddSettings(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<AdminSettings>(configuration.GetSection(nameof(AdminSettings)));
             services.Configure<EncryptionTypeSettings>(configuration.GetSection(nameof(EncryptionTypeSettings)));
             services.Configure<DeviceTypeSettings>(configuration.GetSection(nameof(DeviceTypeSettings)));
 

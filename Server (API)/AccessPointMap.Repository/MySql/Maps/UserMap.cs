@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 
 namespace AccessPointMap.Repository.MySql.Maps
 {
@@ -26,6 +27,26 @@ namespace AccessPointMap.Repository.MySql.Maps
 
             //Query filter
             entityBuilder.HasQueryFilter(e => e.DeleteDate == null);
+
+            //Default data
+            entityBuilder.HasData(new User[]
+            {
+                new User()
+                {
+                    Id = 1,
+                    AddDate = DateTime.Now,
+                    EditDate = DateTime.Now,
+                    Name = "Administrator",
+                    Email = "admin@apm.com",
+                    Password = "$05$feN415S/rRMOaPcaiobkEeo5JTPoxY7PPMCwVGkbrbItw/mj19CBS",
+                    LastLoginIp = string.Empty,
+                    LastLoginDate = DateTime.Now,
+                    AdminPermission = true,
+                    ModPermission = false,
+                    IsActivated =  true,
+                    DeleteDate = null
+                }
+            });
         }
     }
 }

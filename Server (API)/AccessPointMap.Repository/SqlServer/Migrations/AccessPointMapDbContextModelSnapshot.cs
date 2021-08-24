@@ -249,6 +249,22 @@ namespace AccessPointMap.Repository.Migrations
                         .HasFilter("[Email] IS NOT NULL");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AddDate = new DateTime(2021, 8, 24, 14, 49, 54, 382, DateTimeKind.Local).AddTicks(6978),
+                            AdminPermission = true,
+                            EditDate = new DateTime(2021, 8, 24, 14, 49, 54, 390, DateTimeKind.Local).AddTicks(6328),
+                            Email = "admin@apm.com",
+                            IsActivated = true,
+                            LastLoginDate = new DateTime(2021, 8, 24, 14, 49, 54, 390, DateTimeKind.Local).AddTicks(9096),
+                            LastLoginIp = "",
+                            ModPermission = false,
+                            Name = "Administrator",
+                            Password = "$05$feN415S/rRMOaPcaiobkEeo5JTPoxY7PPMCwVGkbrbItw/mj19CBS"
+                        });
                 });
 
             modelBuilder.Entity("AccessPointMap.Domain.AccessPoint", b =>
