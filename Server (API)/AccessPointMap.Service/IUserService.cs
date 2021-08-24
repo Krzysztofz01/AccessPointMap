@@ -18,6 +18,8 @@ namespace AccessPointMap.Service
         Task<ServiceResult<UserDto>> Get(long userId);
         Task<IServiceResult> Delete(long userId);
         Task<IServiceResult> Activation(long userId);
+        Task<IServiceResult> ModeratorPromotion(long userId);
+        Task<IServiceResult> AdminPromotion(long userId);
         Task<IServiceResult> Update(UserDto user, long userId);
 
         long GetUserIdFromPayload(IEnumerable<Claim> claims);

@@ -151,7 +151,7 @@ namespace AccessPointMap.Service
             var accessPoint = await accessPointRepository.GetByIdMaster(accessPointId);
             if (accessPoint is null) return new ServiceResult(ResultStatus.NotFound);
 
-            accessPoint.SetDisplay(accessPoint.Display);
+            accessPoint.SetDisplay(!accessPoint.Display);
 
             accessPointRepository.UpdateState(accessPoint);
 

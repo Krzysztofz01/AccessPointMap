@@ -116,5 +116,43 @@ namespace AccessPointMap.Web.Controllers
                 return Problem();
             }
         }
+
+        [HttpPatch("{userId}/promotion/moderator")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ModeratorPromotionByIdV1(long userId)
+        {
+            try
+            {
+                var result = await userService.ModeratorPromotion(userId);
+
+                if (result.Status() == ResultStatus.NotFound) return NotFound();
+                if (result.Status() == ResultStatus.Sucess) return Ok();
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "System failure on user moderator promotion by id!");
+                return Problem();
+            }
+        }
+
+        [HttpPatch("{userId}/promotion/administrator")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdministratorPromotionByIdV1(long userId)
+        {
+            try
+            {
+                var result = await userService.AdminPromotion(userId);
+
+                if (result.Status() == ResultStatus.NotFound) return NotFound();
+                if (result.Status() == ResultStatus.Sucess) return Ok();
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "System failure on user administrator promotion by id!");
+                return Problem();
+            }
+        }
     }
 }

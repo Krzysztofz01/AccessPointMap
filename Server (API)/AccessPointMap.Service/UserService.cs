@@ -336,5 +336,35 @@ namespace AccessPointMap.Service
                 user.RefreshTokens.Remove(token);
             }
         }
+
+        public async Task<IServiceResult> ModeratorPromotion(long userId)
+        {
+            var user = await userRepository.GetSingleUser(userId);
+            if (user is null) return new ServiceResult(ResultStatus.NotFound);
+
+            user.ModPermission = !user.ModPermission;
+
+            userRepository.UpdateState(user);
+            if (await userRepository.Save() > 0)
+            {
+                return new ServiceResult(ResultStatus.Sucess);
+            }
+            return new ServiceResult(ResultStatus.Failed);
+        }
+
+        public async Task<IServiceResult> AdminPromotion(long userId)
+        {
+            var user = await userRepository.GetSingleUser(userId);
+            if (user is null) return new ServiceResult(ResultStatus.NotFound);
+
+            user.AdminPermission = !user.AdminPermission;
+
+            userRepository.UpdateState(user);
+            if (await userRepository.Save() > 0)
+            {
+                return new ServiceResult(ResultStatus.Sucess);
+            }
+            return new ServiceResult(ResultStatus.Failed);
+        }
     }
 }
