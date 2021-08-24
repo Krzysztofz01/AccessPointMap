@@ -5,12 +5,20 @@
         </div>
     </div>
     <div class="row justify-content-center my-3 no-gutters">
-        <div class="col-lg-3 col-md-12">
+        <div class="col-lg-3 col-md-12 my-2 mx-2">
             <form [formGroup]="securityTypeForm">
                 <label>Security type:</label>
                 <select class="form-select" aria-label="Select security type to display" formControlName="selectType">
                     <option *ngFor="let type of securityTypesOptions" [value]="type" [selected]="type == 'All'">{{ type }}</option>
                 </select>
+            </form>
+        </div>
+        <div class="col-lg-3 col-md-12 my-2 mx-2">
+            <form [formGroup]="ssidForm">
+                <label>Search:</label>
+                <div class="mb-2">
+                    <input type="text" class="form-control search-field" id="text" placeholder="Keyword..." formControlName="text" aria-describedby="text">
+                </div>
             </form>
         </div>
     </div>

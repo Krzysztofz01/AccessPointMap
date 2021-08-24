@@ -34,13 +34,26 @@ export class MapComponent implements OnInit, AfterViewInit{
   public securityTypeForm: FormGroup;
   public securityTypesOptions: Array<string> = [ "All", "WPA3", "WPA2", "WPA", "WEP", "WPS", "None" ];
 
+  public ssidForm: FormGroup;
+
   ngOnInit(): void {
     this.securityTypeForm = new FormGroup({
       selectType: new FormControl('All')
     });
 
+    this.ssidForm = new FormGroup({
+      text: new FormControl(null)
+    });
+
     this.securityTypeForm.get('selectType').valueChanges.subscribe(val => {
-      const features = this.generateMapFeatures(this.accessPoints, val);
+      const features = this.generateMapFeatures(this.accessPoints, val, this.ssidForm.get('text').value);
+      console.log(features.length);
+      this.swapVector(features);
+    });
+
+    this.ssidForm.get('text').valueChanges.subscribe(val => {
+      const features = this.generateMapFeatures(this.accessPoints, this.securityTypeForm.get('selectType').value, val);
+      console.log(features.length);
       this.swapVector(features);
     });
   }
@@ -114,29 +127,43 @@ export class MapComponent implements OnInit, AfterViewInit{
   }
 
   //Generate an array of features (markers) with optional filtering by security type
-  private generateMapFeatures(accessPoints: Array<AccessPoint>, filter: string = "All") : Array<Feature> {
+  private generateMapFeatures(accessPoints: Array<AccessPoint>, filter: string = "All", keyword: string = null) : Array<Feature> {
     const features: Array<Feature> = new Array<Feature>();
 
     accessPoints.forEach(x => {
       if (filter == "All") {
-        features.push(this.generateSingleFeature(x));
+        if (this.filterByKeyword(keyword, x)) {
+          features.push(this.generateSingleFeature(x));
+        }       
       } else {
         //Sorting by security type
 
-        const secPayload: Array<string> = JSON.parse(x.serializedSecurityData);
-        switch(filter) {
-          case 'WPA3': if(secPayload.includes('WPA3')) features.push(this.generateSingleFeature(x)); break;
-          case 'WPA2': if(!secPayload.includes('WPA3') && secPayload.includes('WPA2')) features.push(this.generateSingleFeature(x)); break;
-          case 'WPA': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && secPayload.includes('WPA')) features.push(this.generateSingleFeature(x)); break;
-          case 'WEP': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && !secPayload.includes('WPA') && secPayload.includes('WEP')) features.push(this.generateSingleFeature(x)); break;
-          case 'WPS': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && !secPayload.includes('WPA') && !secPayload.includes('WEP') && secPayload.includes('WPS')) features.push(this.generateSingleFeature(x)); break;
-          case 'None': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && !secPayload.includes('WPA') && !secPayload.includes('WEP') && !secPayload.includes('WPS')) features.push(this.generateSingleFeature(x)); break;
-          default: break;
+        if (this.filterByKeyword(keyword, x)) {
+          const secPayload: Array<string> = JSON.parse(x.serializedSecurityData);
+          switch(filter) {
+            case 'WPA3': if(secPayload.includes('WPA3')) features.push(this.generateSingleFeature(x)); break;
+            case 'WPA2': if(!secPayload.includes('WPA3') && secPayload.includes('WPA2')) features.push(this.generateSingleFeature(x)); break;
+            case 'WPA': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && secPayload.includes('WPA')) features.push(this.generateSingleFeature(x)); break;
+            case 'WEP': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && !secPayload.includes('WPA') && secPayload.includes('WEP')) features.push(this.generateSingleFeature(x)); break;
+            case 'WPS': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && !secPayload.includes('WPA') && !secPayload.includes('WEP') && secPayload.includes('WPS')) features.push(this.generateSingleFeature(x)); break;
+            case 'None': if(!secPayload.includes('WPA3') && !secPayload.includes('WPA2') && !secPayload.includes('WPA') && !secPayload.includes('WEP') && !secPayload.includes('WPS')) features.push(this.generateSingleFeature(x)); break;
+            default: break;
+          }
         }
       }
     });
 
     return features;
+  }
+
+  private filterByKeyword(keyword: string, accessPoint: AccessPoint): boolean {
+    if (keyword == null || keyword == '') return true;
+
+    const query = (param: string, key: string): boolean => {
+      return param.toLowerCase().trim().includes(key.toLowerCase().trim());
+    }
+
+    return query(accessPoint.ssid, keyword) || query(accessPoint.bssid, keyword);
   }
 
   //Prepare a single feature (marker) for the map based on one accesspoint
