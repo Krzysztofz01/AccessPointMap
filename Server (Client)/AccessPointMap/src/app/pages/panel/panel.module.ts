@@ -14,9 +14,10 @@ import { MobileAppComponent } from './mobile-app/mobile-app.component';
 import { WorkshopComponent } from './workshop/workshop.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { UploadComponent } from './upload/upload.component';
 
 @NgModule({
-  declarations: [PanelComponent, QueueListComponent, MergeModalComponent, UsersListComponent, UserStatComponent, MobileAppComponent, WorkshopComponent, SettingsComponent],
+  declarations: [PanelComponent, QueueListComponent, MergeModalComponent, UsersListComponent, UserStatComponent, MobileAppComponent, WorkshopComponent, SettingsComponent, UploadComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

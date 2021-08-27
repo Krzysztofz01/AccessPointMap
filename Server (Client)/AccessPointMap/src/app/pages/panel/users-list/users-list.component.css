@@ -12,6 +12,10 @@
     cursor: pointer !important;
 }
 
+.button-column {
+    text-align: center;
+}
+
 thead {
     color: var(--apm-primary) !important;
 }

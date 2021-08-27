@@ -24,7 +24,7 @@ export class WorkshopComponent implements OnInit, AfterViewInit {
   public accessPointJsonData: string;
 
   public accessPointPreviewData: string;
-  public mapHeight: string = '50vh';
+  public mapHeight: string = '60vh';
   private zoomLevel: number = 16;
   private map: Map;
 
@@ -120,19 +120,5 @@ export class WorkshopComponent implements OnInit, AfterViewInit {
         zoom: this.zoomLevel
       })
     })
-  }
-
-  //Read accesspoints data from clipboard and make a post request to server
-  public pasteAndUpload(): void {
-    if(this.accessPointJsonData.length) {
-      const accessPoints: Array<AccessPoint> = JSON.parse(this.accessPointJsonData)
-
-      this.accessPointService.postMany(accessPoints, 1).subscribe(() => {
-        //TODO: Notification
-      },
-      (error) => {
-        console.error(error);
-      });
-    }
   }
 }

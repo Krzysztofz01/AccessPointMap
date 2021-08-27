@@ -15,7 +15,7 @@ import { AccessPointDetailsComponent } from 'src/app/shared/access-point-details
 export class MainComponent implements OnInit {
   public accessPointsObservable: Observable<Array<AccessPoint>>;
   public mapId: string = 'mainMap';
-  public mapHeight: string = '85vh';
+  public mapHeight: string = '75vh';
   public zoom: number = 16;
 
   private urlParam: string;

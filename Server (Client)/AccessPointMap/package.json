@@ -25,6 +25,7 @@
     "jwt-decode": "^3.1.2",
     "ng2-charts": "^2.2.3",
     "ng2-search-filter": "^0.5.1",
+    "ngx-cookie-service": "^12.0.3",
     "ngx-order-pipe": "^2.1.1",
     "ngx-pagination": "^5.1.1",
     "ol": "^6.5.0",

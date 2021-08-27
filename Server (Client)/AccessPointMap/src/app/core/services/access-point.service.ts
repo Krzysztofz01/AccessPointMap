@@ -90,4 +90,18 @@ export class AccessPointService {
   public getUserModified(apiVersion: number): Observable<Array<AccessPoint>> {
     return this.httpClient.get<Array<AccessPoint>>(`${ this.preparePath(apiVersion) }/user/modified`);
   }
+
+  public postManyWigle(file: File, apiVersion: number): Observable<void> {
+    const formData = new FormData();
+    formData.append('File', file);
+
+    return this.httpClient.post<void>(`${ this.server }/api/v${ apiVersion }/integration/wigle`, formData);
+  }
+
+  public postManyAircrackng(file: File, apiVersion: number): Observable<void> {
+    const formData = new FormData();
+    formData.append('File', file);
+
+    return this.httpClient.post<void>(`${ this.server }/api/v${ apiVersion }/integration/aircrackng`, formData);
+  }
 }

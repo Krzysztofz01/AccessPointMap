@@ -10,6 +10,7 @@ import { AuthUser } from '../models/auth-user.model';
 import jwt_decode  from 'jwt-decode';
 import { AuthRequestRegister } from '../models/auth-request-register.model';
 import { AuthRequestReset } from '../models/auth-request-reset.model';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class AuthService {
   private readonly server: string = environment.SERVER_URL;
   private readonly authVersion: number = 1;
 
-  constructor(private router: Router, private httpClient: HttpClient) {
+  constructor(private router: Router, private httpClient: HttpClient, private cookieService: CookieService) {
     this.userSubject = new BehaviorSubject<AuthUser>(null);
     this.user = this.userSubject.asObservable();
   }
@@ -49,10 +50,15 @@ export class AuthService {
   }
 
   public logout(): void {
-    this.httpClient.post<void>(`${ this.preparePath() }/revoke`, {}, { withCredentials: true }).subscribe();
-    this.stopRefreshTokenTimer();
-    this.userSubject.next(null);
-    this.router.navigate(['/login']);
+    this.httpClient.post<void>(`${ this.preparePath() }/revoke`, {}, { withCredentials: true }).subscribe(() => {
+      this.stopRefreshTokenTimer();
+      this.userSubject.next(null);
+      this.cookieService.delete('refreshToken');
+      this.router.navigate(['/login']);
+    },
+    (error) => {
+      console.error(error);
+    });
   }
 
   public refreshToken(): Observable<any> {
