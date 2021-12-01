@@ -6,5 +6,10 @@
         {
             return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
         }
+
+        public static bool IsLengthLess(this string value, int max)
+        {
+            return value.Length < max;
+        }
     }
 }
