@@ -14,10 +14,10 @@ namespace AccessPointMap.Domain.AccessPoints
         private AccessPointBssid(string value)
         {
             if (value.IsEmpty())
-                throw new ValueObjectValidationExceptions("The access point bssid can not be empty.");
+                throw new ValueObjectValidationException("The access point bssid can not be empty.");
 
             if (value.Length != _bssidLength)
-                throw new ValueObjectValidationExceptions("Invalud access point bssid format");
+                throw new ValueObjectValidationException("Invalud access point bssid format");
 
             Value = value;
         }

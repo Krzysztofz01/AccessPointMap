@@ -29,7 +29,7 @@ namespace AccessPointMap.Domain.AccessPoints
             double highSignalLongitude)
         {
             if (lowSignalLevel > highSignalLevel)
-                throw new ValueObjectValidationExceptions("Invalid signal level data.");
+                throw new ValueObjectValidationException("Invalid signal level data.");
 
             LowSignalLevel = lowSignalLevel;
             HighSignalLevel = highSignalLevel;

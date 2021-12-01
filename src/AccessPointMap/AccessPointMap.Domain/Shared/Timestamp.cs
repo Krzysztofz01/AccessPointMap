@@ -12,7 +12,7 @@ namespace AccessPointMap.Domain.Shared
         protected Timestamp(DateTime value)
         {
             if (value == default)
-                throw new ValueObjectValidationExceptions("The timestamp can not have the default value.");
+                throw new ValueObjectValidationException("The timestamp can not have the default value.");
 
             Value = value;
         }

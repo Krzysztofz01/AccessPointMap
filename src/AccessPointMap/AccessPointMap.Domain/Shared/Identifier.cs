@@ -12,7 +12,7 @@ namespace AccessPointMap.Domain.Shared
         protected Identifier(Guid value)
         {
             if (value == default)
-                throw new ValueObjectValidationExceptions("The identifier value can not be default.");
+                throw new ValueObjectValidationException("The identifier value can not be default.");
 
             Value = value;
         }

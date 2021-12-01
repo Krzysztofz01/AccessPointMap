@@ -13,7 +13,7 @@ namespace AccessPointMap.Domain.AccessPoints
         private AccessPointSsid(string value)
         {
             if (value is null)
-                throw new ValueObjectValidationExceptions("Invalid access point ssid value.");
+                throw new ValueObjectValidationException("Invalid access point ssid value.");
 
             if (value == string.Empty)
             {
