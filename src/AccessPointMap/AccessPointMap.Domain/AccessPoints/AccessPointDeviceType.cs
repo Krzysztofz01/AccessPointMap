@@ -18,6 +18,7 @@ namespace AccessPointMap.Domain.AccessPoints
         };
 
         private const string _defaultDeviceType = "Unknown";
+        public static string DefaultDeviceType => _defaultDeviceType;
 
         public string Value { get; private set; }
 
