@@ -199,6 +199,8 @@ namespace AccessPointMap.Domain.Test
                 StampId = stampId
             });
 
+            var stamp = accesspoint.Stamps.First();
+
             Assert.Equal(updatedLowSignalLevel, accesspoint.Positioning.LowSignalLevel);
             Assert.Equal(updatedLowSignalLatitude, accesspoint.Positioning.LowSignalLatitude);
             Assert.Equal(updatedLowSignalLongitude, accesspoint.Positioning.LowSignalLongitude);
@@ -208,6 +210,10 @@ namespace AccessPointMap.Domain.Test
             Assert.NotEqual(updatedHighSignalLongitude, accesspoint.Positioning.HighSignalLongitude);
 
             Assert.Equal(updatedSsid, accesspoint.Ssid);
+
+            Assert.Equal(stamp.CreationTimestamp.Value, accesspoint.VersionTimestamp.Value);
+
+            Assert.True(stamp.Status);
         }
 
         [Fact]
