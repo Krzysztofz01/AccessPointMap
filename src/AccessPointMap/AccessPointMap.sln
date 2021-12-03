@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Domain.Core"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Domain.Test", "AccessPointMap.Domain.Test\AccessPointMap.Domain.Test.csproj", "{786EDADD-DAA7-462E-8BE2-4037AA96B1DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Infrastructure.Core", "AccessPointMap.Infrastructure.Core\AccessPointMap.Infrastructure.Core.csproj", "{236100A6-27DD-416C-8160-F2BF30CE2BAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Infrastructure.MySql", "AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj", "{41501E70-8A2D-4999-B5DA-398365B51D1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{786EDADD-DAA7-462E-8BE2-4037AA96B1DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{786EDADD-DAA7-462E-8BE2-4037AA96B1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{786EDADD-DAA7-462E-8BE2-4037AA96B1DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{236100A6-27DD-416C-8160-F2BF30CE2BAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{236100A6-27DD-416C-8160-F2BF30CE2BAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{236100A6-27DD-416C-8160-F2BF30CE2BAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{236100A6-27DD-416C-8160-F2BF30CE2BAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
