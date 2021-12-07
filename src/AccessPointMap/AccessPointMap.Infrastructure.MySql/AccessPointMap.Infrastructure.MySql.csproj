@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AccessPointMap.Domain\AccessPointMap.Domain.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Infrastructure.Core\AccessPointMap.Infrastructure.Core.csproj" />
   </ItemGroup>
 
 </Project>

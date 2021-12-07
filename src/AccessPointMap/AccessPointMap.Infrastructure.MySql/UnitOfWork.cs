@@ -2,6 +2,7 @@
 using AccessPointMap.Domain.Identities;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AccessPointMap.Infrastructure.MySql.Repositories;
+using System;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Infrastructure.MySql
@@ -12,6 +13,12 @@ namespace AccessPointMap.Infrastructure.MySql
 
         private IIdentityRepository _identityRepository;
         private IAccessPointRepository _accessPointRepository;
+
+        public UnitOfWork(AccessPointMapDbContext dbContext)
+        {
+            _dbcontext = dbContext ??
+                throw new ArgumentNullException(nameof(dbContext));
+        }
 
         public IIdentityRepository IdentityRepository
         {

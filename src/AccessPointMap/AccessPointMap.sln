@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Domain", "Ac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Domain.Core", "AccessPointMap.Domain.Core\AccessPointMap.Domain.Core.csproj", "{F95F507E-FB96-4234-9715-92DA5FCF1D87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Domain.Test", "AccessPointMap.Domain.Test\AccessPointMap.Domain.Test.csproj", "{786EDADD-DAA7-462E-8BE2-4037AA96B1DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Domain.Test", "AccessPointMap.Domain.Test\AccessPointMap.Domain.Test.csproj", "{786EDADD-DAA7-462E-8BE2-4037AA96B1DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Infrastructure.Core", "AccessPointMap.Infrastructure.Core\AccessPointMap.Infrastructure.Core.csproj", "{236100A6-27DD-416C-8160-F2BF30CE2BAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Infrastructure.Core", "AccessPointMap.Infrastructure.Core\AccessPointMap.Infrastructure.Core.csproj", "{236100A6-27DD-416C-8160-F2BF30CE2BAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Infrastructure.MySql", "AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj", "{41501E70-8A2D-4999-B5DA-398365B51D1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Infrastructure.MySql", "AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj", "{41501E70-8A2D-4999-B5DA-398365B51D1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application", "AccessPointMap.Application\AccessPointMap.Application.csproj", "{0A1DB47B-5E54-4C1A-92E2-B911446E2936}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41501E70-8A2D-4999-B5DA-398365B51D1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A1DB47B-5E54-4C1A-92E2-B911446E2936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A1DB47B-5E54-4C1A-92E2-B911446E2936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A1DB47B-5E54-4C1A-92E2-B911446E2936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A1DB47B-5E54-4C1A-92E2-B911446E2936}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
