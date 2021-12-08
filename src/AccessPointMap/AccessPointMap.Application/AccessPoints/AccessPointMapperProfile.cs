@@ -21,7 +21,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SerializedSecurityPayload, m => m.MapFrom(s => s.Security.SerializedSecurityPayload))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure));
 
-            CreateMap<AccessPoint, AccessPointDetailsUnauthorized>()
+            CreateMap<AccessPoint, AccessPointDetails>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
                 .ForMember(d => d.Bssid, m => m.MapFrom(s => s.Bssid.Value))
                 .ForMember(d => d.Manufacturer, m => m.MapFrom(s => s.Manufacturer.Value))
@@ -44,7 +44,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.Stamps, m => m.MapFrom(s => s.Stamps));
 
-            CreateMap<AccessPoint, AccessPointDetailsAuthorized>()
+            CreateMap<AccessPoint, AccessPointDetailsAdministration>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
                 .ForMember(d => d.Bssid, m => m.MapFrom(s => s.Bssid.Value))
                 .ForMember(d => d.Manufacturer, m => m.MapFrom(s => s.Manufacturer.Value))

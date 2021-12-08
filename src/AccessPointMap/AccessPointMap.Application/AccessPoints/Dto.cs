@@ -19,7 +19,7 @@ namespace AccessPointMap.Application.AccessPoints
             public bool IsSecure { get; set; }
         }
 
-        public class AccessPointDetailsUnauthorized
+        public class AccessPointDetails
         {
             public Guid Id { get; set; }
             public string Bssid { get; set; }
@@ -44,7 +44,7 @@ namespace AccessPointMap.Application.AccessPoints
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
         }
 
-        public class AccessPointDetailsAuthorized
+        public class AccessPointDetailsAdministration
         {
             public Guid Id { get; set; }
             public string Bssid { get; set; }
