@@ -386,3 +386,9 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# ASP.NET Core Development app settings
+*.Development.json
+
+# ASP.NET Core properties
+launchSettings.json
