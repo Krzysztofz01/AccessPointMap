@@ -31,8 +31,4 @@
     <ProjectReference Include="..\AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
