@@ -1,5 +1,4 @@
 ﻿using AccessPointMap.Infrastructure.Core.Abstraction;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace AccessPointMap.Application.Integration.Core
@@ -7,7 +6,7 @@ namespace AccessPointMap.Application.Integration.Core
     public abstract class AccessPointIntegrationBase<TIntegration> where TIntegration : AccessPointIntegrationBase<TIntegration>
     {
         protected readonly IUnitOfWork _unitOfWork;
-        protected readonly ILogger<TIntegration> _logger;
+        protected readonly IScopeWrapperService _scopeWrapperService;
 
         protected abstract string IntegrationName { get; }
         protected abstract string IntegrationDescription { get; }
@@ -15,13 +14,13 @@ namespace AccessPointMap.Application.Integration.Core
 
         private AccessPointIntegrationBase() { }
 
-        public AccessPointIntegrationBase(IUnitOfWork unitOfWork, ILogger<TIntegration> logger)
+        public AccessPointIntegrationBase(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
 
-            _logger = logger ??
-                throw new ArgumentNullException(nameof(logger));
+            _scopeWrapperService = scopeWrapperService ??
+                throw new ArgumentNullException(nameof(scopeWrapperService));
         }
 
         public override string ToString() =>

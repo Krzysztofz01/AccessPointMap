@@ -26,5 +26,12 @@ namespace AccessPointMap.API.Utility
 
             return new OkObjectResult(mappedResult);
         }
+
+        public static async Task<IActionResult> IntegrationServiceCommand<TRequest>(TRequest request, Func<TRequest, Task> serviceMethod)
+        {
+            await serviceMethod(request);
+
+            return new OkResult();
+        }
     }
 }

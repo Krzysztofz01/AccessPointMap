@@ -25,6 +25,8 @@ namespace AccessPointMap.API
 
             services.AddApplicationServices();
 
+            services.AddIntegrationServices();
+
             services.AddMapper();
 
             services.AddBackgroundJobs();
