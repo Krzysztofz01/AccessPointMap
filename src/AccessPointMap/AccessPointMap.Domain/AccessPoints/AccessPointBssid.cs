@@ -19,7 +19,7 @@ namespace AccessPointMap.Domain.AccessPoints
             if (value.Length != _bssidLength)
                 throw new ValueObjectValidationException("Invalud access point bssid format");
 
-            Value = value;
+            Value = value.ToUpper();
         }
 
         public static implicit operator string(AccessPointBssid bssid) => bssid.Value;

@@ -49,6 +49,8 @@ namespace AccessPointMap.Application.Integration.Wigle
 
             foreach (var record in csv.GetRecords<AccessPointRecord>())
             {
+                if (record.Type.ToUpper() != "WIFI") continue;
+
                 if (await _unitOfWork.AccessPointRepository.Exists(record.Mac))
                 {
                     await CreateAccessPointStamp(record);

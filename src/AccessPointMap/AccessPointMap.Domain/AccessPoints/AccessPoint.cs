@@ -76,6 +76,7 @@ namespace AccessPointMap.Domain.AccessPoints
 
         //TODO: Separate merge for measurement-dependent and time-dependent data
         //TODO: The creation should be defined by scan date and not update date
+        //TODO: Check for default frequency, because of integration inconsistency
         private void When(V1.AccessPointMergedWithStamp @event)
         {
             var stamp = _stamps
