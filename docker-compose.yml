@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  database:
+    container_name: database-mariadb
+    image: linuxserver/mariadb
+    restart: unless-stopped
+    volumes:
+      - ./apm-database:/var/lib/mysql
+    ports:
+      - "6002:3306"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD= #Entry value
+      - TZ=Europe/Warsaw
+  api:
+    container_name: api
+    build: ./src/AccessPointMap.API/
+    volumes:
+      - ./apm-api-log:/var/apm/logs #Set in appsettings.json
+    ports:
+      - "6001:80"
+    depends_on:
+      - database
+volumes:
+  apm-database:
+  apm-api-log:
