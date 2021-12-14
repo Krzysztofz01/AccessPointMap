@@ -4,6 +4,7 @@ using AccessPointMap.Domain.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AccessPointMap.API.Utility
 {
@@ -23,6 +24,36 @@ namespace AccessPointMap.API.Utility
             if (result is null) return new NotFoundResult();
 
             var mappedResult = mapper.Map<TResponseDto>(result);
+
+            return new OkObjectResult(mappedResult);
+        }
+
+        public static async Task<IActionResult> MapCachedQuery<TResponse, TResponseDto>(Task<TResponse> query, IMapper mapper, string endpoint, IMemoryCache memoryCache)
+        {
+            memoryCache.TryGetValue(endpoint, out string response);
+
+            if (!string.IsNullOrEmpty(response)) return new OkObjectResult(response);
+
+            var result = await query;
+
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTime.Now.AddMinutes(5),
+                Priority = CacheItemPriority.Normal,
+                SlidingExpiration = TimeSpan.FromMinutes(2),
+                Size = 4096
+            };
+
+            if (result is null)
+            {
+                memoryCache.Set(endpoint, result, cacheOptions);
+
+                return new NotFoundResult();
+            }
+
+            var mappedResult = mapper.Map<TResponseDto>(result);
+
+            memoryCache.Set(endpoint, mappedResult, cacheOptions);
 
             return new OkObjectResult(mappedResult);
         }
