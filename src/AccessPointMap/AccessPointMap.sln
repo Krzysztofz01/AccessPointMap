@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Integration.Wigle", "AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj", "{B9F1D362-8006-4C56-B997-8351009821F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Oui.MacTwoVendor", "AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj", "{776B06CF-97D0-45A3-BDFC-9970DC8F9653}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Oui.MacTwoVendor", "AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj", "{776B06CF-97D0-45A3-BDFC-9970DC8F9653}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Oui.Core", "AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj", "{1C0E0A3D-CFA0-472E-AE02-297811BCE643}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Oui.Core", "AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj", "{1C0E0A3D-CFA0-472E-AE02-297811BCE643}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Integration.Aircrackng", "AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj", "{CD780243-6723-4A08-89F1-0E2603984D22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{1C0E0A3D-CFA0-472E-AE02-297811BCE643}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C0E0A3D-CFA0-472E-AE02-297811BCE643}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C0E0A3D-CFA0-472E-AE02-297811BCE643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD780243-6723-4A08-89F1-0E2603984D22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD780243-6723-4A08-89F1-0E2603984D22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD780243-6723-4A08-89F1-0E2603984D22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD780243-6723-4A08-89F1-0E2603984D22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
