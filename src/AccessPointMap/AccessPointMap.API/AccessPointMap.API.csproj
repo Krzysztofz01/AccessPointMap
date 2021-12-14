@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj" />

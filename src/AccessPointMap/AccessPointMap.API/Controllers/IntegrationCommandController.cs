@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.API.Utility;
+using AccessPointMap.Application.Integration.Aircrackng;
 using AccessPointMap.Application.Integration.Wigle;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace AccessPointMap.API.Controllers
     public class IntegrationCommandController : ControllerBase
     {
         private readonly IWigleIntegrationService _wigleIntegrationService;
+        private readonly IAircrackngIntegrationService _aircrackIntegrationService;
 
         public IntegrationCommandController(IWigleIntegrationService wigleIntegrationService)
         {
@@ -22,7 +24,11 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpPost("wigle")]
-        public async Task<IActionResult> CreateFromWigle(Requests.Create request) =>
+        public async Task<IActionResult> CreateFromWigle(Application.Integration.Wigle.Requests.Create request) =>
             await RequestHandler.IntegrationServiceCommand(request, _wigleIntegrationService.Create);
+
+        [HttpPost("aircrackng")]
+        public async Task<IActionResult> CreateFromAircrackng(Application.Integration.Aircrackng.Requests.Create request) =>
+            await RequestHandler.IntegrationServiceCommand(request, _aircrackIntegrationService.Create);
     }
 }
