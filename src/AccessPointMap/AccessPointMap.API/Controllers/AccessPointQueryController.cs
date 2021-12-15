@@ -51,5 +51,21 @@ namespace AccessPointMap.API.Controllers
         [HttpGet("search/{keyword}")]
         public async Task<IActionResult> GetByKeyword(string keyword) =>
             await RequestHandler.MapQuery<IEnumerable<AccessPoint>, IEnumerable<AccessPointSimple>>(_dataAccess.AccessPoints.SearchByKeyword(keyword), _mapper);
+
+        [HttpGet("statistics/signal")]
+        public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange([FromQuery] int? limit) =>
+            throw new NotImplementedException();
+
+        [HttpGet("statistics/frequency")]
+        public async Task<IActionResult> GetStatisticsMostCommonUsedFrequency([FromQuery] int? limit) =>
+            throw new NotImplementedException();
+
+        [HttpGet("statistics/manufacturer")]
+        public async Task<IActionResult> GetStatisticsMostCommonUsedManufacturer([FromQuery] int? limit) =>
+            throw new NotImplementedException();
+
+        [HttpGet("statistics/encryption")]
+        public async Task<IActionResult> GetStatisticsMostCommonUsedEncryption([FromQuery] int? limit) =>
+            throw new NotImplementedException();
     }
 }
