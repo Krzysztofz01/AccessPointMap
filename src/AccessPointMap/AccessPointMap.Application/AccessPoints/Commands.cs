@@ -70,25 +70,25 @@ namespace AccessPointMap.Application.AccessPoints
                 public string Ssid { get; set; }
 
                 [Required]
-                public double Frequency { get; set; }
+                public double? Frequency { get; set; }
 
                 [Required]
-                public int LowSignalLevel { get; set; }
+                public int? LowSignalLevel { get; set; }
 
                 [Required]
-                public double LowSignalLatitude { get; set; }
+                public double? LowSignalLatitude { get; set; }
 
                 [Required]
-                public double LowSignalLongitude { get; set; }
+                public double? LowSignalLongitude { get; set; }
 
                 [Required]
-                public int HighSignalLevel { get; set; }
+                public int? HighSignalLevel { get; set; }
 
                 [Required]
-                public double HighSignalLatitude { get; set; }
+                public double? HighSignalLatitude { get; set; }
 
                 [Required]
-                public double HighSignalLongitude { get; set; }
+                public double? HighSignalLongitude { get; set; }
 
                 [Required]
                 public string RawSecurityPayload { get; set; }

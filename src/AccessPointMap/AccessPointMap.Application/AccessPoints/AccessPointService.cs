@@ -33,7 +33,7 @@ namespace AccessPointMap.Application.AccessPoints
                 case V1.Update c: await Apply(c.Id, new AccessPointUpdated { Id = c.Id, Note = c.Note }); break;
                 case V1.ChangeDisplayStatus c: await Apply(c.Id, new AccessPointDisplayStatusChanged { Id = c.Id, Status = c.Status }); break;
                 case V1.MergeWithStamp c: await Apply(c.Id, new AccessPointMergedWithStamp { Id = c.Id, StampId = c.StampId }); break;
-                case V1.DeleteStamp c: await Apply(c.Id, new AccessPointStampDeleted { Id = c.Id, StampId = c.Id }); break;
+                case V1.DeleteStamp c: await Apply(c.Id, new AccessPointStampDeleted { Id = c.Id, StampId = c.StampId }); break;
 
                 default: throw new InvalidOperationException("This command is not supported.");
             }
@@ -64,13 +64,13 @@ namespace AccessPointMap.Application.AccessPoints
                     {
                         Id = accessPoint.Id,
                         Ssid = ap.Ssid,
-                        Frequency = ap.Frequency,
-                        LowSignalLevel = ap.LowSignalLevel,
-                        LowSignalLatitude = ap.LowSignalLatitude,
-                        LowSignalLongitude = ap.LowSignalLongitude,
-                        HighSignalLevel = ap.HighSignalLevel,
-                        HighSignalLatitude = ap.HighSignalLatitude,
-                        HighSignalLongitude = ap.HighSignalLongitude,
+                        Frequency = ap.Frequency.Value,
+                        LowSignalLevel = ap.LowSignalLevel.Value,
+                        LowSignalLatitude = ap.LowSignalLatitude.Value,
+                        LowSignalLongitude = ap.LowSignalLongitude.Value,
+                        HighSignalLevel = ap.HighSignalLevel.Value,
+                        HighSignalLatitude = ap.HighSignalLatitude.Value,
+                        HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId
                     });
@@ -83,13 +83,13 @@ namespace AccessPointMap.Application.AccessPoints
                     {
                         Bssid = ap.Bssid,
                         Ssid = ap.Ssid,
-                        Frequency = ap.Frequency,
-                        LowSignalLevel = ap.LowSignalLevel,
-                        LowSignalLatitude = ap.LowSignalLatitude,
-                        LowSignalLongitude = ap.LowSignalLongitude,
-                        HighSignalLevel = ap.HighSignalLevel,
-                        HighSignalLatitude = ap.HighSignalLatitude,
-                        HighSignalLongitude = ap.HighSignalLongitude,
+                        Frequency = ap.Frequency.Value,
+                        LowSignalLevel = ap.LowSignalLevel.Value,
+                        LowSignalLatitude = ap.LowSignalLatitude.Value,
+                        LowSignalLongitude = ap.LowSignalLongitude.Value,
+                        HighSignalLevel = ap.HighSignalLevel.Value,
+                        HighSignalLatitude = ap.HighSignalLatitude.Value,
+                        HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId
                     });
