@@ -79,6 +79,8 @@ namespace AccessPointMap.Domain.AccessPoints
         //TODO: Check for default frequency, because of integration inconsistency
         //TODO: ValueObject helper collections should be static
         //TODO: Move all constants to one place
+        //TODO: More selective merge options
+        //TODO: More ,,freedom'' in update??
         private void When(V1.AccessPointMergedWithStamp @event)
         {
             var stamp = _stamps
