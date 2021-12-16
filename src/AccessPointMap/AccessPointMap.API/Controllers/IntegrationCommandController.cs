@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.API.Utility;
 using AccessPointMap.Application.Integration.Wigle;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpPost("wigle")]
-        public async Task<IActionResult> CreateFromWigle(Requests.Create request) =>
-            await RequestHandler.IntegrationServiceCommand(request, _wigleIntegrationService.Create);
+        public async Task<IActionResult> CreateFromWigle([FromForm] IFormFile csvDatabaseFile) =>
+            await RequestHandler.IntegrationServiceCommand(new Requests.Create { CsvDatabaseFile = csvDatabaseFile }, _wigleIntegrationService.Create);
     }
 }
