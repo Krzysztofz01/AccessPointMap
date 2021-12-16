@@ -1,4 +1,6 @@
-﻿using Hangfire;
+﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.AccessPoints;
+using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +25,8 @@ namespace AccessPointMap.API.Configuration
 
             services.AddHangfireServer();
 
+            services.AddScoped<IAccessPointBackgroundJobs, AccessPointBackgroundJobs>();
+
             return services;
         }
 
@@ -32,6 +36,9 @@ namespace AccessPointMap.API.Configuration
             {
                 app.UseHangfireDashboard();
             }
+
+            jobs.AddOrUpdate("AccessPointUpdateManufacturer", () => service
+                .GetService<IAccessPointBackgroundJobs>().SetAccessPointManufacturer(), Cron.Daily);
 
             return app;
         }
