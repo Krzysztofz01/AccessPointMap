@@ -6,7 +6,7 @@ namespace AccessPointMap.API.Configuration
     {
         public static IServiceCollection AddCaching(this IServiceCollection services)
         {
-            services.AddCaching();
+            services.AddMemoryCache();
 
             return services;
         }
