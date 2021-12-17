@@ -38,25 +38,31 @@ namespace AccessPointMap.Application.Integration.Aircrackng.Models
         [Index(10)]
         public string Type { get; set; }
 
-        public AccessPointFull ToFull()
+        [Ignore]
+        private int _lowSignalLevel;
+        [Ignore]
+        public int LowSignalLevel
         {
-            return new AccessPointFull
-            {
-                LocalTimestamp = LocalTimestamp,
-                GpsTimestamp = GpsTimestamp,
-                Ssid = Ssid,
-                Bssid = Bssid,
-                Security = Security,
-                LowPower = Power,
-                LowLatitude = Latitude,
-                LowLongitude = Longitude,
-                HighPower = Power,
-                HighLatitude = Latitude,
-                HighLongitude = Longitude,
-                LatitudeError = LatitudeError,
-                LongitudeError = LongitudeError,
-                Type = Type
-            };
+            get => (_lowSignalLevel == default) ? Power : _lowSignalLevel;
+            set => _lowSignalLevel = value;
+        }
+
+        [Ignore]
+        private double _lowLatitude;
+        [Ignore]
+        public double LowLatitude
+        {
+            get => (_lowLatitude == default) ? Latitude : _lowLatitude;
+            set => _lowLatitude = value;
+        }
+
+        [Ignore]
+        private double _lowLongitude;
+        [Ignore]
+        public double LowLongitude
+        {
+            get => (_lowLongitude == default) ? Longitude : _lowLongitude;
+            set => _lowLongitude = value;
         }
     }
 }

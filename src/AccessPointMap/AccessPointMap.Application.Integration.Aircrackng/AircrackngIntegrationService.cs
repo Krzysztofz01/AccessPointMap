@@ -16,6 +16,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
     public class AircrackngIntegrationService : AccessPointIntegrationBase<AircrackngIntegrationService>, IAircrackngIntegrationService
     {
         private readonly string[] _allowedExtensions = new string[] { ".csv" };
+        private readonly string _allowedType = "AP";
 
         private const string _integrationName = "Aircrack-ng";
         private const string _integrationDescription = "Integration for the popular WiFi security auditing tools suite.";
@@ -60,38 +61,38 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             await _unitOfWork.Commit();
         }
 
-        private IEnumerable<AccessPointFull> ParseAccessPointDumps(IFormFile csvFile)
+        private IEnumerable<AccessPointRecord> ParseAccessPointDumps(IFormFile csvFile)
         {
             using var sr = new StreamReader(csvFile.OpenReadStream());
 
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
-            var accessPoints = new Dictionary<string, AccessPointFull>();
+            var accessPoints = new Dictionary<string, AccessPointRecord>();
 
             foreach (var record in csv.GetRecords<AccessPointRecord>())
             {
-                if (record.Type != "AP") continue;
+                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
                 if (!accessPoints.ContainsKey(record.Bssid))
                 {
-                    accessPoints.Add(record.Bssid, record.ToFull());
+                    accessPoints.Add(record.Bssid, record);
                     continue;
                 }
 
                 var accessPoint = accessPoints[record.Bssid];
 
-                if (record.Power < accessPoint.LowPower)
+                if (record.Power < accessPoint.Power)
                 {
-                    accessPoint.LowPower = record.Power;
-                    accessPoint.LowLatitude = record.Latitude;
-                    accessPoint.LowLongitude = record.Longitude;
+                    accessPoint.Power = record.Power;
+                    accessPoint.Latitude = record.Latitude;
+                    accessPoint.Latitude = record.Longitude;
                 }
 
-                if (record.Power > accessPoint.HighPower)
+                if (record.LowSignalLevel > accessPoint.LowSignalLevel)
                 {
-                    accessPoint.HighPower = record.Power;
-                    accessPoint.HighLatitude = record.Latitude;
-                    accessPoint.HighLongitude = record.Longitude;
+                    accessPoint.LowSignalLevel = record.LowSignalLevel;
+                    accessPoint.LowLatitude = record.LowLatitude;
+                    accessPoint.LowLongitude = record.LowLongitude;
                 }
 
                 accessPoints[record.Bssid] = accessPoint;
@@ -100,19 +101,19 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             return accessPoints.Select(a => a.Value);
         }
 
-        private async Task CreateAccessPoint(AccessPointFull record)
+        private async Task CreateAccessPoint(AccessPointRecord record)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
                 Bssid = record.Bssid,
                 Ssid = record.Ssid,
                 Frequency = _defaultFrequencyValue,
-                LowSignalLevel = record.LowPower,
+                LowSignalLevel = record.LowSignalLevel,
                 LowSignalLatitude = record.LowLatitude,
                 LowSignalLongitude = record.LowLongitude,
-                HighSignalLevel = record.HighPower,
-                HighSignalLatitude = record.HighLatitude,
-                HighSignalLongitude = record.HighLongitude,
+                HighSignalLevel = record.Power,
+                HighSignalLatitude = record.Latitude,
+                HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
                 UserId = _scopeWrapperService.GetUserId()
             });
@@ -120,7 +121,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             await _unitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointFull record)
+        private async Task CreateAccessPointStamp(AccessPointRecord record)
         {
             var accessPoint = await _unitOfWork.AccessPointRepository.Get(record.Bssid);
 
@@ -129,12 +130,12 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 Id = accessPoint.Id,
                 Ssid = record.Ssid,
                 Frequency = _defaultFrequencyValue,
-                LowSignalLevel = record.LowPower,
+                LowSignalLevel = record.LowSignalLevel,
                 LowSignalLatitude = record.LowLatitude,
                 LowSignalLongitude = record.LowLongitude,
-                HighSignalLevel = record.HighPower,
-                HighSignalLatitude = record.HighLatitude,
-                HighSignalLongitude = record.HighLongitude,
+                HighSignalLevel = record.Power,
+                HighSignalLatitude = record.Latitude,
+                HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
                 UserId = _scopeWrapperService.GetUserId()
             });
