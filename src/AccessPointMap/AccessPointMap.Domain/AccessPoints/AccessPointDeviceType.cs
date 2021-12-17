@@ -1,22 +1,11 @@
 ﻿using AccessPointMap.Domain.Core.Extensions;
 using AccessPointMap.Domain.Core.Models;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace AccessPointMap.Domain.AccessPoints
 {
     public class AccessPointDeviceType : ValueObject<AccessPointDeviceType>
     {
-        private readonly IReadOnlyDictionary<IEnumerable<string>, string> _deviceTypeDictionary = new Dictionary<IEnumerable<string>, string>
-        {
-            { new string[] { "printer", "print", "jet" }, "Printer" },
-            { new string[] { "hotspot" }, "Access point" },
-            { new string[] { "tv", "bravia" }, "Tv" },
-            { new string[] { "cctv", "cam", "iptv", "monitoring" }, "Cctv" },
-            { new string[] { "repeater", "extender" }, "Repeater" },
-            { new string[] { "iot" }, "IoT" }
-        };
-
         private const string _defaultDeviceType = "Unknown";
         public static string DefaultDeviceType => _defaultDeviceType;
 
@@ -31,7 +20,8 @@ namespace AccessPointMap.Domain.AccessPoints
                 return;
             }
 
-            Value = _deviceTypeDictionary
+            //TODO Search keywoard in ssid and not ssid in keywoard
+            Value = Constants.DeviceTypeDictionary
                 .Where(d => d.Key
                     .Any(k => k.Contains(value
                         .Trim()
