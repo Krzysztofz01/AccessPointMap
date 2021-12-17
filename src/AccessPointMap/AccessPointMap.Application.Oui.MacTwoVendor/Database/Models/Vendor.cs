@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AccessPointMap.Application.Oui.MacToVendor.Database.Models
 {
+    [Table("vendordb")]
     public class Vendor
     {
+        [Key]
         [Column("mac")]
         public int MacAddress { get; set; }
         
