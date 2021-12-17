@@ -1,5 +1,4 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
-using AccessPointMap.Domain.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -63,8 +62,8 @@ namespace AccessPointMap.Application.AccessPoints
         {
             return await accessPoints
                 .Where(a => a.DisplayStatus.Value)
-                .Where(a => a.Frequency != default)
-                .GroupBy(a => a.Frequency)
+                .Where(a => a.Frequency.Value != default)
+                .GroupBy(a => a.Frequency.Value)
                 .OrderByDescending(a => a.Count())
                 .Take(limit)
                 .Select(a => new { Frequnecy = a.Key, Count = a.Count() })
@@ -75,7 +74,7 @@ namespace AccessPointMap.Application.AccessPoints
         {
             return await accessPoints
                 .Where(a => a.DisplayStatus.Value)
-                .Where(a => !a.Manufacturer.Value.IsEmpty())
+                .Where(a => !string.IsNullOrEmpty(a.Manufacturer.Value))
                 .GroupBy(a => a.Manufacturer.Value)
                 .OrderByDescending(a => a.Count())
                 .Take(limit)
