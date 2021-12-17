@@ -1,10 +1,10 @@
-﻿using AccessPointMap.API.Utility;
+﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.AccessPoints;
-using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,44 +12,124 @@ using static AccessPointMap.Application.AccessPoints.Dto;
 
 namespace AccessPointMap.API.Controllers
 {
-    [ApiController]
     [Route("api/v{version:apiVersion}/accesspoints")]
     [ApiVersion("1.0")]
-    [Authorize]
-    public class AccessPointQueryController : ControllerBase
+    public class AccessPointQueryController : QueryController
     {
-        private readonly IDataAccess _dataAccess;
-        private readonly IMapper _mapper;
+        private const int _defaultLimit = 100;
 
-        public AccessPointQueryController(IDataAccess dataAccess, IMapper mapper)
+        public AccessPointQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache) : base(dataAccess, mapper, memoryCache)
         {
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
-
-            _mapper = mapper ??
-                throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() =>
-            await RequestHandler.MapQuery<IEnumerable<AccessPoint>, IEnumerable<AccessPointSimple>>(_dataAccess.AccessPoints.GetAllAccessPoints(), _mapper);
+        public async Task<IActionResult> GetAll()
+        {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
+            var response = await _dataAccess.AccessPoints.GetAllAccessPoints();
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            StoreToCache(mappedResponse);
+
+            return Ok(mappedResponse);
+        }
 
         [HttpGet("full")]
         [Authorize(Roles = "Admin, Support")]
-        public async Task<IActionResult> GetAllFull() =>
-            await RequestHandler.MapQuery<IEnumerable<AccessPoint>, IEnumerable<AccessPointSimple>>(_dataAccess.AccessPoints.GetAllAccessPointsAdministration(), _mapper);
+        public async Task<IActionResult> GetAllFull()
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration();
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
 
         [HttpGet("{accessPointId}")]
-        public async Task<IActionResult> GetById(Guid accessPointId) =>
-            await RequestHandler.MapQuery<AccessPoint, AccessPointDetails>(_dataAccess.AccessPoints.GetAccessPointById(accessPointId), _mapper);
+        public async Task<IActionResult> GetById(Guid accessPointId)
+        {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
+            var response = await _dataAccess.AccessPoints.GetAccessPointById(accessPointId);
+
+            var mappedResponse = MapToDto<AccessPointDetails>(response);
+
+            StoreToCache(mappedResponse);
+
+            return Ok(mappedResponse);
+        }
 
         [HttpGet("{accessPointId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        public async Task<IActionResult> GetByIdFull(Guid accessPointId) =>
-            await RequestHandler.MapQuery<AccessPoint, AccessPointDetailsAdministration>(_dataAccess.AccessPoints.GetAccessPointByIdAdministration(accessPointId), _mapper);
+        public async Task<IActionResult> GetByIdFull(Guid accessPointId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAccessPointByIdAdministration(accessPointId);
 
-        [HttpGet("search/{keyword}")]
-        public async Task<IActionResult> GetByKeyword(string keyword) =>
-            await RequestHandler.MapQuery<IEnumerable<AccessPoint>, IEnumerable<AccessPointSimple>>(_dataAccess.AccessPoints.SearchByKeyword(keyword), _mapper);
+            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
+
+            return Ok(mappedResponse);
+        }
+        
+        [HttpGet("search")]
+        public async Task<IActionResult> GetByKeyword([FromQuery] string keyword)
+        {
+            var response = await _dataAccess.AccessPoints.SearchByKeyword(keyword);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+            
+        [HttpGet("statistics/signal")]
+        public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange([FromQuery] int? limit)
+        {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
+            var response = await _dataAccess.AccessPoints
+                .GetAccessPointsWithGreatestSignalRange(limit ?? _defaultLimit);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            StoreToCache(mappedResponse);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("statistics/frequency")]
+        public async Task<IActionResult> GetStatisticsMostCommonUsedFrequency([FromQuery] int? limit)
+        {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
+            var response = await _dataAccess.AccessPoints
+                .GetMostCommonUsedFrequency(limit ?? _defaultLimit);
+
+            StoreToCache(response);
+
+            return Ok(response);
+        }
+
+        [HttpGet("statistics/manufacturer")]
+        public async Task<IActionResult> GetStatisticsMostCommonUsedManufacturer([FromQuery] int? limit)
+        {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
+            var response = await _dataAccess.AccessPoints
+                .GetMostCommonUsedManufacturer(limit ?? _defaultLimit);
+
+            StoreToCache(response);
+
+            return Ok(response);
+        }
+
+        [HttpGet("statistics/encryption")]
+        public async Task<IActionResult> GetStatisticsMostCommonUsedEncryption([FromQuery] int? limit) =>
+            throw new NotImplementedException();
     }
 }

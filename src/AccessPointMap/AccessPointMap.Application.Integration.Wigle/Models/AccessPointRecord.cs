@@ -37,5 +37,33 @@ namespace AccessPointMap.Application.Integration.Wigle.Models
 
         [Index(10)]
         public string Type { get; set; }
+
+
+        [Ignore]
+        private int _lowSignalLevel;
+        [Ignore]
+        public int LowSignalLevel
+        {
+            get => (_lowSignalLevel == default) ? Rssi : _lowSignalLevel;
+            set => _lowSignalLevel = value;
+        }
+
+        [Ignore]
+        private double _lowLatitude;
+        [Ignore]
+        public double LowLatitude
+        {
+            get => (_lowLatitude == default) ? Latitude : _lowLatitude;
+            set => _lowLatitude = value;
+        }
+
+        [Ignore]
+        private double _lowLongitude;
+        [Ignore]
+        public double LowLongitude
+        {
+            get => (_lowLongitude == default) ? Longitude : _lowLongitude;
+            set => _lowLongitude = value;
+        }
     }
 }

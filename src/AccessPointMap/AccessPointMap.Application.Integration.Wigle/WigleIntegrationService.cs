@@ -5,6 +5,7 @@ using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace AccessPointMap.Application.Integration.Wigle
     public class WigleIntegrationService : AccessPointIntegrationBase<WigleIntegrationService>, IWigleIntegrationService
     {
         private readonly string[] _allowedExtensions = new string[] { ".csv" };
+        private readonly string _allowedType = "WIFI";
 
         private const string _integrationName = "WiGLE";
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
@@ -45,11 +47,18 @@ namespace AccessPointMap.Application.Integration.Wigle
 
             using var sr = new StreamReader(request.CsvDatabaseFile.OpenReadStream());
 
+            // This line will shift the stream by one line to avoid the header
+            sr.ReadLine();
+
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
-            foreach (var record in csv.GetRecords<AccessPointRecord>())
+            var records = csv.GetRecords<AccessPointRecord>()
+                .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
+                .ToList();
+
+            foreach (var record in records)
             {
-                if (record.Type.ToUpper() != "WIFI") continue;
+                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
                 if (await _unitOfWork.AccessPointRepository.Exists(record.Mac))
                 {
@@ -101,6 +110,30 @@ namespace AccessPointMap.Application.Integration.Wigle
                 RawSecurityPayload = record.AuthMode,
                 UserId = _scopeWrapperService.GetUserId()
             });
+        }
+
+        private AccessPointRecord CombineRecords(IEnumerable<AccessPointRecord> records)
+        {
+            var accessPoint = records.First();
+
+            foreach(var record in records)
+            {
+                if (accessPoint.Rssi < record.Rssi)
+                {
+                    accessPoint.Rssi = record.Rssi;
+                    accessPoint.Latitude = record.Latitude;
+                    accessPoint.Longitude = record.Longitude;
+                }
+
+                if (accessPoint.LowSignalLevel > record.LowSignalLevel)
+                {
+                    accessPoint.LowSignalLevel = record.LowSignalLevel;
+                    accessPoint.LowLatitude = record.LowLatitude;
+                    accessPoint.LowLongitude = record.LowLongitude;
+                }
+            }
+
+            return accessPoint;
         }
     }
 }

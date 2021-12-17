@@ -31,6 +31,8 @@ namespace AccessPointMap.API
 
             services.AddBackgroundJobs();
 
+            services.AddCaching();
+
             services.AddWebUtilities();
         }
 

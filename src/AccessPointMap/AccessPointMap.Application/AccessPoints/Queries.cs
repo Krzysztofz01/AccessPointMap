@@ -48,5 +48,43 @@ namespace AccessPointMap.Application.AccessPoints
                     a.Security.RawSecurityPayload.ToLower().Contains(kw))
                 .ToListAsync();
         }
+
+        public static async Task<IEnumerable<AccessPoint>> GetAccessPointsWithGreatestSignalRange(this IQueryable<AccessPoint> accessPoints, int limit)
+        {
+            return await accessPoints
+                .Where(x => x.DisplayStatus.Value)
+                .OrderByDescending(a => a.Positioning.SignalArea)
+                .Take(limit)
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<object>> GetMostCommonUsedFrequency(this IQueryable<AccessPoint> accessPoints, int limit)
+        {
+            return await accessPoints
+                .Where(a => a.DisplayStatus.Value)
+                .Where(a => a.Frequency.Value != default)
+                .GroupBy(a => a.Frequency.Value)
+                .OrderByDescending(a => a.Count())
+                .Take(limit)
+                .Select(a => new { Frequnecy = a.Key, Count = a.Count() })
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<object>> GetMostCommonUsedManufacturer(this IQueryable<AccessPoint> accessPoints, int limit)
+        {
+            return await accessPoints
+                .Where(a => a.DisplayStatus.Value)
+                .Where(a => !string.IsNullOrEmpty(a.Manufacturer.Value))
+                .GroupBy(a => a.Manufacturer.Value)
+                .OrderByDescending(a => a.Count())
+                .Take(limit)
+                .Select(a => new { Manufacturer = a.Key, Count = a.Count() })
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<object>> GetMostCommonUsedEncryptionTypes(this IQueryable<AccessPoint> accessPoints, int limit)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
