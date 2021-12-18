@@ -11,6 +11,5 @@ namespace AccessPointMap.Domain.AccessPoints
         public static implicit operator DateTime(AccessPointCreationTimestamp creationTimestamp) => creationTimestamp.Value;
 
         public static AccessPointCreationTimestamp FromDateTime(DateTime date) => new AccessPointCreationTimestamp(date);
-        public static AccessPointCreationTimestamp Now => new AccessPointCreationTimestamp(DateTime.Now);
     }
 }

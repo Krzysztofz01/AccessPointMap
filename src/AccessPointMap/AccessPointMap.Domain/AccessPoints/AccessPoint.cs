@@ -74,8 +74,6 @@ namespace AccessPointMap.Domain.AccessPoints
             Manufacturer = AccessPointManufacturer.FromString(@event.Manufacturer);
         }
 
-        //TODO: The creation should be defined by scan date and not update date
-        //TODO: More ,,freedom'' in update??
         private void When(V1.AccessPointMergedWithStamp @event)
         {
             var stamp = _stamps
@@ -193,8 +191,8 @@ namespace AccessPointMap.Domain.AccessPoints
                     Frequency = AccessPointFrequency.FromDouble(@event.Frequency),
                     DeviceType = AccessPointDeviceType.FromString(@event.Ssid),
                     ContributorId = AccessPointContributorId.FromGuid(@event.UserId),
-                    CreationTimestamp = AccessPointCreationTimestamp.Now,
-                    VersionTimestamp = AccessPointVersionTimestamp.Now,
+                    CreationTimestamp = AccessPointCreationTimestamp.FromDateTime(@event.ScanDate),
+                    VersionTimestamp = AccessPointVersionTimestamp.FromDateTime(@event.ScanDate),
                     Positioning = AccessPointPositioning.FromGpsAndRssi(
                         @event.LowSignalLevel,
                         @event.LowSignalLatitude,
