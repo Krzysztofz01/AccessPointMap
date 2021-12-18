@@ -86,7 +86,8 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
-                UserId = _scopeWrapperService.GetUserId()
+                UserId = _scopeWrapperService.GetUserId(),
+                ScanDate = record.FirstSeen
             });
 
             await _unitOfWork.AccessPointRepository.Add(accessPoint);
@@ -108,7 +109,8 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
-                UserId = _scopeWrapperService.GetUserId()
+                UserId = _scopeWrapperService.GetUserId(),
+                ScanDate = record.FirstSeen
             });
         }
 
@@ -130,6 +132,11 @@ namespace AccessPointMap.Application.Integration.Wigle
                     accessPoint.LowSignalLevel = record.LowSignalLevel;
                     accessPoint.LowLatitude = record.LowLatitude;
                     accessPoint.LowLongitude = record.LowLongitude;
+                }
+
+                if (record.FirstSeen > accessPoint.FirstSeen)
+                {
+                    accessPoint.FirstSeen = record.FirstSeen;
                 }
             }
 
