@@ -49,6 +49,10 @@ namespace AccessPointMap.Domain.AccessPoints
             {
                 public Guid Id { get; set; }
                 public Guid StampId { get; set; }
+                public bool MergeLowSignalLevel { get; set; }
+                public bool MergeHighSignalLevel { get; set; }
+                public bool MergeSsid { get; set; }
+                public bool MergeSecurityData { get; set; }
             }
 
             public class AccessPointStampCreated : IEvent

@@ -74,10 +74,7 @@ namespace AccessPointMap.Domain.AccessPoints
             Manufacturer = AccessPointManufacturer.FromString(@event.Manufacturer);
         }
 
-        //TODO: Separate merge for measurement-dependent and time-dependent data
         //TODO: The creation should be defined by scan date and not update date
-        //TODO: Check for default frequency, because of integration inconsistency
-        //TODO: More selective merge options
         //TODO: More ,,freedom'' in update??
         private void When(V1.AccessPointMergedWithStamp @event)
         {
@@ -85,8 +82,12 @@ namespace AccessPointMap.Domain.AccessPoints
                 .SkipDeleted()
                 .Single(s => s.Id == @event.StampId);
 
-            // Apply SSID related changes only if the stamp is newer than the current state
-            if (stamp.CreationTimestamp.Value > VersionTimestamp.Value)
+            AccessPointVersionTimestamp updatedTimestamp = VersionTimestamp;
+
+            // Aplly SSID related changes if:
+            // 1. The stamp is newer than the current state.
+            // 2. We set the boolean value for merging SSID.
+            if (stamp.CreationTimestamp.Value > VersionTimestamp.Value && @event.MergeSsid)
             {
                 Ssid = AccessPointSsid.FromString(stamp.Ssid);
 
@@ -96,25 +97,36 @@ namespace AccessPointMap.Domain.AccessPoints
                     DeviceType = AccessPointDeviceType.FromString(stamp.Ssid);
                 }
 
+                updatedTimestamp = AccessPointVersionTimestamp.FromDateTime(stamp.CreationTimestamp);
+            }
+
+            // Apply frequency related changes if:
+            // 1. The stamp is newer than the current state.
+            // 2. The value is not ,,default''
+            if (stamp.CreationTimestamp.Value > VersionTimestamp.Value && stamp.Frequency.Value != default)
+            {
+                Frequency = AccessPointFrequency.FromDouble(stamp.Frequency);
+            }
+
+            // Apply security data related changes if:
+            // 1. The stamp is newer than the current state.
+            // 2. We set the boolean value for merging security changes.
+            if (stamp.CreationTimestamp.Value > VersionTimestamp.Value && @event.MergeSecurityData)
+            {
                 // Append the raw security data
                 Security = AccessPointSecurity
                     .FromString($"{Security.RawSecurityPayload}-{stamp.Security.RawSecurityPayload}");
 
-                VersionTimestamp = AccessPointVersionTimestamp.FromDateTime(stamp.CreationTimestamp);
+                updatedTimestamp = AccessPointVersionTimestamp.FromDateTime(stamp.CreationTimestamp);
             }
 
-            // Compare positions in order to get most accurate data
-
+            // Apply low singnal position changes if:
+            // 1. The new low signal position level is lower
+            // 2. We set the boolean value for merging low signal position
             int lowSignalLevel = Positioning.LowSignalLevel;
             double lowSignalLatitude = Positioning.LowSignalLatitude;
             double lowSignalLongitude = Positioning.LowSignalLongitude;
-
-            int highSignalLevel = Positioning.HighSignalLevel;
-            double highSignalLatitude = Positioning.HighSignalLatitude;
-            double highSignalLongitude = Positioning.HighSignalLongitude;
-
-            // Set the position of the lowest signal strength
-            if (stamp.Positioning.LowSignalLevel < Positioning.LowSignalLevel)
+            if (stamp.Positioning.LowSignalLevel < Positioning.LowSignalLevel && @event.MergeLowSignalLevel)
             {
                 lowSignalLevel = stamp.Positioning.LowSignalLevel;
 
@@ -122,8 +134,13 @@ namespace AccessPointMap.Domain.AccessPoints
                 lowSignalLongitude = stamp.Positioning.LowSignalLongitude;
             }
 
-            // Set the position of the highest signal strength
-            if (stamp.Positioning.HighSignalLevel > Positioning.HighSignalLevel)
+            // Apply high singnal position changes if:
+            // 1. The new high signal position level is higher
+            // 2. We set the boolean value for merging high signal position
+            int highSignalLevel = Positioning.HighSignalLevel;
+            double highSignalLatitude = Positioning.HighSignalLatitude;
+            double highSignalLongitude = Positioning.HighSignalLongitude;
+            if (stamp.Positioning.HighSignalLevel > Positioning.HighSignalLevel && @event.MergeHighSignalLevel)
             {
                 highSignalLevel = stamp.Positioning.HighSignalLevel;
 
@@ -138,6 +155,8 @@ namespace AccessPointMap.Domain.AccessPoints
                 highSignalLevel,
                 highSignalLatitude,
                 highSignalLongitude);
+
+            VersionTimestamp = updatedTimestamp;
 
             // Send the domain event to stamp in order to set it as verified
             stamp.Apply(@event);
