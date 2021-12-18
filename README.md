@@ -78,4 +78,6 @@ Functionalities that need to be implemented or repaired:
 
 ( Encryption endpoint needs to be implemeneted. )
 
-🔲 All the AccessPoint [TODO's](https://github.com/Krzysztofz01/AccessPointMap/blob/master/src/AccessPointMap/AccessPointMap.Domain/AccessPoints/AccessPoint.cs#L77), all of them are related to the stamp merge functionality.
+✅ All the AccessPoint [TODO's](https://github.com/Krzysztofz01/AccessPointMap/blob/master/src/AccessPointMap/AccessPointMap.Domain/AccessPoints/AccessPoint.cs#L77), all of them are related to the stamp merge functionality.
+
+🔲 Migration from .NET5 to .NET6 LTS
