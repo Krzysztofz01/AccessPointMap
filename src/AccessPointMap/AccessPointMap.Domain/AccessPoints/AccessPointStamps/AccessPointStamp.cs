@@ -59,7 +59,7 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointStamps
                     Frequency = AccessPointFrequency.FromDouble(@event.Frequency),
                     DeviceType = AccessPointDeviceType.FromString(@event.Ssid),
                     ContributorId = AccessPointContributorId.FromGuid(@event.UserId),
-                    CreationTimestamp = AccessPointCreationTimestamp.Now,
+                    CreationTimestamp = AccessPointCreationTimestamp.FromDateTime(@event.ScanDate),
                     Positioning = AccessPointPositioning.FromGpsAndRssi(
                         @event.LowSignalLevel,
                         @event.LowSignalLatitude,

@@ -16,6 +16,9 @@ namespace AccessPointMap.Application.AccessPoints
             {
                 [Required]
                 public IEnumerable<Helpers.AccessPointV1> AccessPoints { get; set; }
+
+                [Required]
+                public DateTime? ScanDate { get; set; }
             }
 
             public class Delete : IApplicationCommand<AccessPoint>
@@ -48,6 +51,18 @@ namespace AccessPointMap.Application.AccessPoints
 
                 [Required]
                 public Guid StampId { get; set; }
+
+                [Required]
+                public bool? MergeLowSignalLevel { get; set; }
+                
+                [Required]
+                public bool? MergeHighSignalLevel { get; set; }
+                
+                [Required]
+                public bool? MergeSsid { get; set; }
+                
+                [Required]
+                public bool? MergeSecurityData { get; set; }
             }
 
             public class DeleteStamp : IApplicationCommand<AccessPoint>

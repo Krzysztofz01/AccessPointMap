@@ -20,6 +20,7 @@ namespace AccessPointMap.Domain.AccessPoints
                 public double HighSignalLongitude { get; set; }
                 public string RawSecurityPayload { get; set; }
                 public Guid UserId { get; set; }
+                public DateTime ScanDate { get; set; }
             }
 
             public class AccessPointDeleted : IEvent
@@ -49,6 +50,10 @@ namespace AccessPointMap.Domain.AccessPoints
             {
                 public Guid Id { get; set; }
                 public Guid StampId { get; set; }
+                public bool MergeLowSignalLevel { get; set; }
+                public bool MergeHighSignalLevel { get; set; }
+                public bool MergeSsid { get; set; }
+                public bool MergeSecurityData { get; set; }
             }
 
             public class AccessPointStampCreated : IEvent
@@ -64,6 +69,7 @@ namespace AccessPointMap.Domain.AccessPoints
                 public double HighSignalLongitude { get; set; }
                 public string RawSecurityPayload { get; set; }
                 public Guid UserId { get; set; }
+                public DateTime ScanDate { get; set; }
             }
 
             public class AccessPointStampDeleted : IEvent

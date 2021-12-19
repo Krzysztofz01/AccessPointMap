@@ -23,7 +23,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
         }
 
@@ -42,7 +43,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             accesspoint.Apply(new V1.AccessPointDeleted
@@ -69,7 +71,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             string noteExpectedBefore = string.Empty;
@@ -100,7 +103,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             bool statusExpectedBefore = false;
@@ -131,7 +135,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             string manufacturerExpectedBefore = string.Empty;
@@ -148,7 +153,7 @@ namespace AccessPointMap.Domain.Test
         }
 
         [Fact]
-        public void AccessPointShouldMergeWithStamp()
+        public void AccessPointShouldMergeWithStampAndAllValuesSetToMerge()
         {
             var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
             {
@@ -162,7 +167,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             int updatedLowSignalLevel = -80;
@@ -186,7 +192,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = updatedHighSignalLatitude,
                 HighSignalLongitude = updatedHighSignalLongitude,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now.AddDays(2)
             };
 
             accesspoint.Apply(stampCreationEvent);
@@ -196,7 +203,11 @@ namespace AccessPointMap.Domain.Test
             accesspoint.Apply(new V1.AccessPointMergedWithStamp
             {
                 Id = accesspoint.Id,
-                StampId = stampId
+                StampId = stampId,
+                MergeSsid = true,
+                MergeLowSignalLevel = true,
+                MergeHighSignalLevel = true,
+                MergeSecurityData = true
             });
 
             var stamp = accesspoint.Stamps.First();
@@ -210,6 +221,87 @@ namespace AccessPointMap.Domain.Test
             Assert.NotEqual(updatedHighSignalLongitude, accesspoint.Positioning.HighSignalLongitude);
 
             Assert.Equal(updatedSsid, accesspoint.Ssid);
+
+            Assert.Equal(stamp.CreationTimestamp.Value, accesspoint.VersionTimestamp.Value);
+
+            Assert.True(stamp.Status);
+        }
+
+        [Fact]
+        public void AccessPointShouldMergeWithStampAndTheLowSignalLevelAndSsidIsSkiped()
+        {
+            string initialSsid = "Test-Hotspot";
+
+            int initialLowSignalLevel = -70;
+            double initialLowSignalLatitude = 48.8583;
+            double initialLowSignalLongitude = 2.2944;
+
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = "00:00:00:00:00:00",
+                Ssid = initialSsid,
+                Frequency = 2670,
+                LowSignalLevel = initialLowSignalLevel,
+                LowSignalLatitude = initialLowSignalLatitude,
+                LowSignalLongitude = initialLowSignalLongitude,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            int updatedLowSignalLevel = -80;
+            double updatedLowSignalLatitude = 49.0;
+            double updatedLowSignalLongitude = 1.0;
+
+            int updatedHighSignalLevel = -40;
+            double updatedHighSignalLatitude = 47.0;
+            double updatedHighSignalLongitude = 1.0;
+
+            string updatedSsid = "Test-Hotspot-New";
+
+            var stampCreationEvent = new V1.AccessPointStampCreated
+            {
+                Ssid = updatedSsid,
+                Frequency = 2670,
+                LowSignalLevel = updatedLowSignalLevel,
+                LowSignalLatitude = updatedLowSignalLatitude,
+                LowSignalLongitude = updatedLowSignalLongitude,
+                HighSignalLevel = updatedHighSignalLevel,
+                HighSignalLatitude = updatedHighSignalLatitude,
+                HighSignalLongitude = updatedHighSignalLongitude,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now.AddDays(2)
+            };
+
+            accesspoint.Apply(stampCreationEvent);
+
+            var stampId = accesspoint.Stamps.First().Id;
+
+            accesspoint.Apply(new V1.AccessPointMergedWithStamp
+            {
+                Id = accesspoint.Id,
+                StampId = stampId,
+                MergeSsid = false,
+                MergeLowSignalLevel = false,
+                MergeHighSignalLevel = true,
+                MergeSecurityData = true
+            });
+
+            var stamp = accesspoint.Stamps.First();
+
+            Assert.Equal(initialLowSignalLevel, accesspoint.Positioning.LowSignalLevel);
+            Assert.Equal(initialLowSignalLatitude, accesspoint.Positioning.LowSignalLatitude);
+            Assert.Equal(initialLowSignalLongitude, accesspoint.Positioning.LowSignalLongitude);
+
+            Assert.NotEqual(updatedHighSignalLevel, accesspoint.Positioning.HighSignalLevel);
+            Assert.NotEqual(updatedHighSignalLatitude, accesspoint.Positioning.HighSignalLatitude);
+            Assert.NotEqual(updatedHighSignalLongitude, accesspoint.Positioning.HighSignalLongitude);
+
+            Assert.Equal(initialSsid, accesspoint.Ssid);
 
             Assert.Equal(stamp.CreationTimestamp.Value, accesspoint.VersionTimestamp.Value);
 
@@ -231,7 +323,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             var stampCreationEvent = new V1.AccessPointStampCreated
@@ -245,7 +338,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now.AddDays(2)
             };
 
             int expectedStampsCollectionCountBefore = 0;
@@ -275,7 +369,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
             });
 
             var stampCreationEvent = new V1.AccessPointStampCreated
@@ -289,7 +384,8 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
                 RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now.AddDays(2)
             };
 
             int expectedStampsCollectionCountBefore = 0;

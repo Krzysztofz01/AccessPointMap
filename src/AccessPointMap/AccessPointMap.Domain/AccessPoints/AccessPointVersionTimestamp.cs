@@ -11,6 +11,5 @@ namespace AccessPointMap.Domain.AccessPoints
         public static implicit operator DateTime(AccessPointVersionTimestamp modificationTimestamp) => modificationTimestamp.Value;
 
         public static AccessPointVersionTimestamp FromDateTime(DateTime date) => new AccessPointVersionTimestamp(date);
-        public static AccessPointVersionTimestamp Now => new AccessPointVersionTimestamp(DateTime.Now);
     }
 }

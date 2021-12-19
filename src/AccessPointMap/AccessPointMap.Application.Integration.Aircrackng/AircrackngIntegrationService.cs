@@ -95,6 +95,11 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                     accessPoint.LowLongitude = record.LowLongitude;
                 }
 
+                if (record.LocalTimestamp > accessPoint.LocalTimestamp)
+                {
+                    accessPoint.LocalTimestamp = record.LocalTimestamp;
+                }
+
                 accessPoints[record.Bssid] = accessPoint;
             }
 
@@ -115,7 +120,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
-                UserId = _scopeWrapperService.GetUserId()
+                UserId = _scopeWrapperService.GetUserId(),
+                ScanDate = record.LocalTimestamp
             });
 
             await _unitOfWork.AccessPointRepository.Add(accessPoint);
@@ -137,7 +143,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
-                UserId = _scopeWrapperService.GetUserId()
+                UserId = _scopeWrapperService.GetUserId(),
+                ScanDate = record.LocalTimestamp
             });
         }
     }
