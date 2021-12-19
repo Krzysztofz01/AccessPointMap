@@ -8,5 +8,6 @@ namespace AccessPointMap.Infrastructure.Core.Abstraction
         Task<Identity> GetUserByEmail(string email);
         Task<Identity> GetUserByRefreshToken(string refreshTokenHash);
         Task<bool> UserWithEmailExsits(string email);
+        Task<bool> AnyUsersExists();
     }
 }

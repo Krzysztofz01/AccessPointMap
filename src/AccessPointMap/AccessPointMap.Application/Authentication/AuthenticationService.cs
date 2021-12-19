@@ -15,13 +15,15 @@ namespace AccessPointMap.Application.Authentication
         private readonly IAuthenticationWrapperService _authenticationWrapperService;
         private readonly IScopeWrapperService _scopeWrapperService;
         private readonly JsonWebTokenSettings _jwtSettings;
+        private readonly AuthorizationSettings _authorizationSettings;
 
         public AuthenticationService(
             IUnitOfWork unitOfWork,
             IAuthenticationDataAccessService authenticationDataAccessService,
             IAuthenticationWrapperService authenticationWrapperService,
             IScopeWrapperService scopeWrapperService,
-            IOptions<JsonWebTokenSettings> jsonWebTokenSettings)
+            IOptions<JsonWebTokenSettings> jsonWebTokenSettings,
+            IOptions<AuthorizationSettings> authorizationSettings)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
@@ -37,6 +39,9 @@ namespace AccessPointMap.Application.Authentication
 
             _jwtSettings = jsonWebTokenSettings.Value ??
                 throw new ArgumentNullException(nameof(jsonWebTokenSettings));
+
+            _authorizationSettings = authorizationSettings.Value ??
+                throw new ArgumentNullException(nameof(authorizationSettings));
         }
 
         public async Task<Responses.V1.Login> Login(Requests.V1.Login request)
@@ -157,6 +162,21 @@ namespace AccessPointMap.Application.Authentication
                 Name = request.Name,
                 PasswordHash = passwordHash
             });
+
+            if (_authorizationSettings.PromoteFirstAccount && !await _authenticationDataAccessService.AnyUsersExists())
+            {
+                identity.Apply(new Events.V1.IdentityActivationChanged
+                {
+                    Id = identity.Id,
+                    Activated = true
+                });
+
+                identity.Apply(new Events.V1.IdentityRoleChanged
+                {
+                    Id = identity.Id,
+                    Role = UserRole.Admin
+                });
+            }
 
             await _unitOfWork.IdentityRepository.Add(identity);
 
