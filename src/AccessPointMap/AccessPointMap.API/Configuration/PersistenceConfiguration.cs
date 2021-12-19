@@ -2,8 +2,11 @@
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AccessPointMap.Infrastructure.MySql;
 using AccessPointMap.Infrastructure.MySql.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AccessPointMap.API.Configuration
 {
@@ -25,6 +28,15 @@ namespace AccessPointMap.API.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
+        }
+
+        public static IApplicationBuilder UseMySqlPersistence(this IApplicationBuilder app, IServiceProvider service)
+        {
+            using var dbContext = service.GetRequiredService<AccessPointMapDbContext>();
+
+            dbContext.Database.Migrate();
+
+            return app;
         }
     }
 }

@@ -66,9 +66,7 @@ Functionalities that need to be implemented or repaired:
 
 🔲 Preparation of a set of scanning scripts for supported software.
 
-⚠️ Docker support.
-
-(*No tests were performed.*)
+✅ Docker support.
 
 🔲 Deployment script.
 

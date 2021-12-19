@@ -11,13 +11,14 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - MYSQL_ROOT_PASSWORD= #Entry value
+      - MYSQL_ROOT_PASSWORD= #ENTER VALUE
       - TZ=Europe/Warsaw
   api:
     container_name: api
-    build: ./src/AccessPointMap.API/
+    build: ./src/AccessPointMap
+    restart: unless-stopped
     volumes:
-      - ./apm-api-log:/var/apm/logs #Set in appsettings.json
+      - ./apm-api-log:/var/apm/log #Set in appsettings.json
     ports:
       - "6001:80"
     depends_on:

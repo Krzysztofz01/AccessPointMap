@@ -1,4 +1,5 @@
 using AccessPointMap.API.Configuration;
+using AccessPointMap.Infrastructure.MySql;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,9 +37,11 @@ namespace AccessPointMap.API
             services.AddWebUtilities();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service, IRecurringJobManager jobManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service, IRecurringJobManager jobManager, AccessPointMapDbContext dbContext)
         {
             app.UseWebUtilities(env);
+
+            app.UseMySqlPersistence(service);
 
             app.UseAuthentication();
 

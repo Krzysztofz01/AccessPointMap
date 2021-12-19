@@ -14,6 +14,12 @@ namespace AccessPointMap.Infrastructure.MySql
         public AuthenticationDataAccessService(AccessPointMapDbContext dbContext) =>
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
+        public async Task<bool> AnyUsersExists()
+        {
+            return await _context.Identities
+                .AnyAsync();
+        }
+
         public async Task<Identity> GetUserByEmail(string email)
         {
             return await _context.Identities
