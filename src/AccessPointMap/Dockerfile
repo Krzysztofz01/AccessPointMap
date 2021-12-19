@@ -13,6 +13,7 @@ COPY ["AccessPointMap.Application.Integration.Wigle/AccessPointMap.Application.I
 COPY ["AccessPointMap.Application.Integration.Core/AccessPointMap.Application.Integration.Core.csproj", "AccessPointMap.Application.Integration.Core/"]
 COPY ["AccessPointMap.Application.Oui.Core/AccessPointMap.Application.Oui.Core.csproj", "AccessPointMap.Application.Oui.Core/"]
 COPY ["AccessPointMap.Application.Oui.MacTwoVendor/AccessPointMap.Application.Oui.MacTwoVendor.csproj", "AccessPointMap.Application.Oui.MacTwoVendor/"]
+COPY ["AccessPointMap.Application.Integration.Aircrackng/AccessPointMap.Application.Integration.Aircrackng.csproj", "AccessPointMap.Application.Integration.Aircrackng/"]
 COPY ["AccessPointMap.Application/AccessPointMap.Application.csproj", "AccessPointMap.Application/"]
 RUN dotnet restore "AccessPointMap.API/AccessPointMap.API.csproj"
 COPY . .

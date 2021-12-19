@@ -18,7 +18,7 @@ services:
     build: ./src/AccessPointMap
     restart: unless-stopped
     volumes:
-      - ./apm-api-log:/var/apm/log #Set in appsettings.json
+      - ./apm-api-log:/var/apm/log
     ports:
       - "6001:80"
     depends_on:
