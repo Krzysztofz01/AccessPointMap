@@ -10,7 +10,7 @@ namespace AccessPointMap.Domain.AccessPoints
             { new string[] { "hotspot", "free" }, "Access point" },
             { new string[] { "tv", "bravia" }, "Tv" },
             { new string[] { "cctv", "cam", "iptv", "monitoring" }, "Cctv" },
-            { new string[] { "repeater", "extender" }, "Repeater" },
+            { new string[] { "repeater", "extender", "ext" }, "Repeater" },
             { new string[] { "iot" }, "IoT" },
             { new string[] { "car" }, "Car" }
         };

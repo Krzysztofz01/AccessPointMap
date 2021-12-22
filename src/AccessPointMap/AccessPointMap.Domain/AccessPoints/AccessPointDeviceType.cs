@@ -20,15 +20,15 @@ namespace AccessPointMap.Domain.AccessPoints
                 return;
             }
 
-            //TODO Search keywoard in ssid and not ssid in keywoard
             Value = Constants.DeviceTypeDictionary
                 .Where(d => d.Key
-                    .Any(k => k.Contains(value
+                    .Any(k => value
                         .Trim()
-                        .ToLower())))
-                    .Select(k => k.Value)
+                        .ToLower()
+                        .Contains(k)))
+                .Select(d => d.Value)
                 .FirstOrDefault();
-
+            
             if (Value is null)
                 Value = _defaultDeviceType;
         }
