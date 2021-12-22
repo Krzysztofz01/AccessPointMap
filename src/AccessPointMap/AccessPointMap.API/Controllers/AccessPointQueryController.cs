@@ -129,7 +129,17 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("statistics/encryption")]
-        public async Task<IActionResult> GetStatisticsMostCommonUsedEncryption([FromQuery] int? limit) =>
-            throw new NotImplementedException();
+        public async Task<IActionResult> GetStatisticsMostCommonUsedEncryption([FromQuery] int? limit)
+        {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
+            var response = await _dataAccess.AccessPoints
+                .GetMostCommonUsedEncryptionTypes(limit ?? _defaultLimit);
+
+            StoreToCache(response);
+
+            return Ok(response);
+        }
     }
 }

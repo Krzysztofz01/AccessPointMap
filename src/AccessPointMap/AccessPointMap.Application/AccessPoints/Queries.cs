@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.AccessPoints
@@ -84,7 +85,30 @@ namespace AccessPointMap.Application.AccessPoints
 
         public static async Task<IEnumerable<object>> GetMostCommonUsedEncryptionTypes(this IQueryable<AccessPoint> accessPoints, int limit)
         {
-            throw new NotImplementedException();
+            const string _none = "None";
+
+            var encryptionCountMap = Constants.EncryptionTypes
+                .OrderByDescending(e => e.Priority)
+                .ToDictionary(k => k.Name, v => 0);
+
+            encryptionCountMap.Add(_none, 0);
+
+            var accessPointsEncryptions = await accessPoints
+                .Where(a => a.DisplayStatus.Value)
+                .Select(a => a.Security.SerializedSecurityPayload)
+                .ToListAsync();
+
+            foreach(var serializedEncryption in accessPointsEncryptions)
+            {
+                var encryption = JsonSerializer.Deserialize<string[]>(serializedEncryption).FirstOrDefault();
+
+                if (encryption is null) encryptionCountMap[_none]++;
+                if (encryption is not null) encryptionCountMap[encryption]++;
+            }
+
+            return (limit == default)
+                ? encryptionCountMap.Select(e => new { Encryption = e.Key, Count = e.Value }).OrderByDescending(e => e.Count)
+                : encryptionCountMap.Select(e => new { Encryption = e.Key, Count = e.Value }).OrderByDescending(e => e.Count).Take(limit);                
         }
     }
 }
