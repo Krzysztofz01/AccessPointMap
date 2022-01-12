@@ -67,7 +67,7 @@ namespace AccessPointMap.Application.AccessPoints
             public string SerializedSecurityPayload { get; set; }
             public bool IsSecure { get; set; }
             public string Note { get; set; }
-            public string DisplayStatus { get; set; }
+            public bool DisplayStatus { get; set; }
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
         }
 
