@@ -34,12 +34,12 @@ namespace AccessPointMap.API
 
             services.AddCaching();
 
-            services.AddWebUtilities();
+            services.AddWebUtilities(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service, IRecurringJobManager jobManager, AccessPointMapDbContext dbContext)
         {
-            app.UseWebUtilities(env);
+            app.UseWebUtilities(env, service);
 
             app.UseMySqlPersistence(service);
 

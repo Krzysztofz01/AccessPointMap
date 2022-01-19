@@ -15,16 +15,20 @@ namespace AccessPointMap.Application.Authorization
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JsonWebTokenSettings _jwtSettings;
+        private readonly SecuritySettings _securitySettings;
 
-        private const string _refreshTokenCookieName = "balto_refresh_token";
+        private const string _refreshTokenCookieName = "accesspointmap_refresh_token";
 
-        public ScopeWrapperService(IHttpContextAccessor httpContextAccessor, IOptions<JsonWebTokenSettings> jsonWebTokenSettings)
+        public ScopeWrapperService(IHttpContextAccessor httpContextAccessor, IOptions<JsonWebTokenSettings> jsonWebTokenSettings, IOptions<SecuritySettings> securitySettings)
         {
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
 
             _jwtSettings = jsonWebTokenSettings.Value ??
                 throw new ArgumentNullException(nameof(jsonWebTokenSettings)); ;
+
+            _securitySettings = securitySettings.Value ??
+                throw new ArgumentNullException(nameof(securitySettings));
         }
 
         public string GetIpAddress()
@@ -64,8 +68,9 @@ namespace AccessPointMap.Application.Authorization
         {
             _httpContextAccessor.HttpContext.Response.Cookies.Append(_refreshTokenCookieName, refreshTokenCookieValue, new CookieOptions
             {
-                HttpOnly = true,
-                Expires = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpirationDays)
+                HttpOnly = false,
+                Expires = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpirationDays),
+                SameSite = (_securitySettings.SecureMode) ? SameSiteMode.Lax : SameSiteMode.None
             });
         }
 

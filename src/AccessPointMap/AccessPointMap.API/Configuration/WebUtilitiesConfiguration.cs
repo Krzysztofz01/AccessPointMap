@@ -1,19 +1,38 @@
 ﻿using AccessPointMap.API.Middleware;
+using AccessPointMap.Application.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Net;
 
 namespace AccessPointMap.API.Configuration
 {
     public static class WebUtilitiesConfiguration
     {
-        public static readonly string _corsPolicyName = "DefaultCorsPolicy";
+        public const string _defaultCorsPolicyName = "DefaultCorsPolicy";
+        public const string _secureCorsPolicyName = "SecureCorsPolicy";
 
-        public static IServiceCollection AddWebUtilities(this IServiceCollection services)
+        public static IServiceCollection AddWebUtilities(this IServiceCollection services, IConfiguration configuration)
         {
+            var securitySettingsSection = configuration.GetSection(nameof(SecuritySettings));
+            services.Configure<SecuritySettings>(securitySettingsSection);
+
+            var securitySettings = securitySettingsSection.Get<SecuritySettings>();
+            if (securitySettings.SecureMode)
+            {
+                services.AddHttpsRedirection(options =>
+                {
+                    options.RedirectStatusCode = (int)HttpStatusCode.PermanentRedirect;
+                    options.HttpsPort = 443;
+                });
+            }
+
             services.AddApiVersioning(options =>
             {
                 options.AssumeDefaultVersionWhenUnspecified = true;
@@ -30,13 +49,23 @@ namespace AccessPointMap.API.Configuration
 
             services.AddCors(options =>
             {
-                options.AddPolicy(_corsPolicyName, builder =>
+                options.AddPolicy(_defaultCorsPolicyName, builder =>
                 {
                     builder
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .SetIsOriginAllowed(options => true)
                         .AllowCredentials();
+                });
+
+                options.AddPolicy(_secureCorsPolicyName, builder =>
+                {
+                    builder
+                        .AllowAnyHeader()
+                        .WithMethods("PUT", "POST", "OPTIONS", "GET", "DELETE")
+                        .WithOrigins(securitySettings.Origins)
+                        .AllowCredentials();
+                        
                 });
             });
 
@@ -45,7 +74,7 @@ namespace AccessPointMap.API.Configuration
             return services;
         }
 
-        public static IApplicationBuilder UseWebUtilities(this IApplicationBuilder app, IWebHostEnvironment env)
+        public static IApplicationBuilder UseWebUtilities(this IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service)
         {
             if (env.IsDevelopment())
             {
@@ -59,11 +88,21 @@ namespace AccessPointMap.API.Configuration
                 app.UseDeveloperExceptionPage();
             }
 
+            var securitySettings = service.GetService<IOptions<SecuritySettings>>().Value ??
+                throw new InvalidOperationException("Security settings are not available");
+            
+            if (securitySettings.SecureMode)
+            {
+                app.UseHsts();
+
+                app.UseHttpsRedirection();
+            }
+
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseRouting();
 
-            app.UseCors(_corsPolicyName);
+            app.UseCors(securitySettings.SecureMode ? _secureCorsPolicyName : _defaultCorsPolicyName);
 
             return app;
         }
