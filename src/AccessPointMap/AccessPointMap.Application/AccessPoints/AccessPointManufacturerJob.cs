@@ -18,9 +18,9 @@ namespace AccessPointMap.Application.AccessPoints
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDataAccess _dataAccess;
         private readonly IOuiLookupService _ouiLookupService;
-        private readonly ILogger<AccessPointBackgroundJobs> _logger;
+        private readonly ILogger<AccessPointManufacturerJob> _logger;
 
-        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IDataAccess dataAccess, IOuiLookupService ouiLookupService, ILogger<AccessPointBackgroundJobs> logger)
+        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IDataAccess dataAccess, IOuiLookupService ouiLookupService, ILogger<AccessPointManufacturerJob> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
