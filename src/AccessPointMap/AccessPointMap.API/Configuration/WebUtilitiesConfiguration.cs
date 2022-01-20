@@ -58,15 +58,18 @@ namespace AccessPointMap.API.Configuration
                         .AllowCredentials();
                 });
 
-                options.AddPolicy(_secureCorsPolicyName, builder =>
+                if (securitySettings.SecureMode)
                 {
-                    builder
-                        .AllowAnyHeader()
-                        .WithMethods("PUT", "POST", "OPTIONS", "GET", "DELETE")
-                        .WithOrigins(securitySettings.Origins)
-                        .AllowCredentials();
-                        
-                });
+                    options.AddPolicy(_secureCorsPolicyName, builder =>
+                    {
+                        builder
+                            .AllowAnyHeader()
+                            .WithMethods("PUT", "POST", "OPTIONS", "GET", "DELETE")
+                            .WithOrigins(securitySettings.Origins)
+                            .AllowCredentials();
+
+                    });
+                }
             });
 
             services.AddControllers();
