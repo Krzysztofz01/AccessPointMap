@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.13" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+    <PackageReference Include="Quartz" Version="3.3.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.15.0" />
   </ItemGroup>
 
