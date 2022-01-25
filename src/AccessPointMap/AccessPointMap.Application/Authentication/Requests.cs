@@ -33,6 +33,8 @@ namespace AccessPointMap.Application.Authentication
 
             public class Logout
             {
+                [Required]
+                public string RefreshToken { get; set; }
             }
 
             public class PasswordReset
@@ -46,6 +48,8 @@ namespace AccessPointMap.Application.Authentication
 
             public class Refresh
             {
+                [Required]
+                public string RefrshToken { get; set; }
             }
         }
     }

@@ -67,19 +67,18 @@ namespace AccessPointMap.Application.Authentication
 
             await _unitOfWork.Commit();
 
-            _scopeWrapperService.SetRefreshTokenCookie(refreshToken);
-
             return new Responses.V1.Login
             {
-                JsonWebToken = bearerToken
+                JsonWebToken = bearerToken,
+                RefreshToken = refreshToken
             };
         }
 
-        public async Task Logout(Requests.V1.Logout _)
+        public async Task Logout(Requests.V1.Logout request)
         {
             var identity = await _unitOfWork.IdentityRepository.Get(_scopeWrapperService.GetUserId());
 
-            string refreshTokenHash = _authenticationWrapperService.HashString(_scopeWrapperService.GetRefreshTokenCookie());
+            string refreshTokenHash = _authenticationWrapperService.HashString(request.RefreshToken);
 
             identity.Apply(new Events.V1.IdentityTokenRevoked
             {
@@ -109,14 +108,12 @@ namespace AccessPointMap.Application.Authentication
             await _unitOfWork.Commit();
         }
 
-        public async Task<Responses.V1.Refresh> Refresh(Requests.V1.Refresh _)
+        public async Task<Responses.V1.Refresh> Refresh(Requests.V1.Refresh request)
         {
-            var refreshToken = _scopeWrapperService.GetRefreshTokenCookie();
-
-            if (refreshToken.IsEmpty())
+            if (request.RefrshToken.IsEmpty())
                 throw new InvalidOperationException("Invalid authentication credentials.");
 
-            var refreshTokenHash = _authenticationWrapperService.HashString(refreshToken);
+            var refreshTokenHash = _authenticationWrapperService.HashString(request.RefrshToken);
 
             var identity = await _authenticationDataAccessService.GetUserByRefreshToken(refreshTokenHash);
 
@@ -137,11 +134,10 @@ namespace AccessPointMap.Application.Authentication
 
             await _unitOfWork.Commit();
 
-            _scopeWrapperService.SetRefreshTokenCookie(replacementToken);
-
             return new Responses.V1.Refresh
             {
-                JsonWebToken = bearerToken
+                JsonWebToken = bearerToken,
+                RefreshToken = replacementToken
             };
         }
 

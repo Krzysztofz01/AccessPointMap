@@ -8,7 +8,5 @@ namespace AccessPointMap.Infrastructure.Core.Abstraction
         string GetIpAddress();
         Guid GetUserId();
         UserRole GetUserRole();
-        void SetRefreshTokenCookie(string refreshTokenCookieValue);
-        string GetRefreshTokenCookie();
     }
 }
