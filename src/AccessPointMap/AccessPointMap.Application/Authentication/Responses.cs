@@ -7,11 +7,13 @@
             public class Login
             {
                 public string JsonWebToken { get; set; }
+                public string RefreshToken { get; set; }
             }
 
             public class Refresh
             {
                 public string JsonWebToken { get; set; }
+                public string RefreshToken { get; set; }
             }
         }
     }
