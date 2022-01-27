@@ -110,10 +110,10 @@ namespace AccessPointMap.Application.Authentication
 
         public async Task<Responses.V1.Refresh> Refresh(Requests.V1.Refresh request)
         {
-            if (request.RefrshToken.IsEmpty())
+            if (request.RefreshToken.IsEmpty())
                 throw new InvalidOperationException("Invalid authentication credentials.");
 
-            var refreshTokenHash = _authenticationWrapperService.HashString(request.RefrshToken);
+            var refreshTokenHash = _authenticationWrapperService.HashString(request.RefreshToken);
 
             var identity = await _authenticationDataAccessService.GetUserByRefreshToken(refreshTokenHash);
 

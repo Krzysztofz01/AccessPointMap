@@ -49,7 +49,7 @@ namespace AccessPointMap.Application.Authentication
             public class Refresh
             {
                 [Required]
-                public string RefrshToken { get; set; }
+                public string RefreshToken { get; set; }
             }
         }
     }
