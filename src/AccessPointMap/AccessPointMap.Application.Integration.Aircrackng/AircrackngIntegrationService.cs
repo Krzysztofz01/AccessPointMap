@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.Application.Integration.Aircrackng.Models;
 using AccessPointMap.Application.Integration.Core;
+using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
@@ -30,21 +31,23 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         public AircrackngIntegrationService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService) : base(unitOfWork, scopeWrapperService) { }
 
-        private void ValidateCsvDumpFile(IFormFile csv)
-        {
-            if (csv is null)
-                throw new ArgumentNullException(nameof(csv));
-
-            var extension = Path.GetExtension(csv.FileName);
-
-            if (!_allowedExtensions.Contains(extension.ToLower()))
-                throw new ArgumentNullException(nameof(csv));
-        }
-
         public async Task Create(Requests.Create request)
         {
             ValidateCsvDumpFile(request.CsvDumpFile);
 
+            try
+            {
+                await HandleCreate(request);
+            }
+            catch (Exception ex)
+            {
+                throw new AccessPointIntegrationException("Aircrack-ng integration service failed while parsing provied data.", ex);
+            }
+            
+        }
+
+        public async Task HandleCreate(Requests.Create request)
+        {
             var accessPoints = ParseAccessPointDumps(request.CsvDumpFile);
 
             foreach (var accessPoint in accessPoints)
@@ -59,6 +62,17 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             }
 
             await _unitOfWork.Commit();
+        }
+
+        private void ValidateCsvDumpFile(IFormFile csv)
+        {
+            if (csv is null)
+                throw new ArgumentNullException(nameof(csv));
+
+            var extension = Path.GetExtension(csv.FileName);
+
+            if (!_allowedExtensions.Contains(extension.ToLower()))
+                throw new ArgumentNullException(nameof(csv));
         }
 
         private IEnumerable<AccessPointRecord> ParseAccessPointDumps(IFormFile csvFile)

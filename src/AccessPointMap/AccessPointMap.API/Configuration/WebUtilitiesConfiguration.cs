@@ -3,6 +3,7 @@ using AccessPointMap.Application.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,6 +44,13 @@ namespace AccessPointMap.API.Configuration
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "AccessPointMap Web API", Version = "v1" });
                 options.CustomSchemaIds(type => type.ToString());
+            });
+
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes;
+                options.Providers.Add<GzipCompressionProvider>();
             });
 
             services.AddHttpContextAccessor();
@@ -99,6 +107,8 @@ namespace AccessPointMap.API.Configuration
 
                 app.UseHttpsRedirection();
             }
+
+            app.UseResponseCompression();
 
             app.UseMiddleware<ExceptionMiddleware>();
 

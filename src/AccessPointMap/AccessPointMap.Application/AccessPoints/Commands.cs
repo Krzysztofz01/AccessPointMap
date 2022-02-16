@@ -18,7 +18,7 @@ namespace AccessPointMap.Application.AccessPoints
                 public IEnumerable<Helpers.AccessPointV1> AccessPoints { get; set; }
 
                 [Required]
-                public DateTime? ScanDate { get; set; }
+                public DateTime ScanDate { get; set; }
             }
 
             public class Delete : IApplicationCommand<AccessPoint>

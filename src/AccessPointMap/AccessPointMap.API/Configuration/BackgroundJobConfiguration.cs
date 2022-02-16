@@ -12,6 +12,8 @@ namespace AccessPointMap.API.Configuration
 {
     public static class BackgroundJobConfiguration
     {
+        private const string _utcCronExpression = "0 4 * * * ";
+
         public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
         {
             services.AddHangfire(options =>
@@ -38,7 +40,7 @@ namespace AccessPointMap.API.Configuration
             }
 
             jobs.AddOrUpdate("AccessPointUpdateManufacturer", () => service
-                .GetService<IAccessPointBackgroundJobs>().SetAccessPointManufacturer(), Cron.Daily);
+                .GetService<IAccessPointBackgroundJobs>().SetAccessPointManufacturer(), _utcCronExpression);
 
             return app;
         }
