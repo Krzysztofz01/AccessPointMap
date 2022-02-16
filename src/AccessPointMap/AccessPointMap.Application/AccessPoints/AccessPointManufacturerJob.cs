@@ -12,7 +12,7 @@ namespace AccessPointMap.Application.AccessPoints
     [DisallowConcurrentExecution]
     public class AccessPointManufacturerJob : IJob
     {
-        public const string CronExpression = "0 0 0/6 1/1 * ? *";
+        public const string CronExpression = "0 4 * * * ";
         public const string JobName = "AccessPointManufacturerUpdate";
 
         private readonly IUnitOfWork _unitOfWork;
@@ -40,7 +40,7 @@ namespace AccessPointMap.Application.AccessPoints
         {
             try
             {
-                _logger.LogInformation($"{JobName} job started.");
+                _logger.LogInformation($"{JobName} scheduled job started.");
 
                 var accessPoints = _dataAccess.AccessPointsTracked
                     .Where(a => a.Manufacturer.Value == string.Empty);
@@ -58,11 +58,11 @@ namespace AccessPointMap.Application.AccessPoints
 
                 await _unitOfWork.Commit();
 
-                _logger.LogInformation($"{JobName} job finished.");
+                _logger.LogInformation($"{JobName} scheduled job finished.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{JobName} job failed.", ex);
+                _logger.LogError($"{JobName} scheduled job failed.", ex);
             }
         }
     }
