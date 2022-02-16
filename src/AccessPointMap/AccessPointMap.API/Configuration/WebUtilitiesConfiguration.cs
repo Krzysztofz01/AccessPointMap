@@ -75,7 +75,6 @@ namespace AccessPointMap.API.Configuration
                             .WithMethods("PUT", "POST", "OPTIONS", "GET", "DELETE")
                             .WithOrigins(securitySettings.Origins)
                             .AllowCredentials();
-
                     });
                 }
             });
@@ -112,6 +111,8 @@ namespace AccessPointMap.API.Configuration
             app.UseResponseCompression();
 
             app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseMiddleware<AntiXssMiddleware>();
 
             app.UseRouting();
 
