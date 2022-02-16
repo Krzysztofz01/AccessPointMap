@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.API.Extensions;
+using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Domain.Core.Exceptions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -56,6 +57,7 @@ namespace AccessPointMap.API.Middleware
                 ArgumentException _ => (int)HttpStatusCode.BadRequest,
                 BusinessLogicException _ => (int)HttpStatusCode.BadRequest,
                 ValueObjectValidationException _ => (int)HttpStatusCode.BadRequest,
+                IntegrationException _ => (int)HttpStatusCode.BadRequest,
                 SystemAuthorizationException _ => (int)HttpStatusCode.Forbidden,
   
                 _ => (int)HttpStatusCode.InternalServerError

@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Application.Integration.Core;
+using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Application.Integration.Wigle.Models;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
@@ -30,21 +31,22 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         public WigleIntegrationService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService) : base(unitOfWork, scopeWrapperService) { }
 
-        private void ValidateCsvDatabaseFile(IFormFile csv)
-        {
-            if (csv is null)
-                throw new ArgumentNullException(nameof(csv));
-
-            var extension = Path.GetExtension(csv.FileName);
-
-            if (!_allowedExtensions.Contains(extension.ToLower()))
-                throw new ArgumentNullException(nameof(csv));
-        }
-
         public async Task Create(Requests.Create request)
         {
             ValidateCsvDatabaseFile(request.CsvDatabaseFile);
 
+            try
+            {
+                await HandleCreate(request);
+            }
+            catch (Exception ex)
+            {
+                throw new AccessPointIntegrationException("Wigle integration service failed while parsing provied data.", ex);
+            }
+        }
+
+        private async Task HandleCreate(Requests.Create request)
+        {
             using var sr = new StreamReader(request.CsvDatabaseFile.OpenReadStream());
 
             // This line will shift the stream by one line to avoid the header
@@ -70,6 +72,17 @@ namespace AccessPointMap.Application.Integration.Wigle
             }
 
             await _unitOfWork.Commit();
+        }
+
+        private void ValidateCsvDatabaseFile(IFormFile csv)
+        {
+            if (csv is null)
+                throw new ArgumentNullException(nameof(csv));
+
+            var extension = Path.GetExtension(csv.FileName);
+
+            if (!_allowedExtensions.Contains(extension.ToLower()))
+                throw new ArgumentNullException(nameof(csv));
         }
 
         private async Task CreateAccessPoint(AccessPointRecord record)
@@ -114,7 +127,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             });
         }
 
-        private AccessPointRecord CombineRecords(IEnumerable<AccessPointRecord> records)
+        private static AccessPointRecord CombineRecords(IEnumerable<AccessPointRecord> records)
         {
             var accessPoint = records.First();
 
