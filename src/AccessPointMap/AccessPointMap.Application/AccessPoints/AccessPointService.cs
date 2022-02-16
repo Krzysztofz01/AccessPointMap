@@ -73,7 +73,7 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate.Value
+                        ScanDate = command.ScanDate
                     });
 
                     await _unitOfWork.Commit();
@@ -93,7 +93,7 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate.Value
+                        ScanDate = command.ScanDate
                     });
 
                     await _unitOfWork.AccessPointRepository.Add(accessPoint);
