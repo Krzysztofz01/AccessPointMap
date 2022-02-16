@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Infrastructure.Core.Abstraction;
@@ -13,14 +14,18 @@ namespace AccessPointMap.Application.AccessPoints
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IScopeWrapperService _scopeWrapperService;
+        private readonly IOuiLookupService _ouiLookupService;
 
-        public AccessPointService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService)
+        public AccessPointService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService, IOuiLookupService ouiLookupService)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
 
             _scopeWrapperService = scopeWrapperService ??
                 throw new ArgumentNullException(nameof(scopeWrapperService));
+
+            _ouiLookupService = ouiLookupService ??
+                throw new ArgumentNullException(nameof(ouiLookupService));
         }
 
         public async Task Handle(IApplicationCommand<AccessPoint> command)
@@ -96,11 +101,22 @@ namespace AccessPointMap.Application.AccessPoints
                         ScanDate = command.ScanDate
                     });
 
+                    accessPoint.Apply(new AccessPointManufacturerChanged
+                    {
+                        Id = accessPoint.Id,
+                        Manufacturer = await ResolveManufacturer(accessPoint.Bssid)
+                    });
+
                     await _unitOfWork.AccessPointRepository.Add(accessPoint);
 
                     await _unitOfWork.Commit();
                 }
             }
+        }
+
+        private async Task<string> ResolveManufacturer(string bssid)
+        {
+            return await _ouiLookupService.GetManufacturerName(bssid);
         }
     }
 }
