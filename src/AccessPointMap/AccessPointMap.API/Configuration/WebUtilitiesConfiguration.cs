@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace AccessPointMap.API.Configuration
@@ -39,11 +40,43 @@ namespace AccessPointMap.API.Configuration
                 options.DefaultApiVersion = new ApiVersion(1, 0);
             });
 
-            services.AddSwaggerGen(options =>
+            var swaggerSettingsSection = configuration.GetSection(nameof(SwaggerSettings));
+            services.Configure<SwaggerSettings>(swaggerSettingsSection);
+
+            var swaggerSettings = swaggerSettingsSection.Get<SwaggerSettings>();
+            if (swaggerSettings.Enabled)
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "AccessPointMap Web API", Version = "v1" });
-                options.CustomSchemaIds(type => type.ToString());
-            });
+                const string _securitySchemaName = "Bearer";
+
+                services.AddSwaggerGen(options =>
+                {
+                    options.SwaggerDoc("v1", new OpenApiInfo { Title = "AccessPointMap Web API", Version = "v1" });
+                    options.CustomSchemaIds(type => type.ToString());
+                    
+                    options.AddSecurityDefinition(_securitySchemaName, new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey
+                    });
+                    
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Id = _securitySchemaName,
+                                    Type = ReferenceType.SecurityScheme
+                                }
+                            },
+                            new List<string>()
+                        }
+                    });
+                });
+            }
 
             services.AddHttpContextAccessor();
 
@@ -81,18 +114,24 @@ namespace AccessPointMap.API.Configuration
         {
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
+            }
+
+            var swaggerSettings = service.GetService<IOptions<SwaggerSettings>>().Value ??
+                throw new InvalidOperationException("Swagger settubgs are not available.");
+
+            if (swaggerSettings.Enabled)
+            {
                 app.UseSwagger();
 
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "AccessPointMap Web API v1");
                 });
-
-                app.UseDeveloperExceptionPage();
             }
 
             var securitySettings = service.GetService<IOptions<SecuritySettings>>().Value ??
-                throw new InvalidOperationException("Security settings are not available");
+                throw new InvalidOperationException("Security settings are not available.");
             
             if (securitySettings.SecureMode)
             {
