@@ -1,6 +1,4 @@
 using AccessPointMap.API.Configuration;
-using AccessPointMap.Infrastructure.MySql;
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -37,7 +35,7 @@ namespace AccessPointMap.API
             services.AddWebUtilities(Configuration);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service, IRecurringJobManager jobManager, AccessPointMapDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service)
         {
             app.UseWebUtilities(env, service);
 
@@ -46,8 +44,6 @@ namespace AccessPointMap.API
             app.UseAuthentication();
 
             app.UseAuthorization();
-
-            app.UseBackgroundJobs(jobManager, service, env);
 
             app.UseEndpoints(endpoints =>
             {

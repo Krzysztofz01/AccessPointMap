@@ -1,22 +1,26 @@
-﻿using AccessPointMap.Application.Abstraction;
-using AccessPointMap.Application.Oui.Core;
+﻿using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.Extensions.Logging;
+using Quartz;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.AccessPoints
 {
-    public class AccessPointBackgroundJobs : IAccessPointBackgroundJobs
+    [DisallowConcurrentExecution]
+    public class AccessPointManufacturerJob : IJob
     {
+        public const string CronExpression = "0 0 4 1/1 * ? *";
+        public const string JobName = "AccessPointManufacturerUpdate";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDataAccess _dataAccess;
         private readonly IOuiLookupService _ouiLookupService;
-        private readonly ILogger<AccessPointBackgroundJobs> _logger;
+        private readonly ILogger<AccessPointManufacturerJob> _logger;
 
-        public AccessPointBackgroundJobs(IUnitOfWork unitOfWork, IDataAccess dataAccess, IOuiLookupService ouiLookupService, ILogger<AccessPointBackgroundJobs> logger)
+        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IDataAccess dataAccess, IOuiLookupService ouiLookupService, ILogger<AccessPointManufacturerJob> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
@@ -31,17 +35,17 @@ namespace AccessPointMap.Application.AccessPoints
                 throw new ArgumentNullException(nameof(logger));
         }
 
-        //TODO: The tracked data access will be removed in the future
-        public async Task SetAccessPointManufacturer()
+        [Obsolete("This method has inconsistent usage of data access abstraction.")]
+        public async Task Execute(IJobExecutionContext context)
         {
             try
             {
-                _logger.LogInformation($"SetAccessPointManufacturer job started.");
+                _logger.LogInformation($"{JobName} scheduled job started.");
 
                 var accessPoints = _dataAccess.AccessPointsTracked
                     .Where(a => a.Manufacturer.Value == string.Empty);
 
-                foreach(var accessPoint in accessPoints)
+                foreach (var accessPoint in accessPoints)
                 {
                     var manufacturerName = await _ouiLookupService.GetManufacturerName(accessPoint.Bssid.Value);
 
@@ -54,11 +58,11 @@ namespace AccessPointMap.Application.AccessPoints
 
                 await _unitOfWork.Commit();
 
-                _logger.LogInformation($"SetAccessPointManufacturer job finished.");
+                _logger.LogInformation($"{JobName} scheduled job finished.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError("SetAccessPointManufacturer job failed.", ex);
+                _logger.LogError($"{JobName} scheduled job failed.", ex);
             }
         }
     }
