@@ -12,7 +12,7 @@ The project consists of several parts:
 
 - ASP.NET Core REST API
 
-- Angular client/administration application
+- Angular client/administration application (*The main client application is not currently developed, it is recommended to use [AccessPointLab](https://github.com/Krzysztofz01/AccessPointLab)*)
 
 - Xamarin mobile application for collecting data (*The concept has been dropped and it is suggested to use one of the integrations*)
 
@@ -48,7 +48,7 @@ The basic technology stack used by the project. As a "historical curiosity" it i
 
 - [Docker](https://www.docker.com) - Virtualization at the operating system level. The division into microservices provides high scalability of the entire project.
 
-- [Hangfire](https://www.hangfire.io) - An easy way to perform background processing in .NET and .NET Core applications.
+- [Quartz.NET](https://www.quartz-scheduler.net/) - Background jobs scheduling framework for .NET
 
 - [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) - Modern object-database mapper for .NET Core
 
@@ -58,22 +58,10 @@ The basic technology stack used by the project. As a "historical curiosity" it i
 
 ## Roadmap
 
-Functionalities that need to be implemented or repaired:
-
-✅ Adding the OUI lookup service based on the Wireshark database to eliminate dependencies on the external MacVendor API. 
-
-✅ Implementation of the Aircrack-ng integration. Creating a parser for detailed logs containing information about geolocation.
+A list of functionality and features that may be implemented in the future:
 
 🔲 Preparation of a set of scanning scripts for supported software.
 
-✅ Docker support.
-
-🔲 Deployment script.
-
-✅ Server side caching solution.
-
-✅ Statistics endpoint.
-
-✅ All the AccessPoint [TODO's](https://github.com/Krzysztofz01/AccessPointMap/blob/master/src/AccessPointMap/AccessPointMap.Domain/AccessPoints/AccessPoint.cs#L77), all of them are related to the stamp merge functionality.
+🔲 Deployment scripts.
 
 🔲 Migration from .NET5 to .NET6 LTS
