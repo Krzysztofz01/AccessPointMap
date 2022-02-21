@@ -29,7 +29,7 @@ namespace AccessPointMap.API.Controllers
             await ExecuteService(new Application.Integration.Wigle.Requests.Create { CsvDatabaseFile = csvDatabaseFile }, _wigleIntegrationService.Create);
 
         [HttpPost("aircrackng")]
-        public async Task<IActionResult> CreateFromAircrackng([FromForm] IFormFile csvLogFile) =>
-            await ExecuteService(new Application.Integration.Aircrackng.Requests.Create { CsvDumpFile = csvLogFile }, _aircrackngIntegrationService.Create);
+        public async Task<IActionResult> CreateFromAircrackng([FromForm] IFormFile csvDumpFile) =>
+            await ExecuteService(new Application.Integration.Aircrackng.Requests.Create { CsvDumpFile = csvDumpFile }, _aircrackngIntegrationService.Create);
     }
 }

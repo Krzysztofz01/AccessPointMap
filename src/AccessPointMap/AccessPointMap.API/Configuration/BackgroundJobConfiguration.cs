@@ -8,7 +8,7 @@ namespace AccessPointMap.API.Configuration
     public static class BackgroundJobConfiguration
     {
         private const string _schedulerId = "AccessPointMapQuartz";
-
+      
         public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
         {
             services.Configure<QuartzOptions>(options =>
