@@ -12,7 +12,7 @@ namespace AccessPointMap.Application.AccessPoints
     [DisallowConcurrentExecution]
     public class AccessPointManufacturerJob : IJob
     {
-        public const string CronExpression = "0 4 * * * ";
+        public const string CronExpression = "0 0 4 1/1 * ? *";
         public const string JobName = "AccessPointManufacturerUpdate";
 
         private readonly IUnitOfWork _unitOfWork;

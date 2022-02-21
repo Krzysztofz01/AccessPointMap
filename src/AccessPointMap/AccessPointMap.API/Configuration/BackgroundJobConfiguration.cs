@@ -1,10 +1,7 @@
 ﻿using AccessPointMap.Application.AccessPoints;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using AccessPointMap.Application.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Quartz;
-using System;
 
 namespace AccessPointMap.API.Configuration
 {
@@ -32,10 +29,9 @@ namespace AccessPointMap.API.Configuration
                     tpool.MaxConcurrency = 10;
                 });
 
-                options.ScheduleJob<AccessPointManufacturerJob>(trigger => trigger
-                    .WithIdentity(AccessPointManufacturerJob.JobName)
-                    .WithCronSchedule(AccessPointManufacturerJob.CronExpression)
-                );
+                options.AddJobAndTrigger<AccessPointManufacturerJob>(
+                    AccessPointManufacturerJob.JobName,
+                    AccessPointManufacturerJob.CronExpression);
             });
 
             services.AddQuartzServer(options =>
@@ -44,16 +40,6 @@ namespace AccessPointMap.API.Configuration
             });
 
             return services;
-        }
-
-        public static IApplicationBuilder UseBackgroundJobs(this IApplicationBuilder app, IServiceProvider service, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-
-            }
-
-            return app;
         }
     }
 }
