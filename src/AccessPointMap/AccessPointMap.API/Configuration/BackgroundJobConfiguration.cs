@@ -1,46 +1,45 @@
-﻿using AccessPointMap.Application.Abstraction;
-using AccessPointMap.Application.AccessPoints;
-using Hangfire;
-using Hangfire.MemoryStorage;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+﻿using AccessPointMap.Application.AccessPoints;
+using AccessPointMap.Application.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
+using Quartz;
 
 namespace AccessPointMap.API.Configuration
 {
     public static class BackgroundJobConfiguration
     {
+        private const string _schedulerId = "AccessPointMapQuartz";
+      
         public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
         {
-            services.AddHangfire(options =>
+            services.Configure<QuartzOptions>(options =>
             {
-                options
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseDefaultTypeSerializer()
-                    .UseMemoryStorage();
+                options.Scheduling.IgnoreDuplicates = true;
+                options.Scheduling.OverWriteExistingData = true;
             });
 
-            services.AddHangfireServer();
+            services.AddQuartz(options =>
+            {
+                options.SchedulerId = _schedulerId; 
 
-            services.AddScoped<IAccessPointBackgroundJobs, AccessPointBackgroundJobs>();
+                options.UseMicrosoftDependencyInjectionJobFactory();
+                options.UseSimpleTypeLoader();
+                options.UseInMemoryStore();
+                options.UseDefaultThreadPool(tpool =>
+                {
+                    tpool.MaxConcurrency = 10;
+                });
+
+                options.AddJobAndTrigger<AccessPointManufacturerJob>(
+                    AccessPointManufacturerJob.JobName,
+                    AccessPointManufacturerJob.CronExpression);
+            });
+
+            services.AddQuartzServer(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
 
             return services;
-        }
-
-        public static IApplicationBuilder UseBackgroundJobs(this IApplicationBuilder app, IRecurringJobManager jobs, IServiceProvider service, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseHangfireDashboard();
-            }
-
-            jobs.AddOrUpdate("AccessPointUpdateManufacturer", () => service
-                .GetService<IAccessPointBackgroundJobs>().SetAccessPointManufacturer(), Cron.Daily);
-
-            return app;
         }
     }
 }

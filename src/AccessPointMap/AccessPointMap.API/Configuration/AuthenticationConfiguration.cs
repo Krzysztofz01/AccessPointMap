@@ -18,27 +18,32 @@ namespace AccessPointMap.API.Configuration
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
+            var securitySettings = configuration.GetSection(nameof(SecuritySettings)).Get<SecuritySettings>();
+
             var jwtSettingsSection = configuration.GetSection(nameof(JsonWebTokenSettings));
             services.Configure<JsonWebTokenSettings>(jwtSettingsSection);
 
             var jwtSettings = jwtSettingsSection.Get<JsonWebTokenSettings>();
             var secret = Encoding.ASCII.GetBytes(jwtSettings.TokenSecret);
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.RequireHttpsMetadata = false;
+                if (securitySettings.SecureMode)
+                {
+                    options.Authority = jwtSettings.Audience;
+                    options.Audience = jwtSettings.Audience;
+                }
+
+                options.RequireHttpsMetadata = securitySettings.SecureMode;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(secret),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = securitySettings.SecureMode,
+                    ValidateAudience = securitySettings.SecureMode,
                     ClockSkew = TimeSpan.Zero
                 };
             });

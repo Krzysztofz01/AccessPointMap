@@ -2,6 +2,7 @@
 using AccessPointMap.Application.Oui.MacToVendor.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Oui.MacToVendor
@@ -19,17 +20,17 @@ namespace AccessPointMap.Application.Oui.MacToVendor
         public async Task<string> GetManufacturerName(string macAddress)
         {
             string hexadecimalOuiMacPart = macAddress
-                .Replace(":", string.Empty)
-                .Substring(0, 6);
+                .Replace(":", string.Empty)[..6];
 
             int decimalOuiMacPart = Convert.ToInt32(hexadecimalOuiMacPart, 16);
 
             var vendor = await _dbContext.Vendors
-                .SingleOrDefaultAsync(v => v.MacAddress == decimalOuiMacPart && v.Visibility == 1);
+                .Where(v => v.MacAddress == decimalOuiMacPart && v.Visibility == 1)
+                .Select(v => v.Name)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
 
-            if (vendor is null) return string.Empty;
-
-            return vendor.Name;
+            return (vendor is null) ? string.Empty : vendor;
         }
     }
 }
