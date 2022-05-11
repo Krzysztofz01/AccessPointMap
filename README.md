@@ -63,5 +63,3 @@ A list of functionality and features that may be implemented in the future:
 🔲 Preparation of a set of scanning scripts for supported software.
 
 🔲 Deployment scripts.
-
-🔲 Migration from .NET5 to .NET6 LTS
