@@ -407,5 +407,88 @@ namespace AccessPointMap.Domain.Test
             int expectedStampsCollectionCountAfterAfter = 0;
             Assert.Equal(expectedStampsCollectionCountAfterAfter, accesspoint.Stamps.Count);
         }
+
+        [Fact]
+        public void AccessPointAdnnotationShouldCreate()
+        {
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = "00:00:00:00:00:00",
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            Assert.Empty(accesspoint.Adnnotations);
+
+            string adnnotationTitle = "New adnnotation";
+            string adnnotationContent = "New adnnotation content!";
+
+            accesspoint.Apply(new V1.AccessPointAdnnotationCreated
+            {
+                Id = accesspoint.Id,
+                Title = adnnotationTitle,
+                Content = adnnotationContent
+            });
+
+            Assert.NotEmpty(accesspoint.Adnnotations);
+
+            var adnnotation = accesspoint.Adnnotations.Single();
+
+            Assert.Equal(adnnotationTitle, adnnotation.Title);
+            Assert.Equal(adnnotationContent, adnnotationContent);
+        }
+
+        [Fact]
+        public void AccessPointAdnnotationShouldDelete()
+        {
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = "00:00:00:00:00:00",
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            Assert.Empty(accesspoint.Adnnotations);
+
+            string adnnotationTitle = "New adnnotation";
+            string adnnotationContent = "New adnnotation content!";
+
+            accesspoint.Apply(new V1.AccessPointAdnnotationCreated
+            {
+                Id = accesspoint.Id,
+                Title = adnnotationTitle,
+                Content = adnnotationContent
+            });
+
+            Assert.NotEmpty(accesspoint.Adnnotations);
+
+            var adnnotationId = accesspoint.Adnnotations.Single().Id;
+
+            accesspoint.Apply(new V1.AccessPointAdnnotationDeleted
+            {
+                Id = accesspoint.Id,
+                AdnnotationId = adnnotationId
+            });
+
+            Assert.Empty(accesspoint.Adnnotations);
+        }
     }
 }
