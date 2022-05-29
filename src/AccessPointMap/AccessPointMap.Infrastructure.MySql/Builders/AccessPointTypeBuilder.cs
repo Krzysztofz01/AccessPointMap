@@ -40,6 +40,18 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
                 e.Property(e => e.DeletedAt).HasDefaultValue(null);
             });
 
+            builder.OwnsMany(e => e.Adnnotations, e =>
+            {
+                e.WithOwner().HasForeignKey("accesspointId");
+                e.HasKey(e => e.Id);
+                e.Property(e => e.Id).ValueGeneratedNever();
+                e.OwnsOne(e => e.Title);
+                e.OwnsOne(e => e.Content);
+                e.OwnsOne(e => e.Timestamp);
+
+                e.Property(e => e.DeletedAt).HasDefaultValue(null);
+            });
+
             builder.Property(e => e.DeletedAt).HasDefaultValue(null);
 
             builder.HasQueryFilter(e => e.DeletedAt == null);
