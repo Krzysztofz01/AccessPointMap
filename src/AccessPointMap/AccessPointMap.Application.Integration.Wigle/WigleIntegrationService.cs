@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Integration.Wigle
@@ -18,6 +19,8 @@ namespace AccessPointMap.Application.Integration.Wigle
     {
         private readonly string[] _allowedExtensions = new string[] { ".csv" };
         private readonly string _allowedType = "WIFI";
+
+        private readonly string _adnnotationName = "WiGLE integration provided data";
 
         private const string _integrationName = "WiGLE";
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
@@ -103,6 +106,13 @@ namespace AccessPointMap.Application.Integration.Wigle
                 ScanDate = record.FirstSeen
             });
 
+            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            {
+                Id = accessPoint.Id,
+                Title = _adnnotationName,
+                Content = SerializeRawAccessPointRecord(record)
+            });
+
             await _unitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
@@ -124,6 +134,13 @@ namespace AccessPointMap.Application.Integration.Wigle
                 RawSecurityPayload = record.AuthMode,
                 UserId = _scopeWrapperService.GetUserId(),
                 ScanDate = record.FirstSeen
+            });
+
+            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            {
+                Id = accessPoint.Id,
+                Title = _adnnotationName,
+                Content = SerializeRawAccessPointRecord(record)
             });
         }
 
@@ -154,6 +171,14 @@ namespace AccessPointMap.Application.Integration.Wigle
             }
 
             return accessPoint;
+        }
+
+        private string SerializeRawAccessPointRecord(AccessPointRecord record)
+        {
+            return JsonSerializer.Serialize(record, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
         }
     }
 }
