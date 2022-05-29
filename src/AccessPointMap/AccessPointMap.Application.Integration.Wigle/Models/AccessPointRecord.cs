@@ -1,5 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using System;
+using System.Text.Json.Serialization;
 
 namespace AccessPointMap.Application.Integration.Wigle.Models
 {
@@ -40,8 +41,10 @@ namespace AccessPointMap.Application.Integration.Wigle.Models
 
 
         [Ignore]
+        [JsonIgnore]
         private int _lowSignalLevel;
         [Ignore]
+        [JsonIgnore]
         public int LowSignalLevel
         {
             get => (_lowSignalLevel == default) ? Rssi : _lowSignalLevel;
@@ -49,8 +52,10 @@ namespace AccessPointMap.Application.Integration.Wigle.Models
         }
 
         [Ignore]
+        [JsonIgnore]
         private double _lowLatitude;
         [Ignore]
+        [JsonIgnore]
         public double LowLatitude
         {
             get => (_lowLatitude == default) ? Latitude : _lowLatitude;
@@ -58,8 +63,10 @@ namespace AccessPointMap.Application.Integration.Wigle.Models
         }
 
         [Ignore]
+        [JsonIgnore]
         private double _lowLongitude;
         [Ignore]
+        [JsonIgnore]
         public double LowLongitude
         {
             get => (_lowLongitude == default) ? Longitude : _lowLongitude;

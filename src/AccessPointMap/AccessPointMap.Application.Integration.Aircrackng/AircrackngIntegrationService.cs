@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Integration.Aircrackng
@@ -18,6 +19,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
     {
         private readonly string[] _allowedExtensions = new string[] { ".csv" };
         private readonly string _allowedType = "AP";
+
+        private readonly string _adnnotationName = "Aircrack-ng integration provided data";
 
         private const string _integrationName = "Aircrack-ng";
         private const string _integrationDescription = "Integration for the popular WiFi security auditing tools suite.";
@@ -138,6 +141,13 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 ScanDate = record.LocalTimestamp
             });
 
+            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            {
+                Id = accessPoint.Id,
+                Title = _adnnotationName,
+                Content = SerializeRawAccessPointRecord(record)
+            });
+
             await _unitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
@@ -159,6 +169,21 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 RawSecurityPayload = record.Security,
                 UserId = _scopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp
+            });
+
+            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            {
+                Id = accessPoint.Id,
+                Title = _adnnotationName,
+                Content = SerializeRawAccessPointRecord(record)
+            });
+        }
+
+        private string SerializeRawAccessPointRecord(AccessPointRecord record)
+        {
+            return JsonSerializer.Serialize(record, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
             });
         }
     }
