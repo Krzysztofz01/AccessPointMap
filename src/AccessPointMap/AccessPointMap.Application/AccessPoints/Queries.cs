@@ -35,6 +35,7 @@ namespace AccessPointMap.Application.AccessPoints
         {
             return await accessPoints
                 .Include(a => a.Stamps)
+                .Include(a => a.Adnnotations)
                 .SingleAsync(a => a.Id == id);
         }
 

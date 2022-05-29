@@ -8,8 +8,6 @@ namespace AccessPointMap.Application.AccessPoints
 {
     public static class Commands
     {
-        
-
         public static class V1
         {
             public class Create : IApplicationCommand<AccessPoint>
@@ -72,6 +70,27 @@ namespace AccessPointMap.Application.AccessPoints
 
                 [Required]
                 public Guid StampId { get; set; }
+            }
+
+            public class CreateAdnnotation : IApplicationCommand<AccessPoint>
+            {
+                [Required]
+                public Guid Id { get; set; }
+
+                [Required]
+                public string Title { get; set; }
+
+                [Required]
+                public string Content { get; set; }
+            }
+            
+            public class DeleteAdnnotation : IApplicationCommand<AccessPoint>
+            {
+                [Required]
+                public Guid Id { get; set; }
+
+                [Required]
+                public Guid AdnnotationId { get; set; }
             }
         }
 
