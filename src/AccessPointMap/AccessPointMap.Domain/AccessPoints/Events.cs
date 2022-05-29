@@ -77,6 +77,19 @@ namespace AccessPointMap.Domain.AccessPoints
                 public Guid Id { get; set; }
                 public Guid StampId { get; set; }
             }
+
+            public class AccessPointAdnnotationCreated : IEvent
+            {
+                public Guid Id { get; set; }
+                public string Title { get; set; }
+                public string Content { get; set; }
+            }
+
+            public class AccessPointAdnnotationDeleted : IEvent
+            {
+                public Guid Id { get; set; }
+                public Guid AdnnotationId { get; set; }
+            }
         }
     }
 }
