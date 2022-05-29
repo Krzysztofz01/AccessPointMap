@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Domain.Identities;
+using AccessPointMap.Infrastructure.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,8 +12,10 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).ValueGeneratedNever();
             builder.OwnsOne(e => e.Name).Property(v => v.Value).HasMaxLength(40);
+            builder.Navigation(e => e.Name).IsRequired();
             builder.OwnsOne(e => e.Email).HasIndex(v => v.Value).IsUnique();
-            builder.OwnsOne(e => e.PasswordHash);
+            builder.Navigation(e => e.Email).IsRequired();
+            builder.OwnsRequiredOne(e => e.PasswordHash);
             builder.OwnsOne(e => e.LastLogin);
             builder.OwnsOne(e => e.Role);
             builder.OwnsOne(e => e.Activation);
