@@ -14,12 +14,14 @@ namespace AccessPointMap.Application.AccessPoints
         {
             return await accessPoints
                 .Where(a => a.DisplayStatus.Value)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
         public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsAdministration(this IQueryable<AccessPoint> accessPoints)
         {
             return await accessPoints
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -28,6 +30,7 @@ namespace AccessPointMap.Application.AccessPoints
             return await accessPoints
                 .Include(a => a.Stamps)
                 .Where(a => a.DisplayStatus.Value)
+                .AsNoTracking()
                 .SingleAsync(a => a.Id == id);
         }
 
@@ -35,6 +38,7 @@ namespace AccessPointMap.Application.AccessPoints
         {
             return await accessPoints
                 .Include(a => a.Stamps)
+                .AsNoTracking()
                 .SingleAsync(a => a.Id == id);
         }
 
@@ -47,6 +51,7 @@ namespace AccessPointMap.Application.AccessPoints
                     a.Ssid.Value.ToLower().Contains(kw) ||
                     a.DeviceType.Value.ToLower().Contains(kw) ||
                     a.Security.RawSecurityPayload.ToLower().Contains(kw))
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -56,6 +61,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .Where(x => x.DisplayStatus.Value)
                 .OrderByDescending(a => a.Positioning.SignalArea)
                 .Take(limit)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -68,6 +74,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .OrderByDescending(a => a.Count())
                 .Take(limit)
                 .Select(a => new { Frequnecy = a.Key, Count = a.Count() })
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -80,6 +87,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .OrderByDescending(a => a.Count())
                 .Take(limit)
                 .Select(a => new { Manufacturer = a.Key, Count = a.Count() })
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -96,6 +104,7 @@ namespace AccessPointMap.Application.AccessPoints
             var accessPointsEncryptions = await accessPoints
                 .Where(a => a.DisplayStatus.Value)
                 .Select(a => a.Security.SerializedSecurityPayload)
+                .AsNoTracking()
                 .ToListAsync();
 
             foreach(var serializedEncryption in accessPointsEncryptions)
