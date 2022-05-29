@@ -38,8 +38,9 @@ namespace AccessPointMap.Application.AccessPoints
         {
             return await accessPoints
                 .Include(a => a.Stamps)
+                .Include(a => a.Adnnotations)
                 .AsNoTracking()
-                .SingleAsync(a => a.Id == id);
+                .SingleAsync(a => a.Id == id); 
         }
 
         public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)

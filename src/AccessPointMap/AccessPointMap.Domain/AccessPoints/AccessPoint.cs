@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
+﻿using AccessPointMap.Domain.AccessPoints.AccessPointAdnnotations;
+using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
 using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Domain.Core.Extensions;
@@ -28,6 +29,9 @@ namespace AccessPointMap.Domain.AccessPoints
         private readonly List<AccessPointStamp> _stamps;
         public IReadOnlyCollection<AccessPointStamp> Stamps => _stamps.SkipDeleted().AsReadOnly();
 
+        private readonly List<AccessPointAdnnotation> _adnnotations;
+        public IReadOnlyCollection<AccessPointAdnnotation> Adnnotations => _adnnotations.SkipDeleted().AsReadOnly();
+
         protected override void Handle(IEventBase @event)
         {
             switch(@event)
@@ -40,6 +44,9 @@ namespace AccessPointMap.Domain.AccessPoints
 
                 case V1.AccessPointStampCreated e: When(e); break;
                 case V1.AccessPointStampDeleted e: When(e); break;
+
+                case V1.AccessPointAdnnotationCreated e: When(e); break;
+                case V1.AccessPointAdnnotationDeleted e: When(e); break;
 
                 default: throw new BusinessLogicException("This entity can not handlethis type of event.");
             }
@@ -176,8 +183,27 @@ namespace AccessPointMap.Domain.AccessPoints
             stamp.Apply(@event);
         }
 
-        private AccessPoint() =>
+        private void When(V1.AccessPointAdnnotationCreated @event)
+        {
+            var adnnotation = AccessPointAdnnotation.Factory.Create(@event);
+
+            _adnnotations.Add(adnnotation);
+        }
+
+        private void When(V1.AccessPointAdnnotationDeleted @event)
+        {
+            var adnnotation = _adnnotations
+                .SkipDeleted()
+                .Single(s => s.Id == @event.AdnnotationId);
+
+            adnnotation.Apply(@event);
+        }
+
+        private AccessPoint()
+        {
             _stamps = new List<AccessPointStamp>();
+            _adnnotations = new List<AccessPointAdnnotation>();
+        }
 
         public static class Factory
         {

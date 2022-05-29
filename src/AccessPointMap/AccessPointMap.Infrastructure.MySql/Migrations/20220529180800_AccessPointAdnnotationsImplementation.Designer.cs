@@ -3,6 +3,7 @@ using System;
 using AccessPointMap.Infrastructure.MySql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccessPointMap.Infrastructure.MySql.Migrations
 {
     [DbContext(typeof(AccessPointMapDbContext))]
-    partial class AccessPointMapDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220529180800_AccessPointAdnnotationsImplementation")]
+    partial class AccessPointAdnnotationsImplementation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

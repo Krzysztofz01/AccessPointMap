@@ -69,6 +69,7 @@ namespace AccessPointMap.Application.AccessPoints
             public string Note { get; set; }
             public bool DisplayStatus { get; set; }
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
+            public IEnumerable<AccessPointAdnnotationDetails> Adnnotations { get; set; }
         }
 
         public class AccessPointStampDetails
@@ -91,6 +92,14 @@ namespace AccessPointMap.Application.AccessPoints
             public string SerializedSecurityPayload { get; set; }
             public bool IsSecure { get; set; }
             public bool Status { get; set; }
+        }
+
+        public class AccessPointAdnnotationDetails
+        {
+            public Guid Id { get; set; }
+            public string Title { get; set; }
+            public string Content { get; set; }
+            public DateTime Timestamp { get; set; }
         }
     }
 }
