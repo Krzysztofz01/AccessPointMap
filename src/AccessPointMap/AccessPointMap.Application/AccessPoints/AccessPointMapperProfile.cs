@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
+using AccessPointMap.Domain.AccessPoints.AccessPointAdnnotations;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
 using AutoMapper;
 using static AccessPointMap.Application.AccessPoints.Dto;
@@ -88,6 +89,12 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SerializedSecurityPayload, m => m.MapFrom(s => s.Security.SerializedSecurityPayload))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.Status, m => m.MapFrom(s => s.Status.Value));
+
+            CreateMap<AccessPointAdnnotation, AccessPointAdnnotationDetails>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
+                .ForMember(d => d.Title, m => m.MapFrom(s => s.Title))
+                .ForMember(d => d.Content, m => m.MapFrom(s => s.Content))
+                .ForMember(d => d.Timestamp, m => m.MapFrom(s => s.Timestamp));
         }
     }
 }

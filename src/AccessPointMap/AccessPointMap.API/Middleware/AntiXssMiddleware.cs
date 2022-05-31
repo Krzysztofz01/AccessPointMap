@@ -32,11 +32,12 @@ namespace AccessPointMap.API.Middleware
             using var streamReader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, true);
 
             var rawRequestBody = await streamReader.ReadToEndAsync();
+            var newLineSafeRawRequestBody = rawRequestBody.Replace("\r\n", "\n");
 
             var sanitizer = new HtmlSanitizer();
             var sanitizedRequestBody = sanitizer.Sanitize(rawRequestBody);
 
-            if (rawRequestBody != sanitizedRequestBody)
+            if (newLineSafeRawRequestBody != sanitizedRequestBody)
             {
                 _logger.LogInformation("XSS injection detected from");
                 _logger.LogInformation($"{ httpContext.Request.GetCurrentIp() } - { httpContext.Request.GetCurrentUri() }");

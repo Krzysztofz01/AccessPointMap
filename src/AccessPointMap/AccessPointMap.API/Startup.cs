@@ -32,6 +32,8 @@ namespace AccessPointMap.API
 
             services.AddCaching();
 
+            services.AddServiceHealthChecks(Configuration);
+
             services.AddWebUtilities(Configuration);
         }
 
@@ -44,6 +46,8 @@ namespace AccessPointMap.API
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseServiceHealthChecks(service);
 
             app.UseEndpoints(endpoints =>
             {
