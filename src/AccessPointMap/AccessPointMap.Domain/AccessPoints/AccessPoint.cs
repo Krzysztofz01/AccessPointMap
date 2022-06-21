@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Domain.AccessPoints.AccessPointAdnnotations;
+using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
 using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Domain.Core.Exceptions;
@@ -32,6 +33,9 @@ namespace AccessPointMap.Domain.AccessPoints
         private readonly List<AccessPointAdnnotation> _adnnotations;
         public IReadOnlyCollection<AccessPointAdnnotation> Adnnotations => _adnnotations.SkipDeleted().AsReadOnly();
 
+        private readonly List<AccessPointPacket> _packets;
+        public IReadOnlyCollection<AccessPointPacket> Packets => _packets.SkipDeleted().AsReadOnly();
+
         protected override void Handle(IEventBase @event)
         {
             switch(@event)
@@ -47,6 +51,9 @@ namespace AccessPointMap.Domain.AccessPoints
 
                 case V1.AccessPointAdnnotationCreated e: When(e); break;
                 case V1.AccessPointAdnnotationDeleted e: When(e); break;
+
+                case V1.AccessPointPacketCreated e: When(e); break;
+                case V1.AccessPointPacketDeleted e: When(e); break;
 
                 default: throw new BusinessLogicException("This entity can not handlethis type of event.");
             }
@@ -199,10 +206,27 @@ namespace AccessPointMap.Domain.AccessPoints
             adnnotation.Apply(@event);
         }
 
+        private void When(V1.AccessPointPacketCreated @event)
+        {
+            var packet = AccessPointPacket.Factory.Create(@event);
+
+            _packets.Add(packet);
+        }
+
+        private void When(V1.AccessPointPacketDeleted @event)
+        {
+            var packet = _packets
+                .SkipDeleted()
+                .Single(p => p.Id == @event.PacketId);
+
+            packet.Apply(@event);
+        }
+
         private AccessPoint()
         {
             _stamps = new List<AccessPointStamp>();
             _adnnotations = new List<AccessPointAdnnotation>();
+            _packets = new List<AccessPointPacket>();
         }
 
         public static class Factory

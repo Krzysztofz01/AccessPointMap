@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Domain", "AccessPointMap.Domain\AccessPointMap.Domain.csproj", "{48085F18-5A3B-4D7A-A220-69B4EDE76F04}"
 EndProject
@@ -25,7 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Oui.Core", "AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj", "{1C0E0A3D-CFA0-472E-AE02-297811BCE643}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Integration.Aircrackng", "AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj", "{CD780243-6723-4A08-89F1-0E2603984D22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Integration.Aircrackng", "AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj", "{CD780243-6723-4A08-89F1-0E2603984D22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Pcap.Core", "AccessPointMap.Application.Pcap.Core\AccessPointMap.Application.Pcap.Core.csproj", "{326B65A9-970D-40A6-8C71-03E8CACD4723}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Pcap.SharpPcap", "AccessPointMap.Application.Pcap.SharpPcap\AccessPointMap.Application.Pcap.SharpPcap.csproj", "{80ECE4B8-2585-47A5-8974-8894C1552097}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +85,14 @@ Global
 		{CD780243-6723-4A08-89F1-0E2603984D22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD780243-6723-4A08-89F1-0E2603984D22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD780243-6723-4A08-89F1-0E2603984D22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80ECE4B8-2585-47A5-8974-8894C1552097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80ECE4B8-2585-47A5-8974-8894C1552097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80ECE4B8-2585-47A5-8974-8894C1552097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80ECE4B8-2585-47A5-8974-8894C1552097}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
