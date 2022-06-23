@@ -94,6 +94,7 @@ namespace AccessPointMap.Domain.AccessPoints
             public class AccessPointPacketCreated : IEvent
             {
                 public Guid Id { get; set; }
+                public string SourceAddress { get; set; }
                 public string DestinationAddress { get; set; }
                 public string Data { get; set; }
             }

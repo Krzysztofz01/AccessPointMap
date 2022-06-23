@@ -208,6 +208,9 @@ namespace AccessPointMap.Domain.AccessPoints
 
         private void When(V1.AccessPointPacketCreated @event)
         {
+            if (@event.SourceAddress != Bssid.Value)
+                throw new BusinessLogicException("The packet hardware addresses are not matching.");
+
             var packet = AccessPointPacket.Factory.Create(@event);
 
             _packets.Add(packet);
