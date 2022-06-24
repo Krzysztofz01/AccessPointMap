@@ -27,9 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Integration.Aircrackng", "AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj", "{CD780243-6723-4A08-89F1-0E2603984D22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Pcap.Core", "AccessPointMap.Application.Pcap.Core\AccessPointMap.Application.Pcap.Core.csproj", "{326B65A9-970D-40A6-8C71-03E8CACD4723}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Pcap.Core", "AccessPointMap.Application.Pcap.Core\AccessPointMap.Application.Pcap.Core.csproj", "{326B65A9-970D-40A6-8C71-03E8CACD4723}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Pcap.SharpPcap", "AccessPointMap.Application.Pcap.SharpPcap\AccessPointMap.Application.Pcap.SharpPcap.csproj", "{80ECE4B8-2585-47A5-8974-8894C1552097}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Pcap.PcapngUtils", "AccessPointMap.Application.Pcap.PcapngUtils\AccessPointMap.Application.Pcap.PcapngUtils.csproj", "{3C56AC08-8E20-48C1-A4F0-47D264CA2606}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,10 +89,10 @@ Global
 		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80ECE4B8-2585-47A5-8974-8894C1552097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80ECE4B8-2585-47A5-8974-8894C1552097}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80ECE4B8-2585-47A5-8974-8894C1552097}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80ECE4B8-2585-47A5-8974-8894C1552097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C56AC08-8E20-48C1-A4F0-47D264CA2606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C56AC08-8E20-48C1-A4F0-47D264CA2606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C56AC08-8E20-48C1-A4F0-47D264CA2606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C56AC08-8E20-48C1-A4F0-47D264CA2606}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
