@@ -10,6 +10,7 @@
         Data = 0x0020,
         NullFunction = 0x0024,
         Probe = 0x0005,
-        Qos = 0x0028
+        Qos = 0x0028,
+        RequestToSend = 0x001b
     }
 }

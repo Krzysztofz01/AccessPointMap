@@ -17,11 +17,9 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative.Extensions
             return BitConverter.ToUInt16(byteArray, offset);
         }
 
-        public static string ToBase64HardwareAddress(this byte[] byteArray, int offset = 0)
+        public static byte[] ToHardwareAddressBuffer(this byte[] byteArray, int offset = 0)
         {
-            var bufferSlice = byteArray.Skip(offset).Take(6).ToArray();
-
-            return Convert.ToBase64String(bufferSlice);
+            return byteArray.Skip(offset).Take(6).ToArray();
         }
     }
 }

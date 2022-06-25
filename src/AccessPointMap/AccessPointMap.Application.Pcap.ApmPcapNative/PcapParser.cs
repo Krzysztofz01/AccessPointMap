@@ -9,8 +9,6 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
     // Public for development purposes, change to internal
     public class PcapParser : IDisposable
     {
-        
-
         private readonly BinaryReader _binaryReader;
 
         private PcapParser() { }
@@ -27,8 +25,7 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
         {
             try
             {
-                //Skip pcap file header
-                _ = _binaryReader.ReadBytes(Constants.PcapFileHeaderLength);
+                _binaryReader.SkipBytes(Constants.PcapFileHeaderLength);
 
                 var packets = new List<Packet>();
 
@@ -39,8 +36,7 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             }
             catch (Exception ex)
             {
-                //TODO Error handling
-                var exD = ex;
+                System.Diagnostics.Debug.WriteLine(ex);
                 return null;
             }
         }
@@ -59,11 +55,9 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
 
             Ieee80211SubTypes subType = (Ieee80211SubTypes)ieeeFrameBuffer.ToUInt16();
 
-            var sourceAddressOffset = GetSourceOffset(subType);
-            var sourceAddress = ieeeFrameBuffer.ToBase64HardwareAddress(sourceAddressOffset);
+            var sourceAddress = GetSourceAddress(ieeeFrameBuffer, subType);
 
-            var destinationAddressOffset = GetDestinationOffset(subType);
-            var destinationAddress = ieeeFrameBuffer.ToBase64HardwareAddress(destinationAddressOffset);
+            var destinationAddress = GetDestinationAddress(ieeeFrameBuffer, subType);
 
             long frameEndPosition = _binaryReader.BaseStream.Position;
 
@@ -84,20 +78,58 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             };
         }
 
-        private int GetSourceOffset(Ieee80211SubTypes ieee80211SubTypes)
+        private static string GetSourceAddress(byte[] ieeeFrameBuffer, Ieee80211SubTypes ieee80211SubTypes)
         {
-            throw new NotImplementedException();
+            int? offset = ieee80211SubTypes switch
+            {
+                Ieee80211SubTypes.BlockAck => Constants.Ieee80211BlockAckSourceOffset,
+                Ieee80211SubTypes.Acknowledgement => null,
+                Ieee80211SubTypes.Action => Constants.Ieee80211ActionSourceOffset,
+                Ieee80211SubTypes.Beacon => Constants.Ieee80211BeaconSourceOffset,
+                Ieee80211SubTypes.ClearToSend => null,
+                Ieee80211SubTypes.Data => Constants.Ieee80211DataSourceOffset,
+                Ieee80211SubTypes.NullFunction => Constants.Ieee80211NullFuncSourceOffset,
+                Ieee80211SubTypes.Probe => Constants.Ieee80211ProbeSourceOffset,
+                Ieee80211SubTypes.Qos => Constants.Ieee80211QosSourceOffset,
+                Ieee80211SubTypes.RequestToSend => Constants.Ieee80211RequestToSendSourceOffset,
+                _ => throw new ArgumentOutOfRangeException(nameof(ieee80211SubTypes)),
+            };
+
+            if (offset is null) return string.Empty;
+
+            var addressBuffer = ieeeFrameBuffer.ToHardwareAddressBuffer(offset.Value);
+            return Convert.ToBase64String(addressBuffer);
         }
 
-        private int GetDestinationOffset(Ieee80211SubTypes ieee80211SubTypes)
+        private static string GetDestinationAddress(byte[] ieeeFrameBuffer, Ieee80211SubTypes ieee80211SubTypes)
         {
-            throw new NotImplementedException();
+            int? offset = ieee80211SubTypes switch
+            {
+                Ieee80211SubTypes.BlockAck => Constants.Ieee80211BlockAckDestinationOffset,
+                Ieee80211SubTypes.Acknowledgement => null,
+                Ieee80211SubTypes.Action => Constants.Ieee80211ActionDestinationOffset,
+                Ieee80211SubTypes.Beacon => Constants.Ieee80211BeaconDestinationOffset,
+                Ieee80211SubTypes.ClearToSend => null,
+                Ieee80211SubTypes.Data => Constants.Ieee80211DataDestinationOffset,
+                Ieee80211SubTypes.NullFunction => Constants.Ieee80211NullFuncDestinationOffset,
+                Ieee80211SubTypes.Probe => Constants.Ieee80211ProbeDestinationOffset,
+                Ieee80211SubTypes.Qos => Constants.Ieee80211QosDestinationOffset,
+                Ieee80211SubTypes.RequestToSend => Constants.Ieee80211RequestToSendDestinationOffset,
+                _ => throw new ArgumentOutOfRangeException(nameof(ieee80211SubTypes)),
+            };
+
+            if (offset is null) return string.Empty;
+
+            var addressBuffer = ieeeFrameBuffer.ToHardwareAddressBuffer(offset.Value);
+            return Convert.ToBase64String(addressBuffer);
         }
 
         public void Dispose()
         {
             if (_binaryReader is not null)
                 _binaryReader.Close();
+
+            GC.SuppressFinalize(this);
         }
     }
 }
