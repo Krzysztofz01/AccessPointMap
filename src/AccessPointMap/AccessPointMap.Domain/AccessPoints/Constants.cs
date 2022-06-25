@@ -23,6 +23,26 @@ namespace AccessPointMap.Domain.AccessPoints
             new EncryptionType { Name = "WPS", IsSecure = false, Priority = 7 },
             new EncryptionType { Name = "WEP", IsSecure = false, Priority = 6 }
         };
+
+        public static readonly IReadOnlyDictionary<ushort, string> Ieee80211FrameSubTypeToName = new Dictionary<ushort, string>
+        {
+            { 0x0019, "Block Ack" },
+            { 0x001d, "Acknowledgement" },
+            { 0x000d, "Action" },
+            { 0x0008, "Beacon Frame" },
+            { 0x001c, "Clear-to-send" },
+            { 0x0020, "Data" },
+            { 0x0024, "Null function" },
+            { 0x0005, "Probe response" },
+            { 0x0028, "QoS Data" },
+            { 0x001b, "Request-to-send" }
+        };
+
+        public static IEnumerable<ushort> Ieee80211FrameSubTypesWithoutHardwareAddresses = new List<ushort>
+        {
+            0x001d,
+            0x001c
+        };
     }
 
     public class EncryptionType
