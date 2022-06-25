@@ -1,23 +1,25 @@
-﻿using AccessPointMap.Domain.Core.Exceptions;
-using AccessPointMap.Domain.Core.Extensions;
-using AccessPointMap.Domain.Core.Models;
+﻿using AccessPointMap.Domain.Core.Models;
 
 namespace AccessPointMap.Domain.AccessPoints.AccessPointPackets
 {
     public class AccessPointPacketDestinationAddress : ValueObject<AccessPointPacketDestinationAddress>
     {
-        private const int _addressLength = 17;
+        //private const int _addressLength = 17;
 
         public string Value { get; private set; }
 
         private AccessPointPacketDestinationAddress() { }
         private AccessPointPacketDestinationAddress(string value)
         {
-            if (value.IsEmpty())
-                throw new ValueObjectValidationException("The access point packet destination address can not be empty.");
+            //TODO: Some packets doesnt contain addresses, that means this value object can be string.empty,
+            //      the validation should be moved to the ,,level'' on the create event step. The validation
+            //      code below will be removed.
 
-            if (value.Length != _addressLength)
-                throw new ValueObjectValidationException("Invalud access point packet destination address format");
+            //if (value.IsEmpty())
+            //    throw new ValueObjectValidationException("The access point packet destination address can not be empty.");
+
+            //if (value.Length != _addressLength)
+            //    throw new ValueObjectValidationException("Invalud access point packet destination address format");
 
             Value = value.ToUpper();
         }
