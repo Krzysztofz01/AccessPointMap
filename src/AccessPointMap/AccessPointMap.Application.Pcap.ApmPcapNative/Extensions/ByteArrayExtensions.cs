@@ -12,9 +12,11 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative.Extensions
             return new BinaryReader(memoryStream);
         }
 
-        public static ushort ToUInt16(this byte[] byteArray, int offset = 0)
+        public static ushort ToUInt16(this byte[] byteArray, int offset, bool reverseEndianness = false)
         {
-            return BitConverter.ToUInt16(byteArray, offset);
+            var uint16Buffer = byteArray.Skip(offset).Take(2).ToArray();
+            
+            return BitConverter.ToUInt16(reverseEndianness ? uint16Buffer.Reverse().ToArray() : uint16Buffer, 0);
         }
 
         public static byte[] ToHardwareAddressBuffer(this byte[] byteArray, int offset = 0)

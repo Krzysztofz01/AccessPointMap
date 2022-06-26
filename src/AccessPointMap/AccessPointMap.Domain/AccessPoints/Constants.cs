@@ -24,6 +24,7 @@ namespace AccessPointMap.Domain.AccessPoints
             new EncryptionType { Name = "WEP", IsSecure = false, Priority = 6 }
         };
 
+        //TODO: The hex values are wrong, update with the values from ApmPcapNative
         public static readonly IReadOnlyDictionary<ushort, string> Ieee80211FrameSubTypeToName = new Dictionary<ushort, string>
         {
             { 0x0019, "Block Ack" },
@@ -38,6 +39,7 @@ namespace AccessPointMap.Domain.AccessPoints
             { 0x001b, "Request-to-send" }
         };
 
+        //TODO: The hex values are wrong, update with the values from ApmPcapNative
         public static IEnumerable<ushort> Ieee80211FrameSubTypesWithoutHardwareAddresses = new List<ushort>
         {
             0x001d,

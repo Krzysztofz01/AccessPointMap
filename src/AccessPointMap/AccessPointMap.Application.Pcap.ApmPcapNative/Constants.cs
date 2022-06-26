@@ -10,6 +10,13 @@
 
         public const int FrameHeaderLength = FrameHeaderStartToLengthOffset + FrameHeaderLengthToEndOffset + sizeof(ushort);
 
+        public const int Ieee80211ManagementFrameDestinationOffset = 4;
+        public const int Ieee80211ManagementFrameSourceOffset = 10;
+
+        public const int Ieee80211DataFrameDestinationOffset = 4;
+        public const int Ieee80211DataFrameSourceOffset = 16;
+
+        // TODO: Remove below. No longer neccessery
         public const int Ieee80211BlockAckDestinationOffset = 4;
         public const int Ieee80211BlockAckSourceOffset = 10;
 
