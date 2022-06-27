@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 
 namespace AccessPointMap.Application.Pcap.ApmPcapNative.Extensions
@@ -11,9 +10,6 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative.Extensions
             if (bitIndex < 0 || bitIndex > 15)
                 throw new ArgumentOutOfRangeException(nameof(bitIndex), "Invalid bit index");
 
-            //return (value & (1 << (bitIndex - 1))) > 1;
-
-            //TODO: Optimization
             var bitArr = Enumerable.Range(0, 16)
                 .Select(bitIndex => 1 << bitIndex)
                 .Select(bitMask => (value & bitMask) == bitMask)

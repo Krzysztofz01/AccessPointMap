@@ -8,8 +8,7 @@ using System.Text;
 
 namespace AccessPointMap.Application.Pcap.ApmPcapNative
 {
-    // Public for development purposes, change to internal
-    public class PcapParser : IDisposable
+    internal class PcapParser : IDisposable
     {
         private readonly BinaryReader _binaryReader;
 
@@ -38,7 +37,6 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             }
             catch (Exception ex)
             {
-                //System.Diagnostics.Debug.WriteLine(ex);
                 Console.WriteLine(ex);
                 return null;
             }
@@ -57,7 +55,6 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             byte[] ieeeFrameBuffer = _binaryReader.ReadBytes(ieee80211FrameLength);
 
             Ieee80211FrameTypes frameType = GetFrameType(ieeeFrameBuffer);
-            //Ieee80211SubTypes subType = (Ieee80211SubTypes)ieeeFrameBuffer.ToUInt16(0, true);
 
             var sourceAddress = GetSourceAddress(ieeeFrameBuffer, frameType);
 
@@ -74,47 +71,22 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
 
             _binaryReader.BaseStream.Position = frameEndPosition;
 
-            var packet = new Packet()
+            return new Packet()
             {
                 Data = fullFrameBufferBase64,
+                FrameType = Enum.GetName(frameType),
                 DestinationAddress = destinationAddress,
                 SourceAddress = sourceAddress
             };
-
-            Console.WriteLine("{0} - {1} - {2} - {3}", sourceAddress, destinationAddress, Enum.GetName<Ieee80211FrameTypes>(frameType),fullFrameBufferBase64.Length);
-
-            return packet;
-
-            /*return new Packet()
-            {
-                Data = fullFrameBufferBase64,
-                DestinationAddress = destinationAddress,
-                SourceAddress = sourceAddress
-            };*/
         }
 
         private static string GetSourceAddress(byte[] ieeeFrameBuffer, Ieee80211FrameTypes frameTypes)
         {
-            //int? offset = ieee80211SubTypes switch
-            //{
-            //    Ieee80211SubTypes.BlockAck => Constants.Ieee80211BlockAckSourceOffset,
-            //    Ieee80211SubTypes.Acknowledgement => null,
-            //    Ieee80211SubTypes.Action => Constants.Ieee80211ActionSourceOffset,
-            //    Ieee80211SubTypes.Beacon => Constants.Ieee80211BeaconSourceOffset,
-            //    Ieee80211SubTypes.ClearToSend => null,
-            //    Ieee80211SubTypes.Data => Constants.Ieee80211DataSourceOffset,
-            //    Ieee80211SubTypes.NullFunction => Constants.Ieee80211NullFuncSourceOffset,
-            //    Ieee80211SubTypes.Probe => Constants.Ieee80211ProbeSourceOffset,
-            //    Ieee80211SubTypes.Qos => Constants.Ieee80211QosSourceOffset,
-            //    Ieee80211SubTypes.RequestToSend => Constants.Ieee80211RequestToSendSourceOffset,
-            //    _ => throw new ArgumentOutOfRangeException(nameof(ieee80211SubTypes)),
-            //};
-            
             int? offset = frameTypes switch
             {
                 Ieee80211FrameTypes.Management => Constants.Ieee80211ManagementFrameSourceOffset,
-                Ieee80211FrameTypes.Control => null,
-                Ieee80211FrameTypes.Data => Constants.Ieee80211DataSourceOffset,
+                Ieee80211FrameTypes.Control => Constants.Ieee80211ControlFrameSourceOffset,
+                Ieee80211FrameTypes.Data => Constants.Ieee80211DataFrameSourceOffset,
                 Ieee80211FrameTypes.Extension => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(frameTypes)),
             };
@@ -122,31 +94,20 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             if (offset is null) return string.Empty;
 
             var addressBuffer = ieeeFrameBuffer.ToHardwareAddressBuffer(offset.Value);
-            return GetHardwareAddressString(addressBuffer);
+
+            //TODO: Better handling of len_diff6 edge case
+            return addressBuffer.Length == 6
+                ? GetHardwareAddressString(addressBuffer)
+                : string.Empty;
         }
 
         private static string GetDestinationAddress(byte[] ieeeFrameBuffer, Ieee80211FrameTypes frameTypes)
         {
-            //int? offset = ieee80211SubTypes switch
-            //{
-            //    Ieee80211SubTypes.BlockAck => Constants.Ieee80211BlockAckDestinationOffset,
-            //    Ieee80211SubTypes.Acknowledgement => null,
-            //    Ieee80211SubTypes.Action => Constants.Ieee80211ActionDestinationOffset,
-            //    Ieee80211SubTypes.Beacon => Constants.Ieee80211BeaconDestinationOffset,
-            //    Ieee80211SubTypes.ClearToSend => null,
-            //    Ieee80211SubTypes.Data => Constants.Ieee80211DataDestinationOffset,
-            //    Ieee80211SubTypes.NullFunction => Constants.Ieee80211NullFuncDestinationOffset,
-            //    Ieee80211SubTypes.Probe => Constants.Ieee80211ProbeDestinationOffset,
-            //    Ieee80211SubTypes.Qos => Constants.Ieee80211QosDestinationOffset,
-            //    Ieee80211SubTypes.RequestToSend => Constants.Ieee80211RequestToSendDestinationOffset,
-            //    _ => throw new ArgumentOutOfRangeException(nameof(ieee80211SubTypes)),
-            //};
-
             int? offset = frameTypes switch
             {
                 Ieee80211FrameTypes.Management => Constants.Ieee80211ManagementFrameDestinationOffset,
-                Ieee80211FrameTypes.Control => null,
-                Ieee80211FrameTypes.Data => Constants.Ieee80211DataDestinationOffset,
+                Ieee80211FrameTypes.Control => Constants.Ieee80211ControlFrameDestinationOffset,
+                Ieee80211FrameTypes.Data => Constants.Ieee80211DataFrameDestinationOffset,
                 Ieee80211FrameTypes.Extension => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(frameTypes)),
             };
@@ -154,7 +115,11 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             if (offset is null) return string.Empty;
 
             var addressBuffer = ieeeFrameBuffer.ToHardwareAddressBuffer(offset.Value);
-            return GetHardwareAddressString(addressBuffer);
+
+            //TODO: Better handling of len_diff6 edge case
+            return addressBuffer.Length == 6
+                ? GetHardwareAddressString(addressBuffer)
+                : string.Empty;
         }
 
         private static Ieee80211FrameTypes GetFrameType(byte[] ieeeFrameBuffer)
@@ -163,8 +128,6 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
 
             var msb = frameControlField.GetBit(9);
             var lsb = frameControlField.GetBit(8);
-
-            Console.WriteLine("{0}{1}", Convert.ToInt32(msb).ToString(), Convert.ToInt32(lsb).ToString());
 
             if (!msb && !lsb) return Ieee80211FrameTypes.Management;
             if (!msb && lsb) return Ieee80211FrameTypes.Control;

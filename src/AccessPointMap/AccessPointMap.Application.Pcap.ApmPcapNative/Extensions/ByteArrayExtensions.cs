@@ -6,12 +6,6 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative.Extensions
 {
     internal static class ByteArrayExtensions
     {
-        public static BinaryReader ToBinaryReader(this byte[] byteArray)
-        {
-            using var memoryStream = new MemoryStream(byteArray);
-            return new BinaryReader(memoryStream);
-        }
-
         public static ushort ToUInt16(this byte[] byteArray, int offset, bool reverseEndianness = false)
         {
             var uint16Buffer = byteArray.Skip(offset).Take(2).ToArray();

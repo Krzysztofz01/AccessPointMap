@@ -13,32 +13,12 @@
         public const int Ieee80211ManagementFrameDestinationOffset = 4;
         public const int Ieee80211ManagementFrameSourceOffset = 10;
 
+        public const int Ieee80211ControlFrameDestinationOffset = 4;
+        public const int Ieee80211ControlFrameSourceOffset = 10;
+
         public const int Ieee80211DataFrameDestinationOffset = 4;
         public const int Ieee80211DataFrameSourceOffset = 16;
 
-        // TODO: Remove below. No longer neccessery
-        public const int Ieee80211BlockAckDestinationOffset = 4;
-        public const int Ieee80211BlockAckSourceOffset = 10;
-
-        public const int Ieee80211ActionDestinationOffset = 4;
-        public const int Ieee80211ActionSourceOffset = 10;
-
-        public const int Ieee80211BeaconDestinationOffset = 4;
-        public const int Ieee80211BeaconSourceOffset = 10;
-
-        public const int Ieee80211DataDestinationOffset = 4;
-        public const int Ieee80211DataSourceOffset = 16;
-
-        public const int Ieee80211NullFuncDestinationOffset = 16;
-        public const int Ieee80211NullFuncSourceOffset = 10;
-
-        public const int Ieee80211ProbeDestinationOffset = 4;
-        public const int Ieee80211ProbeSourceOffset = 10;
-
-        public const int Ieee80211QosDestinationOffset = 16;
-        public const int Ieee80211QosSourceOffset = 10;
-
-        public const int Ieee80211RequestToSendDestinationOffset = 4;
-        public const int Ieee80211RequestToSendSourceOffset = 10;
+        //TODO: Implement extensions related offsets (if needed)
     }
 }
