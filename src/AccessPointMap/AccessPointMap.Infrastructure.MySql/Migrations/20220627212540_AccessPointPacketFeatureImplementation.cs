@@ -4,12 +4,12 @@
 
 namespace AccessPointMap.Infrastructure.MySql.Migrations
 {
-    public partial class AccessPointPacketSubTypeImplementation : Migration
+    public partial class AccessPointPacketFeatureImplementation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Subtype_Value",
+                name: "FrameType_Value",
                 schema: "apm",
                 table: "AccessPointPacket",
                 type: "longtext",
@@ -20,7 +20,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Subtype_Value",
+                name: "FrameType_Value",
                 schema: "apm",
                 table: "AccessPointPacket");
         }

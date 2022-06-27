@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccessPointMap.Infrastructure.MySql.Migrations
 {
     [DbContext(typeof(AccessPointMapDbContext))]
-    [Migration("20220625151442_AccessPointPacketSubTypeImplementation")]
-    partial class AccessPointPacketSubTypeImplementation
+    [Migration("20220627212540_AccessPointPacketFeatureImplementation")]
+    partial class AccessPointPacketFeatureImplementation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -425,7 +425,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                         .HasForeignKey("AccessPointPacketId");
                                 });
 
-                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketSubtype", "Subtype", b2 =>
+                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketFrameType", "FrameType", b2 =>
                                 {
                                     b2.Property<Guid>("AccessPointPacketId")
                                         .HasColumnType("char(36)");
@@ -447,7 +447,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                             b1.Navigation("DestinationAddress")
                                 .IsRequired();
 
-                            b1.Navigation("Subtype")
+                            b1.Navigation("FrameType")
                                 .IsRequired();
                         });
 

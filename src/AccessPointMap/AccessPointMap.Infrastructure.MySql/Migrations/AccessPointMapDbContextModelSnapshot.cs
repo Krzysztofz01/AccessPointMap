@@ -423,7 +423,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                         .HasForeignKey("AccessPointPacketId");
                                 });
 
-                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketSubtype", "Subtype", b2 =>
+                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketFrameType", "FrameType", b2 =>
                                 {
                                     b2.Property<Guid>("AccessPointPacketId")
                                         .HasColumnType("char(36)");
@@ -445,7 +445,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                             b1.Navigation("DestinationAddress")
                                 .IsRequired();
 
-                            b1.Navigation("Subtype")
+                            b1.Navigation("FrameType")
                                 .IsRequired();
                         });
 

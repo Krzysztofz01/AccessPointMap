@@ -61,7 +61,7 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
                 e.HasKey(e => e.Id);
                 e.Property(e => e.Id).ValueGeneratedNever();
                 e.OwnsRequiredOne(e => e.DestinationAddress);
-                e.OwnsRequiredOne(e => e.Subtype);
+                e.OwnsRequiredOne(e => e.FrameType);
                 e.OwnsRequiredOne(e => e.Data);
 
                 e.Property(e => e.DeletedAt).HasDefaultValue(null);
