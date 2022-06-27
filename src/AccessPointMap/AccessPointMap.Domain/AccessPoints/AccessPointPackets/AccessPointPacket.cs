@@ -1,9 +1,7 @@
 ﻿using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Domain.Core.Exceptions;
-using AccessPointMap.Domain.Core.Extensions;
 using AccessPointMap.Domain.Core.Models;
 using System;
-using System.Linq;
 using static AccessPointMap.Domain.AccessPoints.Events;
 
 namespace AccessPointMap.Domain.AccessPoints.AccessPointPackets
@@ -11,7 +9,7 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointPackets
     public class AccessPointPacket : Entity
     {
         public AccessPointPacketDestinationAddress DestinationAddress { get; private set; }
-        public AccessPointPacketSubtype Subtype { get; private set; }
+        public AccessPointPacketFrameType FrameType { get; private set; }
         public AccessPointPacketData Data { get; private set; }
 
         protected override void Handle(IEventBase @event)
@@ -26,7 +24,7 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointPackets
 
         protected override void Validate()
         {
-            bool isNull = DestinationAddress is null || Data is null || Subtype is null;
+            bool isNull = DestinationAddress is null || Data is null || FrameType is null;
 
             if (isNull)
                 throw new BusinessLogicException("The accesspoint packet entity properties can not be null.");
@@ -43,16 +41,10 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointPackets
         {
             public static AccessPointPacket Create(V1.AccessPointPacketCreated @event)
             {
-                if (!Constants.Ieee80211FrameSubTypesWithoutHardwareAddresses.Any(s => s == @event.Subtype))
-                {
-                    if (@event.DestinationAddress.IsEmpty())
-                        throw new BusinessLogicException("The access point packet destination address can not be empty for this frame type.");
-                }
-
                 return new AccessPointPacket
                 {
                     DestinationAddress = AccessPointPacketDestinationAddress.FromString(@event.DestinationAddress),
-                    Subtype = AccessPointPacketSubtype.FromUInt16(@event.Subtype),
+                    FrameType = AccessPointPacketFrameType.FromString(@event.FrameType),
                     Data = AccessPointPacketData.FromString(@event.Data)
                 };
             }

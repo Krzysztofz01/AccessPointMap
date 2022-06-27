@@ -96,7 +96,7 @@ namespace AccessPointMap.Domain.AccessPoints
                 public Guid Id { get; set; }
                 public string SourceAddress { get; set; }
                 public string DestinationAddress { get; set; }
-                public ushort Subtype { get; set; }
+                public string FrameType { get; set; }
                 public string Data { get; set; }
             }
 
