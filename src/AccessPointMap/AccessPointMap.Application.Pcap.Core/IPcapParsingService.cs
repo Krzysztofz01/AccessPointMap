@@ -6,6 +6,6 @@ namespace AccessPointMap.Application.Pcap.Core
 {
     public interface IPcapParsingService
     {
-        public Task<IDictionary<string, IList<Packet>>> MapPacketsToMacAddresses(IFormFile pcapFile);
+        public Task<IDictionary<string, List<Packet>>> MapPacketsToMacAddresses(IFormFile pcapFile);
     }
 }

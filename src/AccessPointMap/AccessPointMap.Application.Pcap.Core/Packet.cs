@@ -4,7 +4,7 @@
     {
         public string SourceAddress { get; init; }
         public string DestinationAddress { get; init; }
-        public ushort SubType { get; set; }
+        public string FrameType { get; set; }
         public string Data { get; init; }
     }
 }
