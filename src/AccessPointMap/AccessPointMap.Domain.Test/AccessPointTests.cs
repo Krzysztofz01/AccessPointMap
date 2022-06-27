@@ -514,56 +514,14 @@ namespace AccessPointMap.Domain.Test
             });
 
             var packetData = Convert.ToBase64String(new byte[] { 1 });
-            ushort packetSubType = 0x0020;
+            var packetFrameType = "Beacon Request";
             var packetDestination = "11:11:11:11:11:11";
 
             accesspoint.Apply(new V1.AccessPointPacketCreated
             {
                 Id = accesspoint.Id,
                 Data = packetData,
-                Subtype = packetSubType,
-                SourceAddress = bssid,
-                DestinationAddress = packetDestination
-            });
-
-            Assert.NotEmpty(accesspoint.Packets);
-
-            var packet = accesspoint.Packets.Single();
-
-            Assert.Equal(packetData, packet.Data);
-            Assert.Equal(packetDestination, packet.DestinationAddress);
-        }
-
-        [Fact]
-        public void AccessPointPacketShouldCreateWithEmptyAddressForFrameTypeWithoutAddress()
-        {
-            var bssid = "00:00:00:00:00:00";
-
-            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
-            {
-                Bssid = bssid,
-                Ssid = "Test-Hotspot",
-                Frequency = 2670,
-                LowSignalLevel = -70,
-                LowSignalLatitude = 48.8583,
-                LowSignalLongitude = 2.2944,
-                HighSignalLevel = -30,
-                HighSignalLatitude = 48.86,
-                HighSignalLongitude = 2.30,
-                RawSecurityPayload = "[WPA2][WEP]",
-                UserId = Guid.NewGuid(),
-                ScanDate = DateTime.Now
-            });
-
-            var packetData = Convert.ToBase64String(new byte[] { 1 });
-            ushort packetSubType = 0x001d;
-            var packetDestination = string.Empty;
-
-            accesspoint.Apply(new V1.AccessPointPacketCreated
-            {
-                Id = accesspoint.Id,
-                Data = packetData,
-                Subtype = packetSubType,
+                FrameType = packetFrameType,
                 SourceAddress = bssid,
                 DestinationAddress = packetDestination
             });
@@ -598,7 +556,7 @@ namespace AccessPointMap.Domain.Test
             });
 
             var packetData = Convert.ToBase64String(new byte[] { 1 });
-            ushort packetSubType = 0x0020;
+            var packetFrameType = "Beacon request";
             var packetDestination = "11:11:11:11:11:11";
             var invalidHardwareAddress = "22:22:22:22:22:22";
 
@@ -608,7 +566,7 @@ namespace AccessPointMap.Domain.Test
                 {
                     Id = accesspoint.Id,
                     Data = packetData,
-                    Subtype = packetSubType,
+                    FrameType = packetFrameType,
                     SourceAddress = invalidHardwareAddress,
                     DestinationAddress = packetDestination
                 });
@@ -616,7 +574,7 @@ namespace AccessPointMap.Domain.Test
         }
 
         [Fact]
-        public void AccessPointPacketCreateShouldThrowOnEmptyAddressForFrameTypeThatContainsTheAddress()
+        public void AccessPointPacketCreateShouldThrowOnEmptyFrameType()
         {
             var accessPointBssid = "00:00:00:00:00:00";
 
@@ -637,16 +595,16 @@ namespace AccessPointMap.Domain.Test
             });
 
             var packetData = Convert.ToBase64String(new byte[] { 1 });
-            ushort packetSubType = 0x0020;
+            string packetFrameType = null;
             var packetDestination = string.Empty;
 
-            Assert.Throws<BusinessLogicException>(() =>
+            Assert.Throws<ValueObjectValidationException>(() =>
             {
                 accesspoint.Apply(new V1.AccessPointPacketCreated
                 {
                     Id = accesspoint.Id,
                     Data = packetData,
-                    Subtype = packetSubType,
+                    FrameType = packetFrameType,
                     SourceAddress = accessPointBssid,
                     DestinationAddress = packetDestination
                 });
@@ -675,14 +633,14 @@ namespace AccessPointMap.Domain.Test
             });
 
             var packetData = Convert.ToBase64String(new byte[] { 1 });
-            ushort packetSubType = 0x0020;
+            var packetFrameType = "Beacon request";
             var packetDestination = "11:11:11:11:11:11";
 
             accesspoint.Apply(new V1.AccessPointPacketCreated
             {
                 Id = accesspoint.Id,
                 Data = packetData,
-                Subtype = packetSubType,
+                FrameType = packetFrameType,
                 SourceAddress = bssid,
                 DestinationAddress = packetDestination
             });
