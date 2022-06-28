@@ -156,9 +156,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets)
         {
-            //TODO: Replace with bssid based exist method in the future
-            if (!await Exist(bssid)) return;
-
+            if (!await UnitOfWork.AccessPointRepository.Exists(bssid)) return;
+            
             var accessPoint = await UnitOfWork.AccessPointRepository.Get(bssid);
 
             foreach (var packet in packets)
@@ -179,20 +178,6 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
             });
-        }
-
-        //TODO: Replace with bssid based exist method in the future
-        private async Task<bool> Exist(string bssid)
-        {
-            try
-            {
-                _ = await UnitOfWork.AccessPointRepository.Get(bssid);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         private static string SerializeRawAccessPointRecord(AccessPointRecord record)
