@@ -7,10 +7,10 @@ namespace AccessPointMap.Application.Integration.Core
 {
     public abstract class AccessPointIntegrationBase<TIntegration> where TIntegration : AccessPointIntegrationBase<TIntegration>
     {
-        protected readonly IUnitOfWork _unitOfWork;
-        protected readonly IScopeWrapperService _scopeWrapperService;
-        protected readonly IPcapParsingService _pcapParsingService;
-        protected readonly IOuiLookupService _ouiLookupService;
+        protected readonly IUnitOfWork UnitOfWork;
+        protected readonly IScopeWrapperService ScopeWrapperService;
+        protected readonly IPcapParsingService PcapParsingService;
+        protected readonly IOuiLookupService OuiLookupService;
 
         protected abstract string IntegrationName { get; }
         protected abstract string IntegrationDescription { get; }
@@ -24,16 +24,16 @@ namespace AccessPointMap.Application.Integration.Core
             IPcapParsingService pcapParsingService,
             IOuiLookupService ouiLookupService)
         {
-            _unitOfWork = unitOfWork ??
+            UnitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
 
-            _scopeWrapperService = scopeWrapperService ??
+            ScopeWrapperService = scopeWrapperService ??
                 throw new ArgumentNullException(nameof(scopeWrapperService));
 
-            _pcapParsingService = pcapParsingService ??
+            PcapParsingService = pcapParsingService ??
                 throw new ArgumentNullException(nameof(pcapParsingService));
 
-            _ouiLookupService = ouiLookupService ??
+            OuiLookupService = ouiLookupService ??
                 throw new ArgumentNullException(nameof(ouiLookupService));
         }
 
