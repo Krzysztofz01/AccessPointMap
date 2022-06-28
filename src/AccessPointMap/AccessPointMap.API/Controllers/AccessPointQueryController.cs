@@ -73,7 +73,29 @@ namespace AccessPointMap.API.Controllers
 
             return Ok(mappedResponse);
         }
-        
+
+        [HttpGet("{accessPointId}/packet")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> GetAllPackets(Guid accessPointId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAccessPointPackets(accessPointId);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointPacketDetails>>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("{accessPointId}/packet/{accessPointPacketId}")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> GetPacketById(Guid accessPointId, Guid accessPointPacketId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAccessPointsAccessPointPacketById(accessPointId, accessPointPacketId);
+
+            var mappedResponse = MapToDto<AccessPointPacketDetails>(response);
+
+            return Ok(mappedResponse);
+        }
+
         [HttpGet("search")]
         public async Task<IActionResult> GetByKeyword([FromQuery] string keyword)
         {
