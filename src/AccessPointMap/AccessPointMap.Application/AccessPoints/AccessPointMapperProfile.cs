@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointAdnnotations;
+using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
 using AutoMapper;
 using static AccessPointMap.Application.AccessPoints.Dto;
@@ -92,9 +93,15 @@ namespace AccessPointMap.Application.AccessPoints
 
             CreateMap<AccessPointAdnnotation, AccessPointAdnnotationDetails>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
-                .ForMember(d => d.Title, m => m.MapFrom(s => s.Title))
-                .ForMember(d => d.Content, m => m.MapFrom(s => s.Content))
-                .ForMember(d => d.Timestamp, m => m.MapFrom(s => s.Timestamp));
+                .ForMember(d => d.Title, m => m.MapFrom(s => s.Title.Value))
+                .ForMember(d => d.Content, m => m.MapFrom(s => s.Content.Value))
+                .ForMember(d => d.Timestamp, m => m.MapFrom(s => s.Timestamp.Value));
+
+            CreateMap<AccessPointPacket, AccessPointPacketDetails>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
+                .ForMember(d => d.DestinationAddress, m => m.MapFrom(s => s.DestinationAddress.Value))
+                .ForMember(d => d.FrameType, m => m.MapFrom(s => s.FrameType.Value))
+                .ForMember(d => d.Data, m => m.MapFrom(s => s.Data.Value));
         }
     }
 }
