@@ -108,6 +108,14 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 ScanDate = record.LocalTimestamp
             });
 
+            var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
+
+            accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+            {
+                Id = accessPoint.Id,
+                Manufacturer = manufacturer
+            });
+
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
