@@ -26,14 +26,14 @@ namespace AccessPointMap.Domain.AccessPoints
 
         public static readonly IReadOnlyCollection<SecurityStandard> SecurityStandards = new List<SecurityStandard>
         {
-            new SecurityStandard { Name = "WEP", FullName = "Wired Equivalent Privacy", IsSecure = false },
-            new SecurityStandard { Name = "WEP2", FullName = "Wired Equivalent Privacy 2", IsSecure = false },
-            new SecurityStandard { Name = "WEP+", FullName = "Wired Equivalent Privacy Plus", IsSecure = false },
-            new SecurityStandard { Name = "Dynamic WEP", FullName = "Dynamic Wired Equivalent Privacy", IsSecure = false },
-            new SecurityStandard { Name = "WPS", FullName = "Wi-Fi Simple Config", IsSecure = false },
-            new SecurityStandard { Name = "WPA", FullName = "Wi-Fi Protected Access", IsSecure = false },
-            new SecurityStandard { Name = "WPA2", FullName = "Wi-Fi Protected Access II", IsSecure = true },
-            new SecurityStandard { Name = "WPA3", FullName = "Wi-Fi Protected Access 3", IsSecure = true }
+            new SecurityStandard { Name = "WEP", FullName = "Wired Equivalent Privacy", IsSecure = false, Priority = 10 },
+            new SecurityStandard { Name = "WEP2", FullName = "Wired Equivalent Privacy 2", IsSecure = false, Priority = 20 },
+            new SecurityStandard { Name = "WEP+", FullName = "Wired Equivalent Privacy Plus", IsSecure = false, Priority = 30 },
+            new SecurityStandard { Name = "Dynamic WEP", FullName = "Dynamic Wired Equivalent Privacy", IsSecure = false, Priority = 40 },
+            new SecurityStandard { Name = "WPS", FullName = "Wi-Fi Simple Config", IsSecure = false, Priority = 50 },
+            new SecurityStandard { Name = "WPA", FullName = "Wi-Fi Protected Access", IsSecure = false, Priority = 60 },
+            new SecurityStandard { Name = "WPA2", FullName = "Wi-Fi Protected Access II", IsSecure = true, Priority = 70 },
+            new SecurityStandard { Name = "WPA3", FullName = "Wi-Fi Protected Access 3", IsSecure = true, Priority = 80 }
         };
 
         public static readonly IReadOnlyCollection<SecurityProtocols> SecurityProtocols = new List<SecurityProtocols>
@@ -60,6 +60,7 @@ namespace AccessPointMap.Domain.AccessPoints
         public string FullName { get; init; }
         public string Name { get; init; }
         public bool IsSecure { get; init; }
+        public int Priority { get; init; }
     }
 
     public class SecurityProtocols
