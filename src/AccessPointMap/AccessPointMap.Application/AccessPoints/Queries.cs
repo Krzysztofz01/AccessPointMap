@@ -96,15 +96,16 @@ namespace AccessPointMap.Application.AccessPoints
         {
             const string _none = "None";
 
-            var encryptionCountMap = Constants.EncryptionTypes
-                .OrderByDescending(e => e.Priority)
-                .ToDictionary(k => k.Name, v => 0);
+            var encryptionCountMap = Constants.SecurityProtocols
+                .Where(e => e.Value.Type == SecurityProtocolType.Framework)
+                .OrderByDescending(e => e.Value.Priority)
+                .ToDictionary(k => k.Value.Name, v => 0);
 
             encryptionCountMap.Add(_none, 0);
 
             var accessPointsEncryptions = await accessPoints
                 .Where(a => a.DisplayStatus.Value)
-                .Select(a => a.Security.SerializedSecurityPayload)
+                .Select(a => a.Security.SecurityStandards)
                 .AsNoTracking()
                 .ToListAsync();
 
