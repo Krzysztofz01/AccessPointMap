@@ -15,7 +15,8 @@ namespace AccessPointMap.Application.AccessPoints
             public double HighSignalLatitude { get; set; }
             public double HighSignalLongitude { get; set; }
             public double SignalArea { get; set; }
-            public string SerializedSecurityPayload { get; set; }
+            public string SecurityStandards { get; set; }
+            public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
         }
 
@@ -39,7 +40,8 @@ namespace AccessPointMap.Application.AccessPoints
             public double SignalRadius { get; set; }
             public double SignalArea { get; set; }
             public string RawSecurityPayload { get; set; }
-            public string SerializedSecurityPayload { get; set; }
+            public string SecurityStandards { get; set; }
+            public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
         }
@@ -64,7 +66,8 @@ namespace AccessPointMap.Application.AccessPoints
             public double SignalRadius { get; set; }
             public double SignalArea { get; set; }
             public string RawSecurityPayload { get; set; }
-            public string SerializedSecurityPayload { get; set; }
+            public string SecurityStandards { get; set; }
+            public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
             public string Note { get; set; }
             public bool DisplayStatus { get; set; }
@@ -89,7 +92,8 @@ namespace AccessPointMap.Application.AccessPoints
             public double SignalRadius { get; set; }
             public double SignalArea { get; set; }
             public string RawSecurityPayload { get; set; }
-            public string SerializedSecurityPayload { get; set; }
+            public string SecurityStandards { get; set; }
+            public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
             public bool Status { get; set; }
         }
