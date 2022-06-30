@@ -101,5 +101,13 @@ namespace AccessPointMap.Application.AccessPoints
             public string Content { get; set; }
             public DateTime Timestamp { get; set; }
         }
+
+        public class AccessPointPacketDetails
+        {
+            public Guid Id { get; set; }
+            public string DestinationAddress { get; set; }
+            public string FrameType { get; set; }
+            public string Data { get; set; }
+        }
     }
 }

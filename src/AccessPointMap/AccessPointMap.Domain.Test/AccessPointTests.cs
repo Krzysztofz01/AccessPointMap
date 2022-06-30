@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
+using AccessPointMap.Domain.Core.Exceptions;
 using System;
 using System.Linq;
 using Xunit;
@@ -444,7 +445,7 @@ namespace AccessPointMap.Domain.Test
             var adnnotation = accesspoint.Adnnotations.Single();
 
             Assert.Equal(adnnotationTitle, adnnotation.Title);
-            Assert.Equal(adnnotationContent, adnnotationContent);
+            Assert.Equal(adnnotationContent, adnnotation.Content);
         }
 
         [Fact]
@@ -489,6 +490,172 @@ namespace AccessPointMap.Domain.Test
             });
 
             Assert.Empty(accesspoint.Adnnotations);
+        }
+
+        [Fact]
+        public void AccessPointPacketShouldCreate()
+        {
+            var bssid = "00:00:00:00:00:00";
+
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = bssid,
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            var packetData = Convert.ToBase64String(new byte[] { 1 });
+            var packetFrameType = "Beacon Request";
+            var packetDestination = "11:11:11:11:11:11";
+
+            accesspoint.Apply(new V1.AccessPointPacketCreated
+            {
+                Id = accesspoint.Id,
+                Data = packetData,
+                FrameType = packetFrameType,
+                SourceAddress = bssid,
+                DestinationAddress = packetDestination
+            });
+
+            Assert.NotEmpty(accesspoint.Packets);
+
+            var packet = accesspoint.Packets.Single();
+
+            Assert.Equal(packetData, packet.Data);
+            Assert.Equal(packetDestination, packet.DestinationAddress);
+        }
+
+        [Fact]
+        public void AccessPointPacketCreateShouldThrowOnNotMatchingHardwareAddress()
+        {
+            var accessPointBssid = "00:00:00:00:00:00";
+
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = accessPointBssid,
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            var packetData = Convert.ToBase64String(new byte[] { 1 });
+            var packetFrameType = "Beacon request";
+            var packetDestination = "11:11:11:11:11:11";
+            var invalidHardwareAddress = "22:22:22:22:22:22";
+
+            Assert.Throws<BusinessLogicException>(() =>
+            {
+                accesspoint.Apply(new V1.AccessPointPacketCreated
+                {
+                    Id = accesspoint.Id,
+                    Data = packetData,
+                    FrameType = packetFrameType,
+                    SourceAddress = invalidHardwareAddress,
+                    DestinationAddress = packetDestination
+                });
+            });
+        }
+
+        [Fact]
+        public void AccessPointPacketCreateShouldThrowOnEmptyFrameType()
+        {
+            var accessPointBssid = "00:00:00:00:00:00";
+
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = accessPointBssid,
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            var packetData = Convert.ToBase64String(new byte[] { 1 });
+            string packetFrameType = null;
+            var packetDestination = string.Empty;
+
+            Assert.Throws<ValueObjectValidationException>(() =>
+            {
+                accesspoint.Apply(new V1.AccessPointPacketCreated
+                {
+                    Id = accesspoint.Id,
+                    Data = packetData,
+                    FrameType = packetFrameType,
+                    SourceAddress = accessPointBssid,
+                    DestinationAddress = packetDestination
+                });
+            });
+        }
+
+        [Fact]
+        public void AccessPointPacketShouldDelete()
+        {
+            var bssid = "00:00:00:00:00:00";
+
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = bssid,
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            var packetData = Convert.ToBase64String(new byte[] { 1 });
+            var packetFrameType = "Beacon request";
+            var packetDestination = "11:11:11:11:11:11";
+
+            accesspoint.Apply(new V1.AccessPointPacketCreated
+            {
+                Id = accesspoint.Id,
+                Data = packetData,
+                FrameType = packetFrameType,
+                SourceAddress = bssid,
+                DestinationAddress = packetDestination
+            });
+
+            Assert.NotEmpty(accesspoint.Packets);
+
+            var packetId = accesspoint.Packets.Single().Id;
+
+            accesspoint.Apply(new V1.AccessPointPacketDeleted
+            {
+                Id = accesspoint.Id,
+                PacketId = packetId
+            });
+
+            Assert.Empty(accesspoint.Packets);
         }
     }
 }

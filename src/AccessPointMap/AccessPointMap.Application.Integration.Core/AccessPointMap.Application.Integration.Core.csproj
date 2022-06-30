@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Pcap.Core\AccessPointMap.Application.Pcap.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Domain\AccessPointMap.Domain.csproj" />
     <ProjectReference Include="..\AccessPointMap.Infrastructure.Core\AccessPointMap.Infrastructure.Core.csproj" />
   </ItemGroup>

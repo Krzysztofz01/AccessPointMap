@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
+using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,26 @@ namespace AccessPointMap.Application.AccessPoints
                 .Include(a => a.Adnnotations)
                 .AsNoTracking()
                 .SingleAsync(a => a.Id == id); 
+        }
+
+        public static async Task<IEnumerable<AccessPointPacket>> GetAllAccessPointsAccessPointPackets(this IQueryable<AccessPoint> accessPoints, Guid id)
+        {
+            return await accessPoints
+                .Include(a => a.Packets)
+                .Where(a => a.Id == id)
+                .SelectMany(a => a.Packets)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public static async Task<AccessPointPacket> GetAccessPointsAccessPointPacketById(this IQueryable<AccessPoint> accessPoints, Guid id, Guid packetId)
+        {
+            return await accessPoints
+                .Include(a => a.Packets)
+                .Where(a => a.Id == id)
+                .SelectMany(a => a.Packets)
+                .AsNoTracking()
+                .SingleAsync(a => a.Id == packetId);
         }
 
         public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)

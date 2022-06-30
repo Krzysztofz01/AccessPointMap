@@ -3,6 +3,7 @@ using System;
 using AccessPointMap.Infrastructure.MySql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccessPointMap.Infrastructure.MySql.Migrations
 {
     [DbContext(typeof(AccessPointMapDbContext))]
-    partial class AccessPointMapDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220623185228_PcapSystemImplementation")]
+    partial class PcapSystemImplementation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,29 +425,10 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                         .HasForeignKey("AccessPointPacketId");
                                 });
 
-                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketFrameType", "FrameType", b2 =>
-                                {
-                                    b2.Property<Guid>("AccessPointPacketId")
-                                        .HasColumnType("char(36)");
-
-                                    b2.Property<string>("Value")
-                                        .HasColumnType("longtext");
-
-                                    b2.HasKey("AccessPointPacketId");
-
-                                    b2.ToTable("AccessPointPacket", "apm");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("AccessPointPacketId");
-                                });
-
                             b1.Navigation("Data")
                                 .IsRequired();
 
                             b1.Navigation("DestinationAddress")
-                                .IsRequired();
-
-                            b1.Navigation("FrameType")
                                 .IsRequired();
                         });
 
