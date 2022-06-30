@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using AccessPointMap.Application.Integration.Core;
 
 namespace AccessPointMap.Application.Integration.Aircrackng
 {
-    public interface IAircrackngIntegrationService
+    public interface IAircrackngIntegrationService : IIntegrationContract
     {
-        Task Create(Requests.Create request);
     }
 }

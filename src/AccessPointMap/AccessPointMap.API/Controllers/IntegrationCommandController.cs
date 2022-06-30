@@ -1,7 +1,6 @@
 using AccessPointMap.API.Controllers.Base;
-using AccessPointMap.Application.Integration.Aircrackng;
+using Aircrackng = AccessPointMap.Application.Integration.Aircrackng;
 using Wigle = AccessPointMap.Application.Integration.Wigle;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -13,9 +12,9 @@ namespace AccessPointMap.API.Controllers
     public class IntegrationCommandController : CommandController
     {
         private readonly Wigle.IWigleIntegrationService _wigleIntegrationService;
-        private readonly IAircrackngIntegrationService _aircrackngIntegrationService;
+        private readonly Aircrackng.IAircrackngIntegrationService _aircrackngIntegrationService;
 
-        public IntegrationCommandController(Wigle.IWigleIntegrationService wigleIntegrationService, IAircrackngIntegrationService aircrackngIntegrationService) : base()
+        public IntegrationCommandController(Wigle.IWigleIntegrationService wigleIntegrationService, Aircrackng.IAircrackngIntegrationService aircrackngIntegrationService) : base()
         {
             _wigleIntegrationService = wigleIntegrationService ??
                 throw new ArgumentNullException(nameof(wigleIntegrationService));
@@ -28,8 +27,12 @@ namespace AccessPointMap.API.Controllers
         public async Task<IActionResult> CreateFromWigle(Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
             await ExecuteService(command, _wigleIntegrationService.Handle);
 
-        [HttpPost("aircrackng")]
-        public async Task<IActionResult> CreateFromAircrackng([FromForm] IFormFile csvDumpFile) =>
-            await ExecuteService(new Application.Integration.Aircrackng.Requests.Create { CsvDumpFile = csvDumpFile }, _aircrackngIntegrationService.Create);
+        [HttpPost("aircrackng/csv")]
+        public async Task<IActionResult> CreateAccessPointsFromCsvFile(Aircrackng.Commands.CreateAccessPointsFromCsvFile command) =>
+            await ExecuteService(command, _aircrackngIntegrationService.Handle);
+
+        [HttpPost("aircrackng/cap")]
+        public async Task<IActionResult> CreatePacketsFromPcapFile(Aircrackng.Commands.CreatePacketsFromPcapFile command) =>
+            await ExecuteService(command, _aircrackngIntegrationService.Handle);
     }
 }
