@@ -33,6 +33,7 @@
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Pcap.ApmPcapNative\AccessPointMap.Application.Pcap.ApmPcapNative.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application\AccessPointMap.Application.csproj" />
     <ProjectReference Include="..\AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj" />
   </ItemGroup>
