@@ -1,7 +1,6 @@
 using AccessPointMap.API.Controllers.Base;
 using Aircrackng = AccessPointMap.Application.Integration.Aircrackng;
-using AccessPointMap.Application.Integration.Wigle;
-using Microsoft.AspNetCore.Http;
+using Wigle = AccessPointMap.Application.Integration.Wigle;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -12,10 +11,10 @@ namespace AccessPointMap.API.Controllers
     [ApiVersion("1.0")]
     public class IntegrationCommandController : CommandController
     {
-        private readonly IWigleIntegrationService _wigleIntegrationService;
+        private readonly Wigle.IWigleIntegrationService _wigleIntegrationService;
         private readonly Aircrackng.IAircrackngIntegrationService _aircrackngIntegrationService;
 
-        public IntegrationCommandController(IWigleIntegrationService wigleIntegrationService, Aircrackng.IAircrackngIntegrationService aircrackngIntegrationService) : base()
+        public IntegrationCommandController(Wigle.IWigleIntegrationService wigleIntegrationService, Aircrackng.IAircrackngIntegrationService aircrackngIntegrationService) : base()
         {
             _wigleIntegrationService = wigleIntegrationService ??
                 throw new ArgumentNullException(nameof(wigleIntegrationService));
@@ -24,9 +23,9 @@ namespace AccessPointMap.API.Controllers
                 throw new ArgumentNullException(nameof(aircrackngIntegrationService));
         }
 
-        [HttpPost("wigle")]
-        public async Task<IActionResult> CreateFromWigle([FromForm] IFormFile csvDatabaseFile) =>
-            await ExecuteService(new Application.Integration.Wigle.Requests.Create { CsvDatabaseFile = csvDatabaseFile }, _wigleIntegrationService.Create);
+        [HttpPost("wigle/csv")]
+        public async Task<IActionResult> CreateFromWigle(Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
+            await ExecuteService(command, _wigleIntegrationService.Handle);
 
         [HttpPost("aircrackng/csv")]
         public async Task<IActionResult> CreateAccessPointsFromCsvFile(Aircrackng.Commands.CreateAccessPointsFromCsvFile command) =>
