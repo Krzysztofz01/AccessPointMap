@@ -34,13 +34,13 @@ namespace AccessPointMap.Application.Integration.Wireshark
         {
             switch (command)
             {
-                case Commands.CreateAccessPointPacketsFromPcapFile cmd: await HandleCommand(cmd); break;
+                case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
 
                 default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
             }
         }
 
-        private async Task HandleCommand(Commands.CreateAccessPointPacketsFromPcapFile cmd)
+        private async Task HandleCommand(Commands.CreatePacketsFromPcapFile cmd)
         {
             if (cmd.ScanPcapFile is null)
                 throw new ArgumentNullException(nameof(cmd));

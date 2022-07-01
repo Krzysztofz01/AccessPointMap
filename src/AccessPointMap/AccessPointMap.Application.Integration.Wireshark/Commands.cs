@@ -5,7 +5,7 @@ namespace AccessPointMap.Application.Integration.Wireshark
 {
     public static class Commands
     {
-        public class CreateAccessPointPacketsFromPcapFile : IIntegrationCommand
+        public class CreatePacketsFromPcapFile : IIntegrationCommand
         {
             public IFormFile ScanPcapFile { get; set; } 
         }
