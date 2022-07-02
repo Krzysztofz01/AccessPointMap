@@ -22,7 +22,7 @@ The project consists of several parts:
 
 - [Wigle](https://github.com/wiglenet/wigle-wifi-wardriving) - The project has been adapted to the data collected by the WiGLE WiFi Wardriving application. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. The collected data is sent to the server in CSV format.
 
-- [Aircrack-ng](https://github.com/aircrack-ng/aircrack-ng) (*under development*)  - The project has been adapted to the data collected by the airodump-ng segment. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. Geolocation data collection is also supported. The collected data is sent to the server in CSV format.
+- [Aircrack-ng](https://github.com/aircrack-ng/aircrack-ng) [Integration version: 1.0.0] - The project has been adapted to the data collected by the airodump-ng segment. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. Geolocation data collection is also supported. It is also possible to upload the collected IEEE802.11 frames in the CAP format. The collected access point data is sent to the server in CSV format.
 
 - [Kismet](https://github.com/kismetwireless/kismet) (under development)
 
