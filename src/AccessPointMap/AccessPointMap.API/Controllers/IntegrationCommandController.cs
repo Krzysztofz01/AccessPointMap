@@ -32,15 +32,15 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpPost("wigle/csv")]
-        public async Task<IActionResult> CreateFromWigle(Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
+        public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
             await ExecuteService(command, _wigleIntegrationService.Handle);
 
         [HttpPost("aircrackng/csv")]
-        public async Task<IActionResult> CreateAccessPointsFromCsvFile(Aircrackng.Commands.CreateAccessPointsFromCsvFile command) =>
+        public async Task<IActionResult> CreateAccessPointsFromCsvFile([FromForm] Aircrackng.Commands.CreateAccessPointsFromCsvFile command) =>
             await ExecuteService(command, _aircrackngIntegrationService.Handle);
 
         [HttpPost("aircrackng/cap")]
-        public async Task<IActionResult> CreatePacketsFromPcapFile(Aircrackng.Commands.CreatePacketsFromPcapFile command) =>
+        public async Task<IActionResult> CreatePacketsFromPcapFile([FromForm] Aircrackng.Commands.CreatePacketsFromPcapFile command) =>
             await ExecuteService(command, _aircrackngIntegrationService.Handle);
 
         [HttpPost("wireshark/cap")]
