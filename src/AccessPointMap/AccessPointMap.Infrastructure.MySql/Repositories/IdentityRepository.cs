@@ -20,7 +20,9 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
 
         public async Task<bool> Exists(Guid id)
         {
-            return await _context.Identities.AnyAsync(i => i.Id == id);
+            return await _context.Identities
+                .AsNoTracking()
+                .AnyAsync(i => i.Id == id);
         }
 
         public async Task<Identity> Get(Guid id)
