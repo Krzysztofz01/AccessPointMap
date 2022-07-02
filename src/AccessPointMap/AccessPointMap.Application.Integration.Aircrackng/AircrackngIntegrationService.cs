@@ -22,7 +22,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         private const string _integrationName = "Aircrack-ng";
         private const string _integrationDescription = "Integration for the popular WiFi security auditing tools suite.";
-        private const string _integrationVersion = "0.0.0-alpha";
+        private const string _integrationVersion = "1.0.0";
 
         private const double _defaultFrequencyValue = default;
 
@@ -188,7 +188,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             });
         }
 
-        public static IEnumerable<AccessPointRecord> ParseCsvAccessPointScanFile(Stream csvFileStream)
+        private static IEnumerable<AccessPointRecord> ParseCsvAccessPointScanFile(Stream csvFileStream)
         {
             const string _allowedType = "AP";
 
@@ -198,8 +198,21 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
             var accessPoints = new Dictionary<string, AccessPointRecord>();
 
-            foreach (var record in csv.GetRecords<AccessPointRecord>())
+            while (csv.Read())
             {
+                // TODO: Some SSID'S are containing comma's which are confusing the CsvHelper parser
+                // The current solution is to skip all invalid rows.
+                AccessPointRecord record = null;
+                try
+                {
+                    record = csv.GetRecord<AccessPointRecord>();
+                }
+                catch (Exception)
+                {
+                }
+
+                if (record is null) continue;
+
                 if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
                 if (!accessPoints.ContainsKey(record.Bssid))
@@ -210,14 +223,14 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
                 var accessPoint = accessPoints[record.Bssid];
 
-                if (record.Power < accessPoint.Power)
+                if (record.Power > accessPoint.Power)
                 {
                     accessPoint.Power = record.Power;
                     accessPoint.Latitude = record.Latitude;
                     accessPoint.Latitude = record.Longitude;
                 }
 
-                if (record.LowSignalLevel > accessPoint.LowSignalLevel)
+                if (record.LowSignalLevel < accessPoint.LowSignalLevel)
                 {
                     accessPoint.LowSignalLevel = record.LowSignalLevel;
                     accessPoint.LowLatitude = record.LowLatitude;

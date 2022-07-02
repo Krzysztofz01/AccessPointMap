@@ -10,7 +10,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng.Models
         public DateTime LocalTimestamp { get; set; }
 
         [Index(1)]
-        public DateTime GpsTimestamp { get; set; }
+        public string GpsTimestamp { get; set; }
 
         [Index(2)]
         public string Ssid { get; set; }
