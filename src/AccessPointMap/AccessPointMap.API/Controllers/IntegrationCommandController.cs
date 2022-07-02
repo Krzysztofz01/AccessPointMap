@@ -24,7 +24,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpPost("wigle/csv")]
-        public async Task<IActionResult> CreateFromWigle(Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
+        public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
             await ExecuteService(command, _wigleIntegrationService.Handle);
 
         [HttpPost("aircrackng/csv")]
