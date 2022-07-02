@@ -24,7 +24,7 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private const string _integrationName = "WiGLE";
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
-        private const string _integrationVersion = "0.0.0-alpha";
+        private const string _integrationVersion = "1.0.0";
 
         private const double _defaultFrequencyValue = default;
 
