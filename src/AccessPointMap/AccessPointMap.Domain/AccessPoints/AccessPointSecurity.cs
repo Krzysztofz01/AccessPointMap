@@ -74,7 +74,8 @@ namespace AccessPointMap.Domain.AccessPoints
             }
 
             SecurityProtocols = JsonSerializer.Serialize(securityProtocols
-                .Where(p => p.Type != SecurityProtocolType.Framework));
+                .Where(p => p.Type != SecurityProtocolType.Framework)
+                .Select(p => p.Name));
 
             var containsUnsafeProtocols = securityProtocols
                 .Any(p => p.Type != SecurityProtocolType.Framework && !p.IsSecure);
