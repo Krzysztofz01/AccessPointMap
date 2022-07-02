@@ -45,7 +45,7 @@ namespace AccessPointMap.Application.Integration.Wireshark
             if (cmd.ScanPcapFile is null)
                 throw new ArgumentNullException(nameof(cmd));
 
-            if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".cap")
+            if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".pcap")
                 throw new ArgumentNullException(nameof(cmd));
 
             var packetMap = await PcapParsingService.MapPacketsToMacAddresses(cmd.ScanPcapFile);

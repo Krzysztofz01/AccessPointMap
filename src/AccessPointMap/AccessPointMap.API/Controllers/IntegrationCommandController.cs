@@ -43,7 +43,7 @@ namespace AccessPointMap.API.Controllers
         public async Task<IActionResult> CreatePacketsFromPcapFile([FromForm] Aircrackng.Commands.CreatePacketsFromPcapFile command) =>
             await ExecuteService(command, _aircrackngIntegrationService.Handle);
 
-        [HttpPost("wireshark/cap")]
+        [HttpPost("wireshark/pcap")]
         public async Task<IActionResult> CreatePacketsFromPcapFile([FromForm] Wireshark.Commands.CreatePacketsFromPcapFile command) =>
             await ExecuteService(command, _wiresharkIntegrationService.Handle);
     }
