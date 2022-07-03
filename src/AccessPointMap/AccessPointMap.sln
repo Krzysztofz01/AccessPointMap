@@ -29,11 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Pcap.Core", "AccessPointMap.Application.Pcap.Core\AccessPointMap.Application.Pcap.Core.csproj", "{326B65A9-970D-40A6-8C71-03E8CACD4723}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Development", "AccessPointMap.Development\AccessPointMap.Development.csproj", "{1FA1CAAB-12CD-480D-9461-0009FA7A0C12}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Pcap.ApmPcapNative", "AccessPointMap.Application.Pcap.ApmPcapNative\AccessPointMap.Application.Pcap.ApmPcapNative.csproj", "{3465005F-45C8-4AD2-9E02-4034CCBB31AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Integration.Wireshark", "AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj", "{35555C15-E8E0-4D1C-8BA6-524FE380412C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Integration.Wireshark", "AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj", "{35555C15-E8E0-4D1C-8BA6-524FE380412C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,10 +91,6 @@ Global
 		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{326B65A9-970D-40A6-8C71-03E8CACD4723}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1FA1CAAB-12CD-480D-9461-0009FA7A0C12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FA1CAAB-12CD-480D-9461-0009FA7A0C12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FA1CAAB-12CD-480D-9461-0009FA7A0C12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FA1CAAB-12CD-480D-9461-0009FA7A0C12}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3465005F-45C8-4AD2-9E02-4034CCBB31AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3465005F-45C8-4AD2-9E02-4034CCBB31AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3465005F-45C8-4AD2-9E02-4034CCBB31AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
