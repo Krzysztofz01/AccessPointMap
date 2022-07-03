@@ -1,4 +1,5 @@
-﻿using AccessPointMap.API.Middleware;
+﻿using AccessPointMap.API.Converters;
+using AccessPointMap.API.Middleware;
 using AccessPointMap.Application.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -109,7 +110,10 @@ namespace AccessPointMap.API.Configuration
                 }
             });
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new AntiXssConverter());
+            });
 
             return services;
         }
@@ -148,7 +152,9 @@ namespace AccessPointMap.API.Configuration
 
             app.UseMiddleware<ExceptionMiddleware>();
 
-            app.UseMiddleware<AntiXssMiddleware>();
+            // TODO: AnitXssMiddleware requires a fix. Form files are causing false-positives.
+            // A custom serializer rule is used for string validation instead of this middleware
+            // app.UseMiddleware<AntiXssMiddleware>();
 
             app.UseRouting();
 
