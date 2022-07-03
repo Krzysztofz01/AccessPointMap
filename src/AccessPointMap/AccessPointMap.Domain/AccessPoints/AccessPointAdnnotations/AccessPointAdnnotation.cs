@@ -18,13 +18,13 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointAdnnotations
             {
                 case V1.AccessPointAdnnotationDeleted e: When(e); break;
 
-                default: throw new BusinessLogicException("This entity can not handlethis type of event.");
+                default: throw new BusinessLogicException("This entity can not handle this type of event.");
             }    
         }
 
         protected override void Validate()
         {
-            bool isNull = Title is null || Content is null | Timestamp is null;
+            bool isNull = Title is null || Content is null || Timestamp is null;
 
             if (isNull)
                 throw new BusinessLogicException("The accesspoint adnnotation entity properties can not be null.");

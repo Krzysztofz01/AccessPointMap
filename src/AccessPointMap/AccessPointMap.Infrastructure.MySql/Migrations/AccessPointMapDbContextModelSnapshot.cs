@@ -17,7 +17,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("apm")
-                .HasAnnotation("ProductVersion", "6.0.5")
+                .HasAnnotation("ProductVersion", "6.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AccessPointMap.Domain.AccessPoints.AccessPoint", b =>
@@ -172,7 +172,10 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                             b1.Property<string>("RawSecurityPayload")
                                 .HasColumnType("longtext");
 
-                            b1.Property<string>("SerializedSecurityPayload")
+                            b1.Property<string>("SecurityProtocols")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("SecurityStandards")
                                 .HasColumnType("longtext");
 
                             b1.HasKey("AccessPointId");
@@ -356,11 +359,97 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                         .HasForeignKey("AccessPointAdnnotationId");
                                 });
 
-                            b1.Navigation("Content");
+                            b1.Navigation("Content")
+                                .IsRequired();
 
                             b1.Navigation("Timestamp");
 
-                            b1.Navigation("Title");
+                            b1.Navigation("Title")
+                                .IsRequired();
+                        });
+
+                    b.OwnsMany("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacket", "Packets", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("char(36)");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<DateTime?>("DeletedAt")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<Guid>("accesspointId")
+                                .HasColumnType("char(36)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("accesspointId");
+
+                            b1.ToTable("AccessPointPacket", "apm");
+
+                            b1.WithOwner()
+                                .HasForeignKey("accesspointId");
+
+                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketData", "Data", b2 =>
+                                {
+                                    b2.Property<Guid>("AccessPointPacketId")
+                                        .HasColumnType("char(36)");
+
+                                    b2.Property<string>("Value")
+                                        .HasColumnType("longtext");
+
+                                    b2.HasKey("AccessPointPacketId");
+
+                                    b2.ToTable("AccessPointPacket", "apm");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AccessPointPacketId");
+                                });
+
+                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketDestinationAddress", "DestinationAddress", b2 =>
+                                {
+                                    b2.Property<Guid>("AccessPointPacketId")
+                                        .HasColumnType("char(36)");
+
+                                    b2.Property<string>("Value")
+                                        .HasColumnType("longtext");
+
+                                    b2.HasKey("AccessPointPacketId");
+
+                                    b2.ToTable("AccessPointPacket", "apm");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AccessPointPacketId");
+                                });
+
+                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPackets.AccessPointPacketFrameType", "FrameType", b2 =>
+                                {
+                                    b2.Property<Guid>("AccessPointPacketId")
+                                        .HasColumnType("char(36)");
+
+                                    b2.Property<string>("Value")
+                                        .HasColumnType("longtext");
+
+                                    b2.HasKey("AccessPointPacketId");
+
+                                    b2.ToTable("AccessPointPacket", "apm");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AccessPointPacketId");
+                                });
+
+                            b1.Navigation("Data")
+                                .IsRequired();
+
+                            b1.Navigation("DestinationAddress")
+                                .IsRequired();
+
+                            b1.Navigation("FrameType")
+                                .IsRequired();
                         });
 
                     b.OwnsMany("AccessPointMap.Domain.AccessPoints.AccessPointStamps.AccessPointStamp", "Stamps", b1 =>
@@ -501,7 +590,10 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                     b2.Property<string>("RawSecurityPayload")
                                         .HasColumnType("longtext");
 
-                                    b2.Property<string>("SerializedSecurityPayload")
+                                    b2.Property<string>("SecurityProtocols")
+                                        .HasColumnType("longtext");
+
+                                    b2.Property<string>("SecurityStandards")
                                         .HasColumnType("longtext");
 
                                     b2.HasKey("AccessPointStampId");
@@ -548,7 +640,8 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 
                             b1.Navigation("CreationTimestamp");
 
-                            b1.Navigation("DeviceType");
+                            b1.Navigation("DeviceType")
+                                .IsRequired();
 
                             b1.Navigation("Frequency");
 
@@ -556,34 +649,42 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 
                             b1.Navigation("Security");
 
-                            b1.Navigation("Ssid");
+                            b1.Navigation("Ssid")
+                                .IsRequired();
 
                             b1.Navigation("Status");
                         });
 
                     b.Navigation("Adnnotations");
 
-                    b.Navigation("Bssid");
+                    b.Navigation("Bssid")
+                        .IsRequired();
 
                     b.Navigation("ContributorId");
 
                     b.Navigation("CreationTimestamp");
 
-                    b.Navigation("DeviceType");
+                    b.Navigation("DeviceType")
+                        .IsRequired();
 
                     b.Navigation("DisplayStatus");
 
                     b.Navigation("Frequency");
 
-                    b.Navigation("Manufacturer");
+                    b.Navigation("Manufacturer")
+                        .IsRequired();
 
-                    b.Navigation("Note");
+                    b.Navigation("Note")
+                        .IsRequired();
+
+                    b.Navigation("Packets");
 
                     b.Navigation("Positioning");
 
                     b.Navigation("Security");
 
-                    b.Navigation("Ssid");
+                    b.Navigation("Ssid")
+                        .IsRequired();
 
                     b.Navigation("Stamps");
 
@@ -751,13 +852,16 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 
                     b.Navigation("Activation");
 
-                    b.Navigation("Email");
+                    b.Navigation("Email")
+                        .IsRequired();
 
                     b.Navigation("LastLogin");
 
-                    b.Navigation("Name");
+                    b.Navigation("Name")
+                        .IsRequired();
 
-                    b.Navigation("PasswordHash");
+                    b.Navigation("PasswordHash")
+                        .IsRequired();
 
                     b.Navigation("Role");
 

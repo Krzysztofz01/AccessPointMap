@@ -1,10 +1,11 @@
 ﻿using AccessPointMap.Application.Integration.Aircrackng.Models;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Oui.Core;
+using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,14 +18,11 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 {
     public class AircrackngIntegrationService : AccessPointIntegrationBase<AircrackngIntegrationService>, IAircrackngIntegrationService
     {
-        private readonly string[] _allowedExtensions = new string[] { ".csv" };
-        private readonly string _allowedType = "AP";
-
         private readonly string _adnnotationName = "Aircrack-ng integration provided data";
 
         private const string _integrationName = "Aircrack-ng";
         private const string _integrationDescription = "Integration for the popular WiFi security auditing tools suite.";
-        private const string _integrationVersion = "0.0.0-alpha";
+        private const string _integrationVersion = "1.0.0";
 
         private const double _defaultFrequencyValue = default;
 
@@ -32,30 +30,55 @@ namespace AccessPointMap.Application.Integration.Aircrackng
         protected override string IntegrationDescription => _integrationDescription;
         protected override string IntegrationVersion => _integrationVersion;
 
-        public AircrackngIntegrationService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService) : base(unitOfWork, scopeWrapperService) { }
+        public AircrackngIntegrationService(
+            IUnitOfWork unitOfWork,
+            IScopeWrapperService scopeWrapperService,
+            IPcapParsingService pcapParsingService,
+            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
-        public async Task Create(Requests.Create request)
+
+        public async Task Handle(IIntegrationCommand command)
         {
-            ValidateCsvDumpFile(request.CsvDumpFile);
+            switch (command)
+            {
+                case Commands.CreateAccessPointsFromCsvFile cmd: await HandleCommand(cmd); break;
+                case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
 
-            try
-            {
-                await HandleCreate(request);
+                default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
             }
-            catch (Exception ex)
-            {
-                throw new AccessPointIntegrationException("Aircrack-ng integration service failed while parsing provied data.", ex);
-            }
-            
         }
 
-        public async Task HandleCreate(Requests.Create request)
+        private async Task HandleCommand(Commands.CreatePacketsFromPcapFile cmd)
         {
-            var accessPoints = ParseAccessPointDumps(request.CsvDumpFile);
+            if (cmd.ScanPcapFile is null)
+                throw new ArgumentNullException(nameof(cmd));
+
+            if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".cap")
+                throw new ArgumentNullException(nameof(cmd));
+
+            var packetMap = await PcapParsingService.MapPacketsToMacAddresses(cmd.ScanPcapFile);
+
+            foreach (var map in packetMap)
+            {
+                await CreateAccessPointPackets(map.Key, map.Value);
+            }
+
+            await UnitOfWork.Commit();
+        }
+
+        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvFile cmd)
+        {
+            if (cmd.ScanCsvFile is null)
+                throw new ArgumentNullException(nameof(cmd));
+
+            if (Path.GetExtension(cmd.ScanCsvFile.FileName).ToLower() != ".csv")
+                throw new ArgumentNullException(nameof(cmd));
+
+            var accessPoints = ParseCsvAccessPointScanFile(cmd.ScanCsvFile.OpenReadStream());
 
             foreach (var accessPoint in accessPoints)
             {
-                if (await _unitOfWork.AccessPointRepository.Exists(accessPoint.Bssid))
+                if (await UnitOfWork.AccessPointRepository.Exists(accessPoint.Bssid))
                 {
                     await CreateAccessPointStamp(accessPoint);
                     continue;
@@ -64,63 +87,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 await CreateAccessPoint(accessPoint);
             }
 
-            await _unitOfWork.Commit();
-        }
-
-        private void ValidateCsvDumpFile(IFormFile csv)
-        {
-            if (csv is null)
-                throw new ArgumentNullException(nameof(csv));
-
-            var extension = Path.GetExtension(csv.FileName);
-
-            if (!_allowedExtensions.Contains(extension.ToLower()))
-                throw new ArgumentNullException(nameof(csv));
-        }
-
-        private IEnumerable<AccessPointRecord> ParseAccessPointDumps(IFormFile csvFile)
-        {
-            using var sr = new StreamReader(csvFile.OpenReadStream());
-
-            using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
-
-            var accessPoints = new Dictionary<string, AccessPointRecord>();
-
-            foreach (var record in csv.GetRecords<AccessPointRecord>())
-            {
-                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
-
-                if (!accessPoints.ContainsKey(record.Bssid))
-                {
-                    accessPoints.Add(record.Bssid, record);
-                    continue;
-                }
-
-                var accessPoint = accessPoints[record.Bssid];
-
-                if (record.Power < accessPoint.Power)
-                {
-                    accessPoint.Power = record.Power;
-                    accessPoint.Latitude = record.Latitude;
-                    accessPoint.Latitude = record.Longitude;
-                }
-
-                if (record.LowSignalLevel > accessPoint.LowSignalLevel)
-                {
-                    accessPoint.LowSignalLevel = record.LowSignalLevel;
-                    accessPoint.LowLatitude = record.LowLatitude;
-                    accessPoint.LowLongitude = record.LowLongitude;
-                }
-
-                if (record.LocalTimestamp > accessPoint.LocalTimestamp)
-                {
-                    accessPoint.LocalTimestamp = record.LocalTimestamp;
-                }
-
-                accessPoints[record.Bssid] = accessPoint;
-            }
-
-            return accessPoints.Select(a => a.Value);
+            await UnitOfWork.Commit();
         }
 
         private async Task CreateAccessPoint(AccessPointRecord record)
@@ -137,8 +104,16 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
-                UserId = _scopeWrapperService.GetUserId(),
+                UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp
+            });
+
+            var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
+
+            accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+            {
+                Id = accessPoint.Id,
+                Manufacturer = manufacturer
             });
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
@@ -148,12 +123,12 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 Content = SerializeRawAccessPointRecord(record)
             });
 
-            await _unitOfWork.AccessPointRepository.Add(accessPoint);
+            await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
         private async Task CreateAccessPointStamp(AccessPointRecord record)
         {
-            var accessPoint = await _unitOfWork.AccessPointRepository.Get(record.Bssid);
+            var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Bssid);
 
             accessPoint.Apply(new Events.V1.AccessPointStampCreated
             {
@@ -167,7 +142,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
-                UserId = _scopeWrapperService.GetUserId(),
+                UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp
             });
 
@@ -179,12 +154,98 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             });
         }
 
-        private string SerializeRawAccessPointRecord(AccessPointRecord record)
+        private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets)
+        {
+            if (!await UnitOfWork.AccessPointRepository.Exists(bssid)) return;
+            
+            var accessPoint = await UnitOfWork.AccessPointRepository.Get(bssid);
+
+            foreach (var packet in packets)
+            {
+                accessPoint.Apply(new Events.V1.AccessPointPacketCreated
+                {
+                    Id = accessPoint.Id,
+                    SourceAddress = packet.SourceAddress,
+                    DestinationAddress = packet.DestinationAddress,
+                    FrameType = packet.FrameType,
+                    Data = packet.Data
+                });
+            }
+
+            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            {
+                Id = accessPoint.Id,
+                Title = _adnnotationName,
+                Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
+            });
+        }
+
+        private static string SerializeRawAccessPointRecord(AccessPointRecord record)
         {
             return JsonSerializer.Serialize(record, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
+        }
+
+        private static IEnumerable<AccessPointRecord> ParseCsvAccessPointScanFile(Stream csvFileStream)
+        {
+            const string _allowedType = "AP";
+
+            using var sr = new StreamReader(csvFileStream);
+
+            using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
+
+            var accessPoints = new Dictionary<string, AccessPointRecord>();
+
+            while (csv.Read())
+            {
+                // TODO: Some SSID'S are containing comma's which are confusing the CsvHelper parser
+                // The current solution is to skip all invalid rows.
+                AccessPointRecord record = null;
+                try
+                {
+                    record = csv.GetRecord<AccessPointRecord>();
+                }
+                catch (Exception)
+                {
+                }
+
+                if (record is null) continue;
+
+                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
+
+                if (!accessPoints.ContainsKey(record.Bssid))
+                {
+                    accessPoints.Add(record.Bssid, record);
+                    continue;
+                }
+
+                var accessPoint = accessPoints[record.Bssid];
+
+                if (record.Power > accessPoint.Power)
+                {
+                    accessPoint.Power = record.Power;
+                    accessPoint.Latitude = record.Latitude;
+                    accessPoint.Latitude = record.Longitude;
+                }
+
+                if (record.LowSignalLevel < accessPoint.LowSignalLevel)
+                {
+                    accessPoint.LowSignalLevel = record.LowSignalLevel;
+                    accessPoint.LowLatitude = record.LowLatitude;
+                    accessPoint.LowLongitude = record.LowLongitude;
+                }
+
+                if (record.LocalTimestamp > accessPoint.LocalTimestamp)
+                {
+                    accessPoint.LocalTimestamp = record.LocalTimestamp;
+                }
+
+                accessPoints[record.Bssid] = accessPoint;
+            }
+
+            return accessPoints.Select(a => a.Value);
         }
     }
 }

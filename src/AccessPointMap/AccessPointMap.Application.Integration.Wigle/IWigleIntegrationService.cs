@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using AccessPointMap.Application.Integration.Core;
 
 namespace AccessPointMap.Application.Integration.Wigle
 {
-    public interface IWigleIntegrationService
+    public interface IWigleIntegrationService : IIntegrationContract
     {
-        Task Create(Requests.Create request);
     }
 }

@@ -1,7 +1,7 @@
 ![apm logo](https://user-images.githubusercontent.com/46250989/123469319-2b96bb80-d5f3-11eb-9b53-d8be8fa73c0b.png)
 #  AccessPointMap
 
-The AccessPointMap project can be described as "White hat war-driving". AccessPointMap consists in collecting and analyzing data about access points, their security and geolocation (without connecting to the network or interacting with it in any way). In contrast to similar projects like (WiGLE), the project does not focus on statistics on a global, but on a local scale. The main assumption of the project is to pay attention to the lack of education and knowledge of people about their own networks, which often have a default, unsafe configuration. project consists in collecting and analyzing data on access points. From the technical side, the project consists of a mobile application for gathering information. The information is then sent to a server where the analysis is performed, the data is stored in a database and can be viewed through the web application. For data security purposes, everyone can individually have their own AccessPointMap instance. Everyone can join the project by creating their own scanning algorithms or writing integrations for other network-device scanning programs.
+The AccessPointMap project can be described as "White hat war-driving". AccessPointMap consists in collecting and analyzing data about access points, their security and geolocation (without connecting to the network or interacting with it in any way). The platform also allows for the storage of collected (for example via: Aircrack-ng or Wireshark) IEEE802.11 frames, for later analysis. It is possible thanks to a custom implementation of a network frame parser. In contrast to similar projects like (WiGLE), the project does not focus on statistics on a global, but on a local scale. The main assumption of the project is to pay attention to the lack of education and knowledge of people about their own networks, which often have a default, unsafe configuration. project consists in collecting and analyzing data on access points. From the technical side, the project consists of a mobile application for gathering information. The information is then sent to a server where the analysis is performed, the data is stored in a database and can be viewed through the web application. For data security purposes, everyone can individually have their own AccessPointMap instance. Everyone can join the project by creating their own scanning algorithms or writing integrations for other network-device scanning programs.
 A more detailed description of the entire project can be found in the PDF file (*outdated*).
 
 ##  Segments
@@ -20,9 +20,11 @@ The project consists of several parts:
 
 ## Integrations
 
-- [Wigle](https://github.com/wiglenet/wigle-wifi-wardriving) - The project has been adapted to the data collected by the WiGLE WiFi Wardriving application. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. The collected data is sent to the server in CSV format.
+- [Wigle](https://github.com/wiglenet/wigle-wifi-wardriving) [Integration version: 1.0.0] - The project has been adapted to the data collected by the WiGLE WiFi Wardriving application. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. The collected data is sent to the server in CSV format.
 
-- [Aircrack-ng](https://github.com/aircrack-ng/aircrack-ng) (*under development*)  - The project has been adapted to the data collected by the airodump-ng segment. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. Geolocation data collection is also supported. The collected data is sent to the server in CSV format.
+- [Aircrack-ng](https://github.com/aircrack-ng/aircrack-ng) [Integration version: 1.0.0] - The project has been adapted to the data collected by the airodump-ng segment. The data collected by the application are analyzed, processed and prepared for integration with other access points already in the system. Geolocation data collection is also supported. It is also possible to upload the collected IEEE802.11 frames in the CAP format. The collected access point data is sent to the server in CSV format.
+
+- [Wireshark](https://github.com/wireshark/wireshark) [Integration version: 0.0.0-alpha] - Thanks to the custom implementation of the IEEE802.11 frame parser, the project is able to store frames of specific access points collected with the Wireshark software. The collected data is sent to the server in PCAP format.
 
 - [Kismet](https://github.com/kismetwireless/kismet) (under development)
 
@@ -55,11 +57,3 @@ The basic technology stack used by the project. As a "historical curiosity" it i
 - [OpenLayers](https://openlayers.org) - This technology makes it easy to put a dynamic map in any web page.
 
 - [ChartJS](https://www.chartjs.org) - Simple yet flexible JavaScript charting for designers & developers
-
-## Roadmap
-
-A list of functionality and features that may be implemented in the future:
-
-🔲 Preparation of a set of scanning scripts for supported software.
-
-🔲 Deployment scripts.

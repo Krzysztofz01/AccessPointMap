@@ -41,7 +41,7 @@ namespace AccessPointMap.Infrastructure.MySql
 
                 if (entity.State == EntityState.Added)
                 {
-                    ((AuditableSubject)entity.Entity).UpdatedAt = DateTime.Now;
+                    ((AuditableSubject)entity.Entity).CreatedAt = DateTime.Now;
                 }
             }
 

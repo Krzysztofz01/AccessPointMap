@@ -1,10 +1,11 @@
 ﻿using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Application.Integration.Wigle.Models;
+using AccessPointMap.Application.Oui.Core;
+using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,14 +18,13 @@ namespace AccessPointMap.Application.Integration.Wigle
 {
     public class WigleIntegrationService : AccessPointIntegrationBase<WigleIntegrationService>, IWigleIntegrationService
     {
-        private readonly string[] _allowedExtensions = new string[] { ".csv" };
         private readonly string _allowedType = "WIFI";
 
         private readonly string _adnnotationName = "WiGLE integration provided data";
 
         private const string _integrationName = "WiGLE";
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
-        private const string _integrationVersion = "0.0.0-alpha";
+        private const string _integrationVersion = "1.0.0";
 
         private const double _defaultFrequencyValue = default;
 
@@ -32,28 +32,34 @@ namespace AccessPointMap.Application.Integration.Wigle
         protected override string IntegrationDescription => _integrationDescription;
         protected override string IntegrationVersion => _integrationVersion;
 
-        public WigleIntegrationService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService) : base(unitOfWork, scopeWrapperService) { }
+        public WigleIntegrationService(
+            IUnitOfWork unitOfWork,
+            IScopeWrapperService scopeWrapperService,
+            IPcapParsingService pcapParsingService,
+            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
-        public async Task Create(Requests.Create request)
+        public async Task Handle(IIntegrationCommand command)
         {
-            ValidateCsvDatabaseFile(request.CsvDatabaseFile);
+            switch (command)
+            {
+                case Commands.CreateAccessPointsFromCsvFile cmd: await HandleCommand(cmd); break;
 
-            try
-            {
-                await HandleCreate(request);
-            }
-            catch (Exception ex)
-            {
-                throw new AccessPointIntegrationException("Wigle integration service failed while parsing provied data.", ex);
+                default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
             }
         }
 
-        private async Task HandleCreate(Requests.Create request)
+        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvFile cmd)
         {
-            using var sr = new StreamReader(request.CsvDatabaseFile.OpenReadStream());
+            if (cmd.ScanCsvFile is null)
+                throw new ArgumentNullException(nameof(cmd));
+
+            if (Path.GetExtension(cmd.ScanCsvFile.FileName).ToLower() != ".csv")
+                throw new ArgumentNullException(nameof(cmd));
+
+            using var sr = new StreamReader(cmd.ScanCsvFile.OpenReadStream());
 
             // This line will shift the stream by one line to avoid the header
-            sr.ReadLine();
+            _ = sr.ReadLine();
 
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
@@ -65,7 +71,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             {
                 if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
-                if (await _unitOfWork.AccessPointRepository.Exists(record.Mac))
+                if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
                 {
                     await CreateAccessPointStamp(record);
                     continue;
@@ -74,18 +80,7 @@ namespace AccessPointMap.Application.Integration.Wigle
                 await CreateAccessPoint(record);
             }
 
-            await _unitOfWork.Commit();
-        }
-
-        private void ValidateCsvDatabaseFile(IFormFile csv)
-        {
-            if (csv is null)
-                throw new ArgumentNullException(nameof(csv));
-
-            var extension = Path.GetExtension(csv.FileName);
-
-            if (!_allowedExtensions.Contains(extension.ToLower()))
-                throw new ArgumentNullException(nameof(csv));
+            await UnitOfWork.Commit();
         }
 
         private async Task CreateAccessPoint(AccessPointRecord record)
@@ -102,8 +97,16 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
-                UserId = _scopeWrapperService.GetUserId(),
+                UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.FirstSeen
+            });
+
+            var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
+
+            accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+            {
+                Id = accessPoint.Id,
+                Manufacturer = manufacturer
             });
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
@@ -113,12 +116,12 @@ namespace AccessPointMap.Application.Integration.Wigle
                 Content = SerializeRawAccessPointRecord(record)
             });
 
-            await _unitOfWork.AccessPointRepository.Add(accessPoint);
+            await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
         private async Task CreateAccessPointStamp(AccessPointRecord record)
         {
-            var accessPoint = await _unitOfWork.AccessPointRepository.Get(record.Mac);
+            var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Mac);
 
             accessPoint.Apply(new Events.V1.AccessPointStampCreated
             {
@@ -132,7 +135,7 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLatitude = record.Latitude,
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
-                UserId = _scopeWrapperService.GetUserId(),
+                UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.FirstSeen
             });
 
@@ -173,7 +176,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             return accessPoint;
         }
 
-        private string SerializeRawAccessPointRecord(AccessPointRecord record)
+        private static string SerializeRawAccessPointRecord(AccessPointRecord record)
         {
             return JsonSerializer.Serialize(record, new JsonSerializerOptions
             {

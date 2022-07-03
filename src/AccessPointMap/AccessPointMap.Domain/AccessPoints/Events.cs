@@ -90,6 +90,21 @@ namespace AccessPointMap.Domain.AccessPoints
                 public Guid Id { get; set; }
                 public Guid AdnnotationId { get; set; }
             }
+
+            public class AccessPointPacketCreated : IEvent
+            {
+                public Guid Id { get; set; }
+                public string SourceAddress { get; set; }
+                public string DestinationAddress { get; set; }
+                public string FrameType { get; set; }
+                public string Data { get; set; }
+            }
+
+            public class AccessPointPacketDeleted : IEvent
+            {
+                public Guid Id { get; set; }
+                public Guid PacketId { get; set; }
+            }
         }
     }
 }

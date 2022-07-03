@@ -8,10 +8,10 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-    <PackageReference Include="HtmlSanitizer" Version="7.1.488" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
+    <PackageReference Include="HtmlSanitizer" Version="7.1.512" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -20,7 +20,7 @@
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.4.0" />
     <PackageReference Include="Serilog" Version="2.11.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-    <PackageReference Include="Serilog.Enrichers.Context" Version="4.2.0" />
+    <PackageReference Include="Serilog.Enrichers.Context" Version="4.6.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
@@ -31,8 +31,10 @@
   <ItemGroup>
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Pcap.ApmPcapNative\AccessPointMap.Application.Pcap.ApmPcapNative.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application\AccessPointMap.Application.csproj" />
     <ProjectReference Include="..\AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj" />
   </ItemGroup>

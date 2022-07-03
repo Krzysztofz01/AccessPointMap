@@ -1,12 +1,16 @@
-﻿using AccessPointMap.Infrastructure.Core.Abstraction;
+﻿using AccessPointMap.Application.Oui.Core;
+using AccessPointMap.Application.Pcap.Core;
+using AccessPointMap.Infrastructure.Core.Abstraction;
 using System;
 
 namespace AccessPointMap.Application.Integration.Core
 {
     public abstract class AccessPointIntegrationBase<TIntegration> where TIntegration : AccessPointIntegrationBase<TIntegration>
     {
-        protected readonly IUnitOfWork _unitOfWork;
-        protected readonly IScopeWrapperService _scopeWrapperService;
+        protected readonly IUnitOfWork UnitOfWork;
+        protected readonly IScopeWrapperService ScopeWrapperService;
+        protected readonly IPcapParsingService PcapParsingService;
+        protected readonly IOuiLookupService OuiLookupService;
 
         protected abstract string IntegrationName { get; }
         protected abstract string IntegrationDescription { get; }
@@ -14,13 +18,23 @@ namespace AccessPointMap.Application.Integration.Core
 
         private AccessPointIntegrationBase() { }
 
-        public AccessPointIntegrationBase(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService)
+        public AccessPointIntegrationBase(
+            IUnitOfWork unitOfWork,
+            IScopeWrapperService scopeWrapperService,
+            IPcapParsingService pcapParsingService,
+            IOuiLookupService ouiLookupService)
         {
-            _unitOfWork = unitOfWork ??
+            UnitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
 
-            _scopeWrapperService = scopeWrapperService ??
+            ScopeWrapperService = scopeWrapperService ??
                 throw new ArgumentNullException(nameof(scopeWrapperService));
+
+            PcapParsingService = pcapParsingService ??
+                throw new ArgumentNullException(nameof(pcapParsingService));
+
+            OuiLookupService = ouiLookupService ??
+                throw new ArgumentNullException(nameof(ouiLookupService));
         }
 
         public override string ToString() =>

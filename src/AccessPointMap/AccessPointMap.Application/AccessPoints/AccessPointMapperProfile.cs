@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointAdnnotations;
+using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
 using AutoMapper;
 using static AccessPointMap.Application.AccessPoints.Dto;
@@ -19,7 +20,8 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.HighSignalLatitude, m => m.MapFrom(s => s.Positioning.HighSignalLatitude))
                 .ForMember(d => d.HighSignalLongitude, m => m.MapFrom(s => s.Positioning.HighSignalLongitude))
                 .ForMember(d => d.SignalArea, m => m.MapFrom(s => s.Positioning.SignalArea))
-                .ForMember(d => d.SerializedSecurityPayload, m => m.MapFrom(s => s.Security.SerializedSecurityPayload))
+                .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
+                .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure));
 
             CreateMap<AccessPoint, AccessPointDetails>()
@@ -41,7 +43,8 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SignalRadius, m => m.MapFrom(s => s.Positioning.SignalRadius))
                 .ForMember(d => d.SignalArea, m => m.MapFrom(s => s.Positioning.SignalArea))
                 .ForMember(d => d.RawSecurityPayload, m => m.MapFrom(s => s.Security.RawSecurityPayload))
-                .ForMember(d => d.SerializedSecurityPayload, m => m.MapFrom(s => s.Security.SerializedSecurityPayload))
+                .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
+                .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.Stamps, m => m.MapFrom(s => s.Stamps));
 
@@ -64,7 +67,8 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SignalRadius, m => m.MapFrom(s => s.Positioning.SignalRadius))
                 .ForMember(d => d.SignalArea, m => m.MapFrom(s => s.Positioning.SignalArea))
                 .ForMember(d => d.RawSecurityPayload, m => m.MapFrom(s => s.Security.RawSecurityPayload))
-                .ForMember(d => d.SerializedSecurityPayload, m => m.MapFrom(s => s.Security.SerializedSecurityPayload))
+                .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
+                .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.Note, m => m.MapFrom(s => s.Note))
                 .ForMember(d => d.DisplayStatus, m => m.MapFrom(s => s.DisplayStatus))
@@ -86,15 +90,22 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SignalRadius, m => m.MapFrom(s => s.Positioning.SignalRadius))
                 .ForMember(d => d.SignalArea, m => m.MapFrom(s => s.Positioning.SignalArea))
                 .ForMember(d => d.RawSecurityPayload, m => m.MapFrom(s => s.Security.RawSecurityPayload))
-                .ForMember(d => d.SerializedSecurityPayload, m => m.MapFrom(s => s.Security.SerializedSecurityPayload))
+                .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
+                .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.Status, m => m.MapFrom(s => s.Status.Value));
 
             CreateMap<AccessPointAdnnotation, AccessPointAdnnotationDetails>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
-                .ForMember(d => d.Title, m => m.MapFrom(s => s.Title))
-                .ForMember(d => d.Content, m => m.MapFrom(s => s.Content))
-                .ForMember(d => d.Timestamp, m => m.MapFrom(s => s.Timestamp));
+                .ForMember(d => d.Title, m => m.MapFrom(s => s.Title.Value))
+                .ForMember(d => d.Content, m => m.MapFrom(s => s.Content.Value))
+                .ForMember(d => d.Timestamp, m => m.MapFrom(s => s.Timestamp.Value));
+
+            CreateMap<AccessPointPacket, AccessPointPacketDetails>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
+                .ForMember(d => d.DestinationAddress, m => m.MapFrom(s => s.DestinationAddress.Value))
+                .ForMember(d => d.FrameType, m => m.MapFrom(s => s.FrameType.Value))
+                .ForMember(d => d.Data, m => m.MapFrom(s => s.Data.Value));
         }
     }
 }
