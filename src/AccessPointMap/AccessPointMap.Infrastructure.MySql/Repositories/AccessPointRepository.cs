@@ -12,9 +12,11 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
         public AccessPointRepository(AccessPointMapDbContext dbContext) =>
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
-        public async Task Add(AccessPoint accessPoint)
+        public Task Add(AccessPoint accessPoint)
         {
-            _ = await _context.AccessPoints.AddAsync(accessPoint); 
+            _context.AccessPoints.Add(accessPoint);
+            
+            return Task.CompletedTask;
         }
 
         public async Task<bool> Exists(Guid id)
