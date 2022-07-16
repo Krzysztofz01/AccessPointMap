@@ -24,8 +24,8 @@ namespace AccessPointMap.Application.Identities
             switch(command)
             {
                 case V1.Delete c: await Apply(c.Id, new IdentityDeleted { Id = c.Id }); break;
-                case V1.Activation c: await Apply(c.Id, new IdentityActivationChanged { Id = c.Id, Activated = c.Activated }); break;
-                case V1.RoleChange c: await Apply(c.Id, new IdentityRoleChanged { Id = c.Id, Role = c.Role }); break;
+                case V1.Activation c: await Apply(c.Id, new IdentityActivationChanged { Id = c.Id, Activated = c.Activated.Value }); break;
+                case V1.RoleChange c: await Apply(c.Id, new IdentityRoleChanged { Id = c.Id, Role = c.Role.Value }); break;
                 
                 default: throw new InvalidOperationException("This command is not supported.");
             }
