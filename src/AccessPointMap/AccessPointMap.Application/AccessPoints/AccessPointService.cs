@@ -36,7 +36,7 @@ namespace AccessPointMap.Application.AccessPoints
 
                 case V1.Delete c: await Apply(c.Id, new AccessPointDeleted { Id = c.Id }); break;
                 case V1.Update c: await Apply(c.Id, new AccessPointUpdated { Id = c.Id, Note = c.Note }); break;
-                case V1.ChangeDisplayStatus c: await Apply(c.Id, new AccessPointDisplayStatusChanged { Id = c.Id, Status = c.Status }); break;
+                case V1.ChangeDisplayStatus c: await Apply(c.Id, new AccessPointDisplayStatusChanged { Id = c.Id, Status = c.Status.Value }); break;
                 case V1.MergeWithStamp c: await Apply(c.Id, new AccessPointMergedWithStamp { Id = c.Id, StampId = c.StampId, MergeSsid = c.MergeSsid.Value, MergeLowSignalLevel = c.MergeLowSignalLevel.Value, MergeHighSignalLevel = c.MergeHighSignalLevel.Value, MergeSecurityData = c.MergeSecurityData.Value }); break;
                 case V1.DeleteStamp c: await Apply(c.Id, new AccessPointStampDeleted { Id = c.Id, StampId = c.StampId }); break;
                 case V1.CreateAdnnotation c: await Apply(c.Id, new AccessPointAdnnotationCreated { Id = c.Id, Title = c.Title, Content = c.Content }); break;
@@ -80,7 +80,7 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate
+                        ScanDate = command.ScanDate.Value
                     });
 
                     await _unitOfWork.Commit();
@@ -100,7 +100,7 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate
+                        ScanDate = command.ScanDate.Value
                     });
 
                     accessPoint.Apply(new AccessPointManufacturerChanged
