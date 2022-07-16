@@ -37,14 +37,18 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
         {
             return await _context.AccessPoints
                 .Include(a => a.Stamps)
-                .SingleAsync(a => a.Id == id);
+                .Include(a => a.Adnnotations)
+                .Include(a => a.Packets)
+                .FirstAsync(a => a.Id == id);
         }
 
         public async Task<AccessPoint> Get(string bssid)
         {
             return await _context.AccessPoints
                 .Include(a => a.Stamps)
-                .SingleAsync(a => a.Bssid.Value == bssid);
+                .Include(a => a.Adnnotations)
+                .Include(a => a.Packets)
+                .FirstAsync(a => a.Bssid.Value == bssid);
         }
     }
 }
