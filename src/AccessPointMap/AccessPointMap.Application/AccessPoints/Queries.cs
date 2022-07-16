@@ -95,7 +95,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .GroupBy(a => a.Frequency.Value)
                 .OrderByDescending(a => a.Count())
                 .Take(limit)
-                .Select(a => new { Frequnecy = a.Key, Count = a.Count() })
+                .Select(a => new { Frequency = a.Key, Count = a.Count() })
                 .AsNoTracking()
                 .ToListAsync();
         }
