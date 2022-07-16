@@ -31,7 +31,7 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
         {
             return await _context.Identities
                 .Include(i => i.Tokens)
-                .SingleAsync(i => i.Id == id);
+                .FirstAsync(i => i.Id == id);
         }
     }
 }

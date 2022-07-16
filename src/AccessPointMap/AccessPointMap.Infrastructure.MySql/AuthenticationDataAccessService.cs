@@ -17,6 +17,7 @@ namespace AccessPointMap.Infrastructure.MySql
         public async Task<bool> AnyUsersExists()
         {
             return await _context.Identities
+                .AsNoTracking()
                 .AnyAsync();
         }
 
@@ -37,6 +38,7 @@ namespace AccessPointMap.Infrastructure.MySql
         public async Task<bool> UserWithEmailExsits(string email)
         {
             return await _context.Identities
+                .AsNoTracking()
                 .AnyAsync(e => e.Email.Value == email);
         }
     }
