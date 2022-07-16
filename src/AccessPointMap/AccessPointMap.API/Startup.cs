@@ -28,6 +28,8 @@ namespace AccessPointMap.API
 
             services.AddMapper();
 
+            services.AddValidation();
+
             services.AddBackgroundJobs();
 
             services.AddCaching();
