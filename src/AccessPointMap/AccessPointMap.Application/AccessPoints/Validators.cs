@@ -17,8 +17,9 @@ namespace AccessPointMap.Application.AccessPoints
             {
                 public CreateValidator()
                 {
-                    RuleFor(c => c.AccessPoints).NotNull();
                     RuleFor(c => c.ScanDate).NotNull();
+                    RuleFor(c => c.AccessPoints).NotNull();
+                    RuleForEach(c => c.AccessPoints).SetValidator(new AccessPointV1Validator());
                 }
             }
 
