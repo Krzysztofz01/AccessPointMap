@@ -42,6 +42,13 @@ namespace AccessPointMap.Domain.AccessPoints
             { "PBKDF", new SecurityProtocol { Name = "PBKDF", FullName = "Password-Based Key Derivation Function", IsSecure = true, Type = SecurityProtocolType.KeyDerivation } },
             { "RADIUS", new SecurityProtocol { Name = "RADIUS", FullName = "Remote Authentication Dial-In User Service", IsSecure = true, Type = SecurityProtocolType.Authentication } },
             { "EAP", new SecurityProtocol { Name = "EAP", FullName = "Extensible Authentication Protocol", IsSecure = true, Type = SecurityProtocolType.Authentication } },
+            { "SEC80", new SecurityProtocol { Name = "SEC80", FullName = "NM_802_11_AP_SEC_GROUP_CCMP", IsSecure = false, Type = SecurityProtocolType.Other } },
+            { "RSN", new SecurityProtocol { Name = "RSN", FullName = "Robust Security Network", IsSecure = false, Type = SecurityProtocolType.Other } },
+            { "FT", new SecurityProtocol { Name = "FT", FullName = "Fast Secure Roaming", IsSecure = false, Type = SecurityProtocolType.Other } },
+            { "IBSS", new SecurityProtocol { Name = "IBSS", FullName = "Independent Basic Service Set", IsSecure = false, Type = SecurityProtocolType.Other } },
+            { "ESS", new SecurityProtocol { Name = "ESS", FullName = "Extended Service Set", IsSecure = false, Type = SecurityProtocolType.Other } },
+            { "BSS", new SecurityProtocol { Name = "BSS", FullName = "Basic Service Set", IsSecure = false, Type = SecurityProtocolType.Other } },
+            { "P2P", new SecurityProtocol { Name = "P2P", FullName = "Peer-To-Peer Wi-Fi Direct", IsSecure = false, Type = SecurityProtocolType.Other } }
         };
     }
     public class SecurityProtocol
@@ -61,6 +68,7 @@ namespace AccessPointMap.Domain.AccessPoints
         EncryptionMode,
         KeyExchange,
         KeyDerivation,
-        Authentication
+        Authentication,
+        Other
     }
 }

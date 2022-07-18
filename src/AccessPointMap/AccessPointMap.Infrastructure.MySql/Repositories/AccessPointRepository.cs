@@ -12,9 +12,11 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
         public AccessPointRepository(AccessPointMapDbContext dbContext) =>
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
-        public async Task Add(AccessPoint accessPoint)
+        public Task Add(AccessPoint accessPoint)
         {
-            _ = await _context.AccessPoints.AddAsync(accessPoint); 
+            _context.AccessPoints.Add(accessPoint);
+            
+            return Task.CompletedTask;
         }
 
         public async Task<bool> Exists(Guid id)
@@ -35,14 +37,18 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
         {
             return await _context.AccessPoints
                 .Include(a => a.Stamps)
-                .SingleAsync(a => a.Id == id);
+                .Include(a => a.Adnnotations)
+                .Include(a => a.Packets)
+                .FirstAsync(a => a.Id == id);
         }
 
         public async Task<AccessPoint> Get(string bssid)
         {
             return await _context.AccessPoints
                 .Include(a => a.Stamps)
-                .SingleAsync(a => a.Bssid.Value == bssid);
+                .Include(a => a.Adnnotations)
+                .Include(a => a.Packets)
+                .FirstAsync(a => a.Bssid.Value == bssid);
         }
     }
 }

@@ -13,9 +13,11 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
 
-        public async Task Add(Identity identity)
+        public Task Add(Identity identity)
         {
-            _ = await _context.Identities.AddAsync(identity);
+            _context.Identities.Add(identity);
+            
+            return Task.CompletedTask;
         }
 
         public async Task<bool> Exists(Guid id)
@@ -29,7 +31,7 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
         {
             return await _context.Identities
                 .Include(i => i.Tokens)
-                .SingleAsync(i => i.Id == id);
+                .FirstAsync(i => i.Id == id);
         }
     }
 }
