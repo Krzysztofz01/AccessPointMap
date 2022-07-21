@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private const string _integrationName = "WiGLE";
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
-        private const string _integrationVersion = "1.0.0";
+        private const string _integrationVersion = "1.1.0";
 
         private const double _defaultFrequencyValue = default;
 
@@ -43,6 +44,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             switch (command)
             {
                 case Commands.CreateAccessPointsFromCsvFile cmd: await HandleCommand(cmd); break;
+                case Commands.CreateAccessPointsFromCsvGzFile cmd: await HandleCommand(cmd); break;
 
                 default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
             }
@@ -57,6 +59,45 @@ namespace AccessPointMap.Application.Integration.Wigle
                 throw new ArgumentNullException(nameof(cmd));
 
             using var sr = new StreamReader(cmd.ScanCsvFile.OpenReadStream());
+
+            // This line will shift the stream by one line to avoid the header
+            _ = sr.ReadLine();
+
+            using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
+
+            var records = csv.GetRecords<AccessPointRecord>()
+                .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
+                .ToList();
+
+            foreach (var record in records)
+            {
+                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
+
+                if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
+                {
+                    await CreateAccessPointStamp(record);
+                    continue;
+                }
+
+                await CreateAccessPoint(record);
+            }
+
+            await UnitOfWork.Commit();
+        }
+
+        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvGzFile cmd)
+        {
+            if (cmd.ScanCsvGzFile is null)
+                throw new ArgumentNullException(nameof(cmd));
+
+            if (Path.GetExtension(cmd.ScanCsvGzFile.FileName).ToLower() != ".csv.gz")
+                throw new ArgumentNullException(nameof(cmd));
+
+            using var decompressedFileStream = new MemoryStream();
+            using var compressionStream = new GZipStream(cmd.ScanCsvGzFile.OpenReadStream(), CompressionMode.Decompress);
+            compressionStream.CopyTo(decompressedFileStream);
+
+            using var sr = new StreamReader(decompressedFileStream);
 
             // This line will shift the stream by one line to avoid the header
             _ = sr.ReadLine();
