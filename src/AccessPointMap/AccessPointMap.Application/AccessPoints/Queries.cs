@@ -44,6 +44,44 @@ namespace AccessPointMap.Application.AccessPoints
                 .SingleAsync(a => a.Id == id); 
         }
 
+        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsByRunId(this IQueryable<AccessPoint> accessPoints, Guid runId)
+        {
+            return await accessPoints
+                .Where(a => a.RunIdentifier.Value.HasValue)
+                .Where(a => a.RunIdentifier.Value.Value == runId)
+                .Where(a => a.DisplayStatus.Value)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsByRunIdAdministration(this IQueryable<AccessPoint> accessPoints, Guid runId)
+        {
+            return await accessPoints
+                .Where(a => a.RunIdentifier.Value.HasValue)
+                .Where(a => a.RunIdentifier.Value.Value == runId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<object>> GetAllAccessPointRunIds(this IQueryable<AccessPoint> accessPoints)
+        {
+            return await accessPoints
+                .Where(a => a.DisplayStatus.Value)
+                .Where(a => a.RunIdentifier.Value.HasValue)
+                .DistinctBy(a => a.RunIdentifier.Value.Value)
+                .Select(a => new { RunIdentifier = a.RunIdentifier.Value.Value })
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<object>> GetAllAccessPointRunIdsAdministration(this IQueryable<AccessPoint> accessPoints)
+        {
+            return await accessPoints
+                .Where(a => a.RunIdentifier.Value.HasValue)
+                .DistinctBy(a => a.RunIdentifier.Value.Value)
+                .Select(a => new { RunIdentifier = a.RunIdentifier.Value.Value })
+                .ToListAsync();
+        }
+
         public static async Task<IEnumerable<AccessPointPacket>> GetAllAccessPointsAccessPointPackets(this IQueryable<AccessPoint> accessPoints, Guid id)
         {
             return await accessPoints
