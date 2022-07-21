@@ -25,6 +25,7 @@ namespace AccessPointMap.Domain.AccessPoints
         public AccessPointPositioning Positioning { get; private set; }
         public AccessPointSecurity Security { get; private set; }
         public AccessPointNote Note { get; private set; }
+        public AccessPointRunIdentifier RunIdentifier { get; private set; }
         public AccessPointDisplayStatus DisplayStatus { get; private set; }
 
         private readonly List<AccessPointStamp> _stamps;
@@ -170,6 +171,10 @@ namespace AccessPointMap.Domain.AccessPoints
 
             VersionTimestamp = updatedTimestamp;
 
+            // The accesspoint combines now data from multiple runs
+            // The RunIdentifier will be None from now
+            RunIdentifier = AccessPointRunIdentifier.None;
+
             // Send the domain event to stamp in order to set it as verified
             stamp.Apply(@event);
         }
@@ -255,7 +260,10 @@ namespace AccessPointMap.Domain.AccessPoints
                         @event.HighSignalLongitude),
                     Security = AccessPointSecurity.FromString(@event.RawSecurityPayload),
                     Note = AccessPointNote.Empty,
-                    DisplayStatus = AccessPointDisplayStatus.Hidden
+                    DisplayStatus = AccessPointDisplayStatus.Hidden,
+                    RunIdentifier = @event.RunIdentifier.HasValue
+                        ? AccessPointRunIdentifier.FromGuid(@event.RunIdentifier.Value)
+                        : AccessPointRunIdentifier.None
                 };
             }
         }
