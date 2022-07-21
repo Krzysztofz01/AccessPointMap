@@ -48,6 +48,27 @@ namespace AccessPointMap.API.Controllers
             return Ok(mappedResponse);
         }
 
+        [HttpGet("run/{runId}")]
+        public async Task<IActionResult> GetAllByRunId(Guid runId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("run/{runId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> GetAllByRunIdFull(Guid runId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunIdAdministration(runId);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+
         [HttpGet("{accessPointId}")]
         public async Task<IActionResult> GetById(Guid accessPointId)
         {
