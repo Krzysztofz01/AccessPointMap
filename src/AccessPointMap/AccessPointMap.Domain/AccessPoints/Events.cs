@@ -40,6 +40,12 @@ namespace AccessPointMap.Domain.AccessPoints
                 public bool Status { get; set; }
             }
 
+            public class AccessPointPresenceStatusChanged : IEvent
+            {
+                public Guid Id { get; set; }
+                public bool Presence { get; set; }
+            }
+
             public class AccessPointManufacturerChanged : IEvent
             {
                 public Guid Id { get; set; }
