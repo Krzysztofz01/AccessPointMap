@@ -32,6 +32,10 @@ namespace AccessPointMap.API.Configuration
                 options.AddJobAndTrigger<AccessPointManufacturerJob>(
                     AccessPointManufacturerJob.JobName,
                     AccessPointManufacturerJob.CronExpression);
+
+                options.AddJobAndTrigger<AccessPointPresenceJob>(
+                    AccessPointPresenceJob.JobName,
+                    AccessPointPresenceJob.CronExpression);
             });
 
             services.AddQuartzServer(options =>
