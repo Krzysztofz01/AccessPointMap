@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.IO;
 
 namespace AccessPointMap.API.Controllers.Base
 {
@@ -52,6 +53,18 @@ namespace AccessPointMap.API.Controllers.Base
         protected object MapToDto<TDto>(object response) where TDto : class
         {
             return _mapper.Map<TDto>(response);
+        }
+
+        protected object MapToFile(Stream fileStream, string mimeType)
+        {
+            if (fileStream is null || string.IsNullOrEmpty(mimeType)) return null;
+
+            return File(fileStream, mimeType);
+        }
+
+        protected object MapToFile(object fileStreamObject, string mimeType)
+        {
+            return MapToFile((MemoryStream)fileStreamObject, mimeType);
         }
     }
 }
