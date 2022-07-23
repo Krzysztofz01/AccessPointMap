@@ -16,6 +16,8 @@ namespace AccessPointMap.API.Controllers
     {
         private readonly Wigle.IWigleIntegrationService _wigleIntegrationService;
 
+        private const string _csvContentType = "text/csv";
+
         public IntegrationQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, Wigle.IWigleIntegrationService wigleIntegrationService) : base(dataAccess, mapper, memoryCache)
         {
             _wigleIntegrationService = wigleIntegrationService ??
@@ -27,10 +29,7 @@ namespace AccessPointMap.API.Controllers
         {
             var response = await _wigleIntegrationService.Query(new Wigle.Queries.ExportAccessPointsToCsv());
 
-            var mappedResponse = MapToFile(response, "application/csv");
-
-            if (mappedResponse is null) return BadRequest();
-            return Ok(mappedResponse);
+            return MapToFile((byte[])response, _csvContentType);
         }
     }
 }
