@@ -101,13 +101,17 @@ namespace AccessPointMap.Application.AccessPoints
                 .SingleAsync(a => a.Id == packetId);
         }
 
-        public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)
-        {
-            return await accessPoints
-                .Where(a => Helpers.IsMatchingKeyword(keyword, a))
-                .AsNoTracking()
-                .ToListAsync();
-        }
+        // TODO: Resolve problems related to this query
+        // The main get endpoint can be used the same way, this endpoint were used
+        // The filtering is happening now on the server side, which might be less efficient
+        // We can remove this method (breaking change) or leave it as a alternative way
+        //public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)
+        //{
+        //    return await accessPoints
+        //        .Where(a => Helpers.IsMatchingKeyword(keyword, a))
+        //        .AsNoTracking()
+        //        .ToListAsync();
+        //}
 
         public static async Task<IEnumerable<AccessPoint>> GetAccessPointsWithGreatestSignalRange(this IQueryable<AccessPoint> accessPoints, int limit)
         {
