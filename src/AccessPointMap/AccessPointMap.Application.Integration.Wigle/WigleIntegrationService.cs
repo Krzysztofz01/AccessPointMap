@@ -69,20 +69,7 @@ namespace AccessPointMap.Application.Integration.Wigle
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
-            foreach (var record in records)
-            {
-                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
-
-                if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
-                {
-                    await CreateAccessPointStamp(record);
-                    continue;
-                }
-
-                await CreateAccessPoint(record);
-            }
-
-            await UnitOfWork.Commit();
+            await HandleAccessPointRecords(records);
         }
 
         private async Task HandleCommand(Commands.CreateAccessPointsFromCsvGzFile cmd)
@@ -90,14 +77,11 @@ namespace AccessPointMap.Application.Integration.Wigle
             if (cmd.ScanCsvGzFile is null)
                 throw new ArgumentNullException(nameof(cmd));
 
-            if (Path.GetExtension(cmd.ScanCsvGzFile.FileName).ToLower() != ".csv.gz")
+            if (!cmd.ScanCsvGzFile.FileName.ToLower().EndsWith(".csv.gz"))
                 throw new ArgumentNullException(nameof(cmd));
 
-            using var decompressedFileStream = new MemoryStream();
             using var compressionStream = new GZipStream(cmd.ScanCsvGzFile.OpenReadStream(), CompressionMode.Decompress);
-            compressionStream.CopyTo(decompressedFileStream);
-
-            using var sr = new StreamReader(decompressedFileStream);
+            using var sr = new StreamReader(compressionStream);
 
             // This line will shift the stream by one line to avoid the header
             _ = sr.ReadLine();
@@ -108,7 +92,12 @@ namespace AccessPointMap.Application.Integration.Wigle
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
-            foreach (var record in records)
+            await HandleAccessPointRecords(records);
+        }
+
+        private async Task HandleAccessPointRecords(IEnumerable<AccessPointRecord> accessPointRecords)
+        {
+            foreach (var record in accessPointRecords)
             {
                 if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
