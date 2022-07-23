@@ -23,15 +23,22 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery]DateTime? startingData,
+            [FromQuery]DateTime? endingDate,
+            [FromQuery]double? latitude,
+            [FromQuery]double? longitude,
+            [FromQuery]double? distance,
+            [FromQuery]string keyword)
         {
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPoints();
+            var response = await _dataAccess.AccessPoints.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
+            // TODO: Verify the correct caching strategy.
             StoreToCache(mappedResponse);
 
             return Ok(mappedResponse);
@@ -39,9 +46,15 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("full")]
         [Authorize(Roles = "Admin, Support")]
-        public async Task<IActionResult> GetAllFull()
+        public async Task<IActionResult> GetAllFull(
+            [FromQuery] DateTime? startingData,
+            [FromQuery] DateTime? endingDate,
+            [FromQuery] double? latitude,
+            [FromQuery] double? longitude,
+            [FromQuery] double? distance,
+            [FromQuery] string keyword)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration();
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
