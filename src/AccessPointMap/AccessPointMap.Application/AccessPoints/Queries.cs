@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Domain.AccessPoints;
+﻿using AccessPointMap.Application.Extensions;
+using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,17 +12,39 @@ namespace AccessPointMap.Application.AccessPoints
 {
     public static class Queries
     {
-        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPoints(this IQueryable<AccessPoint> accessPoints)
+        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPoints(
+            this IQueryable<AccessPoint> accessPoints,
+            DateTime? startingDate,
+            DateTime? endingData,
+            double? latitude,
+            double? longitude,
+            double? distance,
+            string keyword)
         {
             return await accessPoints
                 .Where(a => a.DisplayStatus.Value)
+                .WhereParamPresent(startingDate.HasValue, a => a.CreationTimestamp.Value > startingDate.Value)
+                .WhereParamPresent(endingData.HasValue, a => a.CreationTimestamp.Value < endingData.Value)
+                .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
+                .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsAdministration(this IQueryable<AccessPoint> accessPoints)
+        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsAdministration(
+            this IQueryable<AccessPoint> accessPoints,
+            DateTime? startingDate,
+            DateTime? endingData,
+            double? latitude,
+            double? longitude,
+            double? distance,
+            string keyword)
         {
             return await accessPoints
+                .WhereParamPresent(startingDate.HasValue, a => a.CreationTimestamp.Value > startingDate.Value)
+                .WhereParamPresent(endingData.HasValue, a => a.CreationTimestamp.Value < endingData.Value)
+                .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
+                .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -66,13 +89,8 @@ namespace AccessPointMap.Application.AccessPoints
 
         public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)
         {
-            string kw = keyword.Trim().ToLower();
-
             return await accessPoints
-                .Where(a =>
-                    a.Ssid.Value.ToLower().Contains(kw) ||
-                    a.DeviceType.Value.ToLower().Contains(kw) ||
-                    a.Security.RawSecurityPayload.ToLower().Contains(kw))
+                .Where(a => Helpers.IsMatchingKeyword(keyword, a))
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -141,6 +159,37 @@ namespace AccessPointMap.Application.AccessPoints
             return (limit == default)
                 ? encryptionCountMap.Select(e => new { Encryption = e.Key, Count = e.Value }).OrderByDescending(e => e.Count)
                 : encryptionCountMap.Select(e => new { Encryption = e.Key, Count = e.Value }).OrderByDescending(e => e.Count).Take(limit);                
+        }
+
+        private static class Helpers
+        {
+            public static bool IsAccessPointInArea(
+                double latitude,
+                double longitude,
+                double distance,
+                AccessPoint accessPoint)
+            {
+                const double _pi = 3.1415;
+                double o1 = latitude * _pi / 180.0;
+                double o2 = accessPoint.Positioning.HighSignalLatitude * _pi / 180.0;
+
+                double so = (accessPoint.Positioning.HighSignalLatitude - latitude) * _pi / 180.0;
+                double sl = (accessPoint.Positioning.HighSignalLongitude - longitude) * _pi / 180.0;
+
+                double a = Math.Pow(Math.Sin(so / 2.0), 2.0) + Math.Cos(o1) * Math.Cos(o2) * Math.Pow(Math.Sin(sl / 2.0), 2.0);
+                double c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0 - a));
+
+                return Math.Round(6371e3 * c, 2) <= distance;
+            }
+
+            public static bool IsMatchingKeyword(string keyword, AccessPoint accessPoint)
+            {
+                string kw = keyword.Trim().ToLower();
+
+                return accessPoint.Ssid.Value.ToLower().Contains(kw) ||
+                    accessPoint.DeviceType.Value.ToLower().Contains(kw) ||
+                    accessPoint.Security.RawSecurityPayload.ToLower().Contains(kw);
+            }
         }
     }
 }
