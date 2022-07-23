@@ -27,7 +27,6 @@ namespace AccessPointMap.Application.Integration.Wigle
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
         private const string _integrationVersion = "1.0.0";
 
-        private const string _csvHeader = "[BSSID],[SSID],[Capabilities],[First timestamp seen],[Channel],[RSSI],[Latitude],[Longitude],[Altitude],[Accuracy],[Type]";
         private const string _csvPreheader = $"WigleWifi-1.4,appRelease=1.0.0,model=AccessPointMap,release=AccessPointMap,device=AccessPointMap,display=AccessPointMap,board=AccessPointMap,brand=AccessPointMap";
 
         private const double _defaultFrequencyValue = default;
@@ -98,7 +97,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             await UnitOfWork.Commit();
         }
 
-        private Task<object> HandleQuery(Queries.ExportAccessPointsToCsv q)
+        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv q)
         {
             var accessPoints = DataAccess.AccessPoints
                 .Where(a => !a.DeletedAt.HasValue)
@@ -114,18 +113,11 @@ namespace AccessPointMap.Application.Integration.Wigle
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
             foreach (var field in _csvPreheader.Split(',')) csv.WriteField(field);
-            csv.NextRecord();
+            await csv.NextRecordAsync();
 
-            foreach (var field in _csvHeader.Split(',')) csv.WriteField(field);
-            csv.NextRecord();
+            await csv.WriteRecordsAsync(records);
 
-            csv.WriteRecords(records);
-            
-            csv.Flush();
-            writer.Close();
-
-            stream.Seek(0, SeekOrigin.Begin);
-            return Task.FromResult((object)stream);
+            return stream.ToArray();
         }
 
         private async Task CreateAccessPoint(AccessPointRecord record)
