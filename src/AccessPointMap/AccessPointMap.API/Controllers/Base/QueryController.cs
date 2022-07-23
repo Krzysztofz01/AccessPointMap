@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.IO;
+using System.Net.Http.Headers;
 
 namespace AccessPointMap.API.Controllers.Base
 {
@@ -55,16 +56,17 @@ namespace AccessPointMap.API.Controllers.Base
             return _mapper.Map<TDto>(response);
         }
 
-        protected object MapToFile(Stream fileStream, string mimeType)
+        protected FileStreamResult MapToFile(Stream fileStream, string mimeType)
         {
             if (fileStream is null || string.IsNullOrEmpty(mimeType)) return null;
 
+            Response.ContentType = new MediaTypeHeaderValue(mimeType).ToString();
             return File(fileStream, mimeType);
         }
 
-        protected object MapToFile(object fileStreamObject, string mimeType)
+        protected FileStreamResult MapToFile(byte[] fileBuffer, string mimeType)
         {
-            return MapToFile((MemoryStream)fileStreamObject, mimeType);
+            return MapToFile(new MemoryStream(fileBuffer), mimeType);
         }
     }
 }
