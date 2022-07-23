@@ -19,16 +19,23 @@ namespace AccessPointMap.Application.AccessPoints
             double? latitude,
             double? longitude,
             double? distance,
-            string keyword)
+            string keyword,
+            int? page,
+            int? pageSize)
         {
-            return await accessPoints
+            // Database handled query filtering
+            var databaseResult = await accessPoints
                 .Where(a => a.DisplayStatus.Value)
                 .WhereParamPresent(startingDate.HasValue, a => a.CreationTimestamp.Value > startingDate.Value)
                 .WhereParamPresent(endingData.HasValue, a => a.CreationTimestamp.Value < endingData.Value)
-                .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
-                .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
                 .AsNoTracking()
                 .ToListAsync();
+
+            // Server handled query filtering
+            return databaseResult
+                .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
+                .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
+                .Paginate(page, pageSize);
         }
 
         public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsAdministration(
@@ -38,15 +45,22 @@ namespace AccessPointMap.Application.AccessPoints
             double? latitude,
             double? longitude,
             double? distance,
-            string keyword)
+            string keyword,
+            int? page,
+            int? pageSize)
         {
-            return await accessPoints
+            // Database handled query filtering
+            var databaseResult = await accessPoints
                 .WhereParamPresent(startingDate.HasValue, a => a.CreationTimestamp.Value > startingDate.Value)
                 .WhereParamPresent(endingData.HasValue, a => a.CreationTimestamp.Value < endingData.Value)
-                .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
-                .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
                 .AsNoTracking()
                 .ToListAsync();
+
+            // Server handled query filtering
+            return databaseResult
+                .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
+                .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
+                .Paginate(page, pageSize);
         }
 
         public static async Task<AccessPoint> GetAccessPointById(this IQueryable<AccessPoint> accessPoints, Guid id)

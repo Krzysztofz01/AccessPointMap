@@ -29,16 +29,17 @@ namespace AccessPointMap.API.Controllers
             [FromQuery]double? latitude,
             [FromQuery]double? longitude,
             [FromQuery]double? distance,
-            [FromQuery]string keyword)
+            [FromQuery]string keyword,
+            [FromQuery]int? page,
+            [FromQuery]int? pageSize)
         {
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword);
+            var response = await _dataAccess.AccessPoints.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
-            // TODO: Verify the correct caching strategy.
             StoreToCache(mappedResponse);
 
             return Ok(mappedResponse);
@@ -52,9 +53,11 @@ namespace AccessPointMap.API.Controllers
             [FromQuery] double? latitude,
             [FromQuery] double? longitude,
             [FromQuery] double? distance,
-            [FromQuery] string keyword)
+            [FromQuery] string keyword,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword);
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 

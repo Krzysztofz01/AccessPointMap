@@ -12,5 +12,16 @@ namespace AccessPointMap.Application.Extensions
                 ? entities.Where(predicate)
                 : entities;
         }
+
+        public static IQueryable<TEntity> Paginate<TEntity>(this IQueryable<TEntity> entities, int? page, int? elementsPerPage, bool skipIfParamsNotProvided = true)
+        {
+            if (!skipIfParamsNotProvided && (!page.HasValue || !elementsPerPage.HasValue)) return entities;
+
+            if (page.Value <= 0) throw new ArgumentOutOfRangeException(nameof(page));
+
+            return entities
+                .Skip(page.Value * elementsPerPage.Value)
+                .Take(elementsPerPage.Value);
+        }
     }
 }
