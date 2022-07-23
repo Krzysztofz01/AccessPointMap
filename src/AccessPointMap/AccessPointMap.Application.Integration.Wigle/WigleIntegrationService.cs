@@ -67,23 +67,25 @@ namespace AccessPointMap.Application.Integration.Wigle
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
+            var isSingleRun = IsSingleRun(records);
+
             foreach (var record in records)
             {
                 if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
                 if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
                 {
-                    await CreateAccessPointStamp(record);
+                    await CreateAccessPointStamp(record, isSingleRun);
                     continue;
                 }
 
-                await CreateAccessPoint(record);
+                await CreateAccessPoint(record, isSingleRun);
             }
 
             await UnitOfWork.Commit();
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record)
+        private async Task CreateAccessPoint(AccessPointRecord record, bool isSingleRun)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
@@ -119,7 +121,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, bool isSingleRun)
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Mac);
 
@@ -145,6 +147,19 @@ namespace AccessPointMap.Application.Integration.Wigle
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
             });
+        }
+
+        private static bool IsSingleRun(IEnumerable<AccessPointRecord> records)
+        {
+            if (records.Count() < 2) return false;
+
+            var firstRecordDate = records.Min(r => r.FirstSeen);
+            var lastRecordData = records.Max(r => r.FirstSeen);
+
+            const double hoursThreshold = 18;
+            var hoursDifference = (lastRecordData - firstRecordDate).TotalHours;
+
+            return hoursDifference < hoursThreshold;
         }
 
         private static AccessPointRecord CombineRecords(IEnumerable<AccessPointRecord> records)
