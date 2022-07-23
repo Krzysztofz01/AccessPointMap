@@ -26,9 +26,10 @@ namespace AccessPointMap.Application.Integration.Wireshark
 
         public WiresharkIntegrationService(
             IUnitOfWork unitOfWork,
+            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
         public async Task Handle(IIntegrationCommand command)
         {
@@ -37,6 +38,14 @@ namespace AccessPointMap.Application.Integration.Wireshark
                 case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
 
                 default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+            }
+        }
+
+        public Task<object> Query(IIntegrationQuery query)
+        {
+            switch (query)
+            {
+                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
             }
         }
 
