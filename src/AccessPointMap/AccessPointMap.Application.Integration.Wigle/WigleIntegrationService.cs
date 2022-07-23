@@ -67,7 +67,9 @@ namespace AccessPointMap.Application.Integration.Wigle
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
-            var isSingleRun = IsSingleRun(records);
+            Guid? runIdentifier = IsSingleRun(records)
+                ? Guid.NewGuid()
+                : null;
 
             foreach (var record in records)
             {
@@ -75,17 +77,17 @@ namespace AccessPointMap.Application.Integration.Wigle
 
                 if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
                 {
-                    await CreateAccessPointStamp(record, isSingleRun);
+                    await CreateAccessPointStamp(record, runIdentifier);
                     continue;
                 }
 
-                await CreateAccessPoint(record, isSingleRun);
+                await CreateAccessPoint(record, runIdentifier);
             }
 
             await UnitOfWork.Commit();
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record, bool isSingleRun)
+        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
@@ -100,7 +102,8 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.FirstSeen
+                ScanDate = record.FirstSeen,
+                RunIdentifier = runIdentifier
             });
 
             var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
@@ -121,7 +124,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record, bool isSingleRun)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Mac);
 
@@ -138,7 +141,8 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.FirstSeen
+                ScanDate = record.FirstSeen,
+                RunIdentifier = runIdentifier
             });
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
