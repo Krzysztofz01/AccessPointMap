@@ -24,7 +24,7 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
             builder.OwnsOne(e => e.Positioning);
             builder.OwnsOne(e => e.Security);
             builder.OwnsRequiredOne(e => e.Note);
-            builder.OwnsOne(e => e.RunIdentifier);
+            builder.OwnsRequiredOne(e => e.RunIdentifier);
             builder.OwnsOne(e => e.DisplayStatus);
             builder.OwnsOne(e => e.Presence);
 
