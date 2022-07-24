@@ -131,7 +131,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             await UnitOfWork.Commit();
         }
 
-        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv q)
+        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv _)
         {
             var accessPoints = DataAccess.AccessPoints
                 .Where(a => !a.DeletedAt.HasValue)
