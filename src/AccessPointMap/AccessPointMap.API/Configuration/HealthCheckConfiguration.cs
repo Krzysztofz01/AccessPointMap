@@ -12,7 +12,7 @@ namespace AccessPointMap.API.Configuration
 {
     public static class HealthCheckConfiguration
     {
-        public const string _healthCheckPath = "/health";
+        public const string _healthCheckPath = "/api/health";
 
         public static IServiceCollection AddServiceHealthChecks(this IServiceCollection services, IConfiguration configuration)
         {
