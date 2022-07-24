@@ -41,7 +41,7 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
                 e.OwnsOne(e => e.Positioning);
                 e.OwnsOne(e => e.Security);
                 e.OwnsOne(e => e.Status);
-                e.OwnsOne(e => e.RunIdentifier);
+                e.OwnsRequiredOne(e => e.RunIdentifier);
 
                 e.Property(e => e.DeletedAt).HasDefaultValue(null);
             });
