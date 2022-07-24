@@ -35,6 +35,10 @@ namespace AccessPointMap.API.Controllers
         public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
             await ExecuteService(command, _wigleIntegrationService.Handle);
 
+        [HttpPost("wigle/csvgz")]
+        public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvGzFile command) =>
+            await ExecuteService(command, _wigleIntegrationService.Handle);
+
         [HttpPost("aircrackng/csv")]
         public async Task<IActionResult> CreateAccessPointsFromCsvFile([FromForm] Aircrackng.Commands.CreateAccessPointsFromCsvFile command) =>
             await ExecuteService(command, _aircrackngIntegrationService.Handle);

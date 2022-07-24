@@ -10,7 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -24,7 +26,9 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private const string _integrationName = "WiGLE";
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
-        private const string _integrationVersion = "1.0.0";
+        private const string _integrationVersion = "1.1.0";
+
+        private const string _csvPreheader = $"WigleWifi-1.4,appRelease=1.0.0,model=AccessPointMap,release=AccessPointMap,device=AccessPointMap,display=AccessPointMap,board=AccessPointMap,brand=AccessPointMap";
 
         private const double _defaultFrequencyValue = default;
 
@@ -34,17 +38,29 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         public WigleIntegrationService(
             IUnitOfWork unitOfWork,
+            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
         public async Task Handle(IIntegrationCommand command)
         {
             switch (command)
             {
                 case Commands.CreateAccessPointsFromCsvFile cmd: await HandleCommand(cmd); break;
+                case Commands.CreateAccessPointsFromCsvGzFile cmd: await HandleCommand(cmd); break;
 
                 default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+            }
+        }
+
+        public async Task<object> Query(IIntegrationQuery query)
+        {
+            switch (query)
+            {
+                case Queries.ExportAccessPointsToCsv q: return await HandleQuery(q);
+
+                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
             }
         }
 
@@ -67,11 +83,39 @@ namespace AccessPointMap.Application.Integration.Wigle
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
-            Guid? runIdentifier = IsSingleRun(records)
+            await HandleAccessPointRecords(records);
+        }
+
+        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvGzFile cmd)
+        {
+            if (cmd.ScanCsvGzFile is null)
+                throw new ArgumentNullException(nameof(cmd));
+
+            if (!cmd.ScanCsvGzFile.FileName.ToLower().EndsWith(".csv.gz"))
+                throw new ArgumentNullException(nameof(cmd));
+
+            using var compressionStream = new GZipStream(cmd.ScanCsvGzFile.OpenReadStream(), CompressionMode.Decompress);
+            using var sr = new StreamReader(compressionStream);
+
+            // This line will shift the stream by one line to avoid the header
+            _ = sr.ReadLine();
+
+            using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
+
+            var records = csv.GetRecords<AccessPointRecord>()
+                .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
+                .ToList();
+
+            await HandleAccessPointRecords(records);
+        }
+
+        private async Task HandleAccessPointRecords(IEnumerable<AccessPointRecord> accessPointRecords)
+        {
+            Guid? runIdentifier = IsSingleRun(accessPointRecords)
                 ? Guid.NewGuid()
                 : null;
 
-            foreach (var record in records)
+            foreach (var record in accessPointRecords)
             {
                 if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
@@ -85,6 +129,29 @@ namespace AccessPointMap.Application.Integration.Wigle
             }
 
             await UnitOfWork.Commit();
+        }
+
+        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv q)
+        {
+            var accessPoints = DataAccess.AccessPoints
+                .Where(a => !a.DeletedAt.HasValue)
+                .Where(a => a.DisplayStatus.Value)
+                .ToList();
+
+            var records = accessPoints
+                .Select(a => AccessPointToRecord(a));
+
+            using var stream = new MemoryStream();
+            using var writer = new StreamWriter(stream, Encoding.UTF8);
+
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+
+            foreach (var field in _csvPreheader.Split(',')) csv.WriteField(field);
+            await csv.NextRecordAsync();
+
+            await csv.WriteRecordsAsync(records);
+
+            return stream.ToArray();
         }
 
         private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
@@ -193,6 +260,24 @@ namespace AccessPointMap.Application.Integration.Wigle
             }
 
             return accessPoint;
+        }
+
+        private static AccessPointRecord AccessPointToRecord(AccessPoint accessPoint)
+        {
+            return new AccessPointRecord
+            {
+                Mac = accessPoint.Bssid.Value,
+                Ssid = accessPoint.Ssid.Value,
+                AuthMode = accessPoint.Security.RawSecurityPayload,
+                FirstSeen = accessPoint.CreationTimestamp.Value,
+                Channel = 0,
+                Rssi = accessPoint.Positioning.HighSignalLevel,
+                Latitude = accessPoint.Positioning.HighSignalLatitude,
+                Longitude = accessPoint.Positioning.HighSignalLongitude,
+                Altituded = 0,
+                Accuracy = 0,
+                Type = "WIFI"
+            };
         }
 
         private static string SerializeRawAccessPointRecord(AccessPointRecord record)
