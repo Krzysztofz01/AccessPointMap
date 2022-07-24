@@ -126,6 +126,36 @@ namespace AccessPointMap.Domain.Test
         }
 
         [Fact]
+        public void AccessPointPresenceShouldChange()
+        {
+            var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
+            {
+                Bssid = "00:00:00:00:00:00",
+                Ssid = "Test-Hotspot",
+                Frequency = 2670,
+                LowSignalLevel = -70,
+                LowSignalLatitude = 48.8583,
+                LowSignalLongitude = 2.2944,
+                HighSignalLevel = -30,
+                HighSignalLatitude = 48.86,
+                HighSignalLongitude = 2.30,
+                RawSecurityPayload = "[WPA2][WEP]",
+                UserId = Guid.NewGuid(),
+                ScanDate = DateTime.Now
+            });
+
+            Assert.True(accesspoint.Presence);
+
+            accesspoint.Apply(new V1.AccessPointPresenceStatusChanged
+            {
+                Id = accesspoint.Id,
+                Presence = false
+            });
+
+            Assert.False(accesspoint.Presence);
+        }
+
+        [Fact]
         public void AccessPointManufacturerShouldChange()
         {
             var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
