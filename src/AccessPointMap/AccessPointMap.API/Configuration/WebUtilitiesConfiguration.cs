@@ -134,7 +134,8 @@ namespace AccessPointMap.API.Configuration
 
                 app.UseSwaggerUI(options =>
                 {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                    options.RoutePrefix = "api/swagger";
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");   
                 });
             }
 
