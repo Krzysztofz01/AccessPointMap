@@ -23,12 +23,20 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery]DateTime? startingData,
+            [FromQuery]DateTime? endingDate,
+            [FromQuery]double? latitude,
+            [FromQuery]double? longitude,
+            [FromQuery]double? distance,
+            [FromQuery]string keyword,
+            [FromQuery]int? page,
+            [FromQuery]int? pageSize)
         {
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPoints();
+            var response = await _dataAccess.AccessPoints.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
@@ -39,9 +47,38 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("full")]
         [Authorize(Roles = "Admin, Support")]
-        public async Task<IActionResult> GetAllFull()
+        public async Task<IActionResult> GetAllFull(
+            [FromQuery] DateTime? startingData,
+            [FromQuery] DateTime? endingDate,
+            [FromQuery] double? latitude,
+            [FromQuery] double? longitude,
+            [FromQuery] double? distance,
+            [FromQuery] string keyword,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration();
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("run/{runId}")]
+        public async Task<IActionResult> GetAllByRunId(Guid runId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("run/{runId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> GetAllByRunIdFull(Guid runId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunIdAdministration(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 

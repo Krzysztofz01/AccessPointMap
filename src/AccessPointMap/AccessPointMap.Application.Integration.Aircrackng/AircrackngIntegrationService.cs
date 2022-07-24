@@ -32,9 +32,10 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         public AircrackngIntegrationService(
             IUnitOfWork unitOfWork,
+            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
 
         public async Task Handle(IIntegrationCommand command)
@@ -45,6 +46,14 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
 
                 default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+            }
+        }
+
+        public Task<object> Query(IIntegrationQuery query)
+        {
+            switch (query)
+            {
+                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
             }
         }
 
@@ -76,21 +85,25 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
             var accessPoints = ParseCsvAccessPointScanFile(cmd.ScanCsvFile.OpenReadStream());
 
+            Guid? runIdentifier = IsSingleRun(accessPoints)
+                ? Guid.NewGuid()
+                : null;
+
             foreach (var accessPoint in accessPoints)
             {
                 if (await UnitOfWork.AccessPointRepository.Exists(accessPoint.Bssid))
                 {
-                    await CreateAccessPointStamp(accessPoint);
+                    await CreateAccessPointStamp(accessPoint, runIdentifier);
                     continue;
                 }
 
-                await CreateAccessPoint(accessPoint);
+                await CreateAccessPoint(accessPoint, runIdentifier);
             }
 
             await UnitOfWork.Commit();
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record)
+        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
@@ -105,7 +118,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.LocalTimestamp
+                ScanDate = record.LocalTimestamp,
+                RunIdentifier = runIdentifier
             });
 
             var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
@@ -126,7 +140,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Bssid);
 
@@ -143,7 +157,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.LocalTimestamp
+                ScanDate = record.LocalTimestamp,
+                RunIdentifier = runIdentifier
             });
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
@@ -178,6 +193,19 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
             });
+        }
+
+        private static bool IsSingleRun(IEnumerable<AccessPointRecord> records)
+        {
+            if (records.Count() < 2) return false;
+
+            var firstRecordDate = records.Min(r => r.LocalTimestamp);
+            var lastRecordData = records.Max(r => r.LocalTimestamp);
+
+            const double hoursThreshold = 18;
+            var hoursDifference = (lastRecordData - firstRecordDate).TotalHours;
+
+            return hoursDifference < hoursThreshold;
         }
 
         private static string SerializeRawAccessPointRecord(AccessPointRecord record)
