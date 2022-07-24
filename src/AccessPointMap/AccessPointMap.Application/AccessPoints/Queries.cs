@@ -105,13 +105,20 @@ namespace AccessPointMap.Application.AccessPoints
         // The main get endpoint can be used the same way, this endpoint were used
         // The filtering is happening now on the server side, which might be less efficient
         // We can remove this method (breaking change) or leave it as a alternative way
-        //public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)
-        //{
-        //    return await accessPoints
-        //        .Where(a => Helpers.IsMatchingKeyword(keyword, a))
-        //        .AsNoTracking()
-        //        .ToListAsync();
-        //}
+        //
+        // For now the query will stay, but will be removed in the next braking-changes release
+        public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IQueryable<AccessPoint> accessPoints, string keyword)
+        {
+            string kw = keyword.Trim().ToLower();
+
+            return await accessPoints
+                .Where(a => 
+                    a.Ssid.Value.ToLower().Contains(kw) ||
+                    a.DeviceType.Value.ToLower().Contains(kw) ||
+                    a.Security.RawSecurityPayload.ToLower().Contains(kw))
+                .AsNoTracking()
+                .ToListAsync();
+        }
 
         public static async Task<IEnumerable<AccessPoint>> GetAccessPointsWithGreatestSignalRange(this IQueryable<AccessPoint> accessPoints, int limit)
         {
