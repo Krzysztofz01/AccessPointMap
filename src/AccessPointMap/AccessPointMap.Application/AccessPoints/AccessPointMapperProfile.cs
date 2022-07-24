@@ -22,7 +22,8 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SignalArea, m => m.MapFrom(s => s.Positioning.SignalArea))
                 .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
                 .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
-                .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure));
+                .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
+                .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value));
 
             CreateMap<AccessPoint, AccessPointDetails>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
@@ -46,6 +47,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
                 .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
+                .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value))
                 .ForMember(d => d.Stamps, m => m.MapFrom(s => s.Stamps));
 
             CreateMap<AccessPoint, AccessPointDetailsAdministration>()
@@ -72,6 +74,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.Note, m => m.MapFrom(s => s.Note))
                 .ForMember(d => d.DisplayStatus, m => m.MapFrom(s => s.DisplayStatus))
+                .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value))
                 .ForMember(d => d.Stamps, m => m.MapFrom(s => s.Stamps));
 
             CreateMap<AccessPointStamp, AccessPointStampDetails>()
@@ -93,7 +96,8 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
                 .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
-                .ForMember(d => d.Status, m => m.MapFrom(s => s.Status.Value));
+                .ForMember(d => d.Status, m => m.MapFrom(s => s.Status.Value))
+                .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value));
 
             CreateMap<AccessPointAdnnotation, AccessPointAdnnotationDetails>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))

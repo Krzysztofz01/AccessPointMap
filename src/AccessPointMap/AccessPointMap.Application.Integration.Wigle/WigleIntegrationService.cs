@@ -111,23 +111,27 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private async Task HandleAccessPointRecords(IEnumerable<AccessPointRecord> accessPointRecords)
         {
+            Guid? runIdentifier = IsSingleRun(accessPointRecords)
+                ? Guid.NewGuid()
+                : null;
+
             foreach (var record in accessPointRecords)
             {
                 if (!record.Type.ToUpper().Contains(_allowedType)) continue;
 
                 if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
                 {
-                    await CreateAccessPointStamp(record);
+                    await CreateAccessPointStamp(record, runIdentifier);
                     continue;
                 }
 
-                await CreateAccessPoint(record);
+                await CreateAccessPoint(record, runIdentifier);
             }
 
             await UnitOfWork.Commit();
         }
 
-        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv q)
+        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv _)
         {
             var accessPoints = DataAccess.AccessPoints
                 .Where(a => !a.DeletedAt.HasValue)
@@ -150,7 +154,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             return stream.ToArray();
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record)
+        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
@@ -165,7 +169,8 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.FirstSeen
+                ScanDate = record.FirstSeen,
+                RunIdentifier = runIdentifier
             });
 
             var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
@@ -186,7 +191,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Mac);
 
@@ -203,7 +208,8 @@ namespace AccessPointMap.Application.Integration.Wigle
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.AuthMode,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.FirstSeen
+                ScanDate = record.FirstSeen,
+                RunIdentifier = runIdentifier
             });
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
@@ -212,6 +218,19 @@ namespace AccessPointMap.Application.Integration.Wigle
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
             });
+        }
+
+        private static bool IsSingleRun(IEnumerable<AccessPointRecord> records)
+        {
+            if (records.Count() < 2) return false;
+
+            var firstRecordDate = records.Min(r => r.FirstSeen);
+            var lastRecordData = records.Max(r => r.FirstSeen);
+
+            const double hoursThreshold = 18;
+            var hoursDifference = (lastRecordData - firstRecordDate).TotalHours;
+
+            return hoursDifference < hoursThreshold;
         }
 
         private static AccessPointRecord CombineRecords(IEnumerable<AccessPointRecord> records)

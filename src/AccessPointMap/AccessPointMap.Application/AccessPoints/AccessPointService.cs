@@ -58,6 +58,7 @@ namespace AccessPointMap.Application.AccessPoints
         private async Task HandleCreate(V1.Create command)
         {
             var userId = _scopeWrapperService.GetUserId();
+            var runId = Guid.NewGuid();
 
             //Iterate through all pushed access points
             foreach (var ap in command.AccessPoints)
@@ -80,7 +81,8 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate.Value
+                        ScanDate = command.ScanDate.Value,
+                        RunIdentifier = runId
                     });
 
                     await _unitOfWork.Commit();
@@ -100,7 +102,8 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate.Value
+                        ScanDate = command.ScanDate.Value,
+                        RunIdentifier = runId
                     });
 
                     accessPoint.Apply(new AccessPointManufacturerChanged

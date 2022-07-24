@@ -19,6 +19,7 @@ namespace AccessPointMap.Domain.AccessPoints
                 public double HighSignalLatitude { get; set; }
                 public double HighSignalLongitude { get; set; }
                 public string RawSecurityPayload { get; set; }
+                public Guid? RunIdentifier { get; set; }
                 public Guid UserId { get; set; }
                 public DateTime ScanDate { get; set; }
             }
@@ -68,6 +69,7 @@ namespace AccessPointMap.Domain.AccessPoints
                 public double HighSignalLatitude { get; set; }
                 public double HighSignalLongitude { get; set; }
                 public string RawSecurityPayload { get; set; }
+                public Guid? RunIdentifier { get; set; }
                 public Guid UserId { get; set; }
                 public DateTime ScanDate { get; set; }
             }
