@@ -65,7 +65,8 @@ namespace AccessPointMap.Domain.AccessPoints
         protected override void Validate()
         {
             bool isNull = Bssid == null || Manufacturer == null || Ssid == null || DeviceType == null || ContributorId == null ||
-                Frequency == null || CreationTimestamp == null || VersionTimestamp == null || Positioning == null || Security == null || Note == null || DisplayStatus == null || Presence == null;
+                Frequency == null || CreationTimestamp == null || VersionTimestamp == null || Positioning == null || Security == null ||
+                Note == null || DisplayStatus == null || RunIdentifier == null || Presence == null;
 
             if (isNull)
                 throw new BusinessLogicException("The accesspoint aggregate properties can not be null.");
