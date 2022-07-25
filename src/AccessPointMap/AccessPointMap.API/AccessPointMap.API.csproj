@@ -34,6 +34,8 @@
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Kml.Core\AccessPointMap.Application.Kml.Core.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Kml.Sharpkml\AccessPointMap.Application.Kml.Sharpkml.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Pcap.ApmPcapNative\AccessPointMap.Application.Pcap.ApmPcapNative.csproj" />
