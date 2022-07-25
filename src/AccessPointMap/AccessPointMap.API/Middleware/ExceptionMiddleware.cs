@@ -43,7 +43,9 @@ namespace AccessPointMap.API.Middleware
         {
             try
             {
-                _logger.LogDebug($"{ context.Request.GetCurrentIp() } - { context.Request.GetCurrentUri() }");
+                _logger.LogDebug("Client with address: {IpAddress} requested resource under: {Url}",
+                    context.Request.GetCurrentIp(),
+                    context.Request.GetCurrentUri());
 
                 await _next(context);
             }
@@ -73,11 +75,16 @@ namespace AccessPointMap.API.Middleware
             if (context.Response.StatusCode == (int)HttpStatusCode.InternalServerError)
             {
                 _healthStatusService.SetHealthStatusDegraded();
-                _logger.LogError(ex, ex.Message);
+
+                _logger.LogError("Client with address: {IpAddress} requested resource under: {Url} causing a failure.",
+                    context.Request.GetCurrentIp(),
+                    context.Request.GetCurrentUri());
+
+                _logger.LogError(ex, "Exception message: {Message}", ex.Message);
             }
             else
             {
-                _logger.LogWarning(ex, ex.Message);
+                _logger.LogWarning(ex, "Exception message: {Message}", ex.Message);
             }
 
             var serializedResponse = JsonSerializer.Serialize(new

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Threading.Tasks;
-using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -18,7 +18,7 @@ namespace AccessPointMap.API.Controllers
 
         private const string _csvContentType = "text/csv";
 
-        public IntegrationQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, Wigle.IWigleIntegrationService wigleIntegrationService) : base(dataAccess, mapper, memoryCache)
+        public IntegrationQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<IntegrationQueryController> logger, Wigle.IWigleIntegrationService wigleIntegrationService) : base(dataAccess, mapper, memoryCache, logger)
         {
             _wigleIntegrationService = wigleIntegrationService ??
                 throw new ArgumentNullException(nameof(wigleIntegrationService));

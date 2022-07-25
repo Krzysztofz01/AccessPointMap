@@ -2,6 +2,7 @@
 using AccessPointMap.Application.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.Identities.Commands;
@@ -15,7 +16,7 @@ namespace AccessPointMap.API.Controllers
     {
         private readonly IIdentityService _identityService;
 
-        public IdentityCommandController(IIdentityService identityService) : base()
+        public IdentityCommandController(IIdentityService identityService, ILogger<IdentityCommandController> logger) : base(logger)
         {
             _identityService = identityService ??
                 throw new ArgumentNullException(nameof(identityService));
