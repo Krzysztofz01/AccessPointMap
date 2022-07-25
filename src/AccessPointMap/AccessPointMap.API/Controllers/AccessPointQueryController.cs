@@ -85,6 +85,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("kml/full")]
+        [Authorize(Roles = "Admin, Support")]
         public async Task<IActionResult> GetAllInKmlFull()
         {
             var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = true);
