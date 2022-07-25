@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpKml.Core" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AccessPointMap.Application.Kml.Core\AccessPointMap.Application.Kml.Core.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Infrastructure.Core\AccessPointMap.Infrastructure.Core.csproj" />
+  </ItemGroup>
+
+</Project>

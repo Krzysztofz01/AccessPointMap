@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.AccessPoints;
+using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -17,10 +18,20 @@ namespace AccessPointMap.API.Controllers
     [ApiVersion("1.0")]
     public class AccessPointQueryController : QueryController
     {
-        private const int _defaultLimit = 100;
+        private readonly IKmlParsingService _kmlParsingService;
 
-        public AccessPointQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<AccessPointQueryController> logger) : base(dataAccess, mapper, memoryCache, logger)
+        private const int _defaultLimit = 100;
+        private const string _kmlContentType = "text/kml";
+
+        public AccessPointQueryController(
+            IDataAccess dataAccess,
+            IMapper mapper,
+            IMemoryCache memoryCache,
+            ILogger<AccessPointQueryController> logger,
+            IKmlParsingService kmlParsingService) : base(dataAccess, mapper, memoryCache, logger)
         {
+            _kmlParsingService = kmlParsingService ??
+                throw new ArgumentNullException(nameof(kmlParsingService));
         }
 
         [HttpGet]
@@ -63,6 +74,23 @@ namespace AccessPointMap.API.Controllers
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
             return Ok(mappedResponse);
+        }
+
+        [HttpGet("kml")]
+        public async Task<IActionResult> GetAllInKml()
+        {
+            var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = false);
+
+            return MapToFile(response.FileBuffer, _kmlContentType);
+        }
+
+        [HttpGet("kml/full")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> GetAllInKmlFull()
+        {
+            var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = true);
+
+            return MapToFile(response.FileBuffer, _kmlContentType);
         }
 
         [HttpGet("run/{runId}")]
