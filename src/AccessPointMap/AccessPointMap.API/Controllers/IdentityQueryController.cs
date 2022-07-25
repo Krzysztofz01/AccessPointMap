@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using static AccessPointMap.Application.Identities.Dto;
 using AccessPointMap.API.Controllers.Base;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -17,7 +18,7 @@ namespace AccessPointMap.API.Controllers
     [Authorize(Roles = "Admin, Support")]
     public class IdentityQueryController : QueryController
     {
-        public IdentityQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache) : base(dataAccess, mapper, memoryCache)
+        public IdentityQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<IdentityQueryController> logger) : base(dataAccess, mapper, memoryCache, logger)
         {
         }
 

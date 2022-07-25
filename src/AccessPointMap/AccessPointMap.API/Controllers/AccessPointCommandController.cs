@@ -2,6 +2,7 @@
 using AccessPointMap.Application.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Commands;
@@ -14,7 +15,7 @@ namespace AccessPointMap.API.Controllers
     {
         private readonly IAccessPointService _accessPointService;
 
-        public AccessPointCommandController(IAccessPointService accessPointService) : base()
+        public AccessPointCommandController(IAccessPointService accessPointService, ILogger<AccessPointCommandController> logger) : base(logger)
         {
             _accessPointService = accessPointService ??
                 throw new ArgumentNullException(nameof(accessPointService));

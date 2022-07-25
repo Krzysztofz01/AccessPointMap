@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace AccessPointMap.API.Controllers
     {
         private const int _defaultLimit = 100;
 
-        public AccessPointQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache) : base(dataAccess, mapper, memoryCache)
+        public AccessPointQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<AccessPointQueryController> logger) : base(dataAccess, mapper, memoryCache, logger)
         {
         }
 
