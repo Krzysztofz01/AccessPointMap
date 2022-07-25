@@ -1,9 +1,12 @@
-﻿using AccessPointMap.Infrastructure.Core.Abstraction;
+﻿using AccessPointMap.Application.Logging;
+using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Net.Http.Headers;
@@ -17,8 +20,9 @@ namespace AccessPointMap.API.Controllers.Base
         protected readonly IDataAccess _dataAccess;
         protected readonly IMapper _mapper;
         protected readonly IMemoryCache _memoryCache;
+        protected readonly ILogger<QueryController> _logger;
 
-        public QueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache)
+        public QueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<QueryController> logger)
         {
             _dataAccess = dataAccess ??
                 throw new ArgumentNullException(nameof(dataAccess));
@@ -28,6 +32,9 @@ namespace AccessPointMap.API.Controllers.Base
 
             _memoryCache = memoryCache ??
                 throw new ArgumentNullException(nameof(memoryCache));
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         protected object ResolveFromCache()
@@ -67,6 +74,13 @@ namespace AccessPointMap.API.Controllers.Base
         protected FileStreamResult MapToFile(byte[] fileBuffer, string mimeType)
         {
             return MapToFile(new MemoryStream(fileBuffer), mimeType);
+        }
+
+        public override OkObjectResult Ok([ActionResultObjectValue] object value)
+        {
+            _logger.LogQueryController(Request.GetEncodedPathAndQuery());
+
+            return base.Ok(value);
         }
     }
 }

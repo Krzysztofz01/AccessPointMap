@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,7 +23,12 @@ namespace AccessPointMap.API.Controllers
         private const int _defaultLimit = 100;
         private const string _kmlContentType = "text/kml";
 
-        public AccessPointQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, IKmlParsingService kmlParsingService) : base(dataAccess, mapper, memoryCache)
+        public AccessPointQueryController(
+            IDataAccess dataAccess,
+            IMapper mapper,
+            IMemoryCache memoryCache,
+            ILogger<AccessPointQueryController> logger,
+            IKmlParsingService kmlParsingService) : base(dataAccess, mapper, memoryCache, logger)
         {
             _kmlParsingService = kmlParsingService ??
                 throw new ArgumentNullException(nameof(kmlParsingService));
