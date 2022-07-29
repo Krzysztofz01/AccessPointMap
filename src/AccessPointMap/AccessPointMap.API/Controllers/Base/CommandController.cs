@@ -2,6 +2,7 @@
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Logging;
 using AccessPointMap.Domain.Core.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,8 @@ using System.Threading.Tasks;
 namespace AccessPointMap.API.Controllers.Base
 {
     [ApiController]
-    [Authorize]
+    [Produces("application/json")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public abstract class CommandController : ControllerBase
     {
         private readonly ILogger<CommandController> _logger;
