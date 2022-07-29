@@ -4,6 +4,7 @@ using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -35,6 +36,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(
             [FromQuery]DateTime? startingData,
             [FromQuery]DateTime? endingDate,
@@ -59,6 +61,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("full")]
         [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllFull(
             [FromQuery] DateTime? startingData,
             [FromQuery] DateTime? endingDate,
@@ -77,6 +80,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("kml")]
+        [Produces(_kmlContentType)]
         public async Task<IActionResult> GetAllInKml()
         {
             var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = false);
@@ -86,6 +90,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("kml/full")]
         [Authorize(Roles = "Admin, Support")]
+        [Produces(_kmlContentType)]
         public async Task<IActionResult> GetAllInKmlFull()
         {
             var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = true);
@@ -94,6 +99,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("run/{runId}")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByRunId(Guid runId)
         {
             var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
@@ -105,6 +111,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("run/{runId}/full")]
         [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByRunIdFull(Guid runId)
         {
             var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunIdAdministration(runId);
@@ -115,6 +122,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("{accessPointId}")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById(Guid accessPointId)
         {
             var cachedResponse = ResolveFromCache();
@@ -131,6 +139,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("{accessPointId}/full")]
         [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByIdFull(Guid accessPointId)
         {
             var response = await _dataAccess.AccessPoints.GetAccessPointByIdAdministration(accessPointId);
@@ -142,6 +151,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("{accessPointId}/packet")]
         [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointPacketDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllPackets(Guid accessPointId)
         {
             var response = await _dataAccess.AccessPoints.GetAllAccessPointsAccessPointPackets(accessPointId);
@@ -153,6 +163,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("{accessPointId}/packet/{accessPointPacketId}")]
         [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointPacketDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPacketById(Guid accessPointId, Guid accessPointPacketId)
         {
             var response = await _dataAccess.AccessPoints.GetAccessPointsAccessPointPacketById(accessPointId, accessPointPacketId);
@@ -163,6 +174,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("search")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByKeyword([FromQuery] string keyword)
         {
             var response = await _dataAccess.AccessPoints.SearchByKeyword(keyword);
@@ -173,6 +185,7 @@ namespace AccessPointMap.API.Controllers
         }
             
         [HttpGet("statistics/signal")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange([FromQuery] int? limit)
         {
             var cachedResponse = ResolveFromCache();

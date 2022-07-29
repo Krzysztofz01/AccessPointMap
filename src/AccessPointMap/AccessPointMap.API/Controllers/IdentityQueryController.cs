@@ -10,6 +10,7 @@ using static AccessPointMap.Application.Identities.Dto;
 using AccessPointMap.API.Controllers.Base;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -23,6 +24,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<IdentitySimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
             var cachedResponse = ResolveFromCache();
@@ -38,6 +40,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("{identityId}")]
+        [ProducesResponseType(typeof(IEnumerable<IdentityDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById(Guid identityId)
         {
             var response = await _dataAccess.Identities.GetIdentityById(identityId);

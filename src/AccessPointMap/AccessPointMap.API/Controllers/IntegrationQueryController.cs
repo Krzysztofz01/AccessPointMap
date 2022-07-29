@@ -25,6 +25,7 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("wigle/csv")]
+        [Produces(_csvContentType)]
         public async Task<IActionResult> DownloadWigleCsv()
         {
             var response = await _wigleIntegrationService.Query(new Wigle.Queries.ExportAccessPointsToCsv());
