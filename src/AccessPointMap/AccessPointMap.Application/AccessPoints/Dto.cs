@@ -44,6 +44,7 @@ namespace AccessPointMap.Application.AccessPoints
             public string SecurityStandards { get; set; }
             public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
+            public bool IsPresent { get; set; }
             public Guid? RunIdentifier { get; set; }
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
         }
@@ -71,6 +72,7 @@ namespace AccessPointMap.Application.AccessPoints
             public string SecurityStandards { get; set; }
             public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
+            public bool IsPresent { get; set; }
             public string Note { get; set; }
             public bool DisplayStatus { get; set; }
             public Guid? RunIdentifier { get; set; }
