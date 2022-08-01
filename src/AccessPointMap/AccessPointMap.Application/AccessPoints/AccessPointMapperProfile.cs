@@ -74,7 +74,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
                 .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
                 .ForMember(d => d.IsPresent, m => m.MapFrom(s => s.Presence.Value))
-                .ForMember(d => d.Note, m => m.MapFrom(s => s.Note))
+                .ForMember(d => d.Note, m => m.MapFrom(s => s.Note.Value))
                 .ForMember(d => d.DisplayStatus, m => m.MapFrom(s => s.DisplayStatus))
                 .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value))
                 .ForMember(d => d.Stamps, m => m.MapFrom(s => s.Stamps));
