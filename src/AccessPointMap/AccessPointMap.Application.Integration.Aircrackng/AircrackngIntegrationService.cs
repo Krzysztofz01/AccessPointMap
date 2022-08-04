@@ -22,7 +22,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         private const string _integrationName = "Aircrack-ng";
         private const string _integrationDescription = "Integration for the popular WiFi security auditing tools suite.";
-        private const string _integrationVersion = "1.0.0";
+        private const string _integrationVersion = "1.1.0";
 
         private const double _defaultFrequencyValue = default;
 
@@ -84,20 +84,22 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 throw new ArgumentNullException(nameof(cmd));
 
             var accessPoints = ParseCsvAccessPointScanFile(cmd.ScanCsvFile.OpenReadStream());
+            var runRecordGroups = GroupAccessPointsByRun(accessPoints);
 
-            Guid? runIdentifier = IsSingleRun(accessPoints)
-                ? Guid.NewGuid()
-                : null;
-
-            foreach (var accessPoint in accessPoints)
+            foreach (var runGroup in runRecordGroups)
             {
-                if (await UnitOfWork.AccessPointRepository.Exists(accessPoint.Bssid))
-                {
-                    await CreateAccessPointStamp(accessPoint, runIdentifier);
-                    continue;
-                }
+                var runIdentifier = runGroup.Key;
 
-                await CreateAccessPoint(accessPoint, runIdentifier);
+                foreach (var record in runGroup.Value)
+                {
+                    if (await UnitOfWork.AccessPointRepository.Exists(record.Bssid))
+                    {
+                        await CreateAccessPointStamp(record, runIdentifier);
+                        continue;
+                    }
+
+                    await CreateAccessPoint(record, runIdentifier);
+                }
             }
 
             await UnitOfWork.Commit();
@@ -195,17 +197,35 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             });
         }
 
-        private static bool IsSingleRun(IEnumerable<AccessPointRecord> records)
+        private static IDictionary<Guid, IList<AccessPointRecord>> GroupAccessPointsByRun(IEnumerable<AccessPointRecord> records)
         {
-            if (records.Count() < 2) return false;
+            var accessPointRunGrouping = new Dictionary<Guid, IList<AccessPointRecord>>();
 
-            var firstRecordDate = records.Min(r => r.LocalTimestamp);
-            var lastRecordData = records.Max(r => r.LocalTimestamp);
+            const double minutesThreshold = 30;
+            var currentRun = Guid.NewGuid();
 
-            const double hoursThreshold = 18;
-            var hoursDifference = (lastRecordData - firstRecordDate).TotalHours;
+            foreach (var accessPoint in records.OrderBy(r => r.LocalTimestamp))
+            {
+                if (accessPointRunGrouping.Count == 0)
+                {
+                    accessPointRunGrouping.Add(currentRun, new List<AccessPointRecord>() { accessPoint });
+                    continue;
+                }
 
-            return hoursDifference < hoursThreshold;
+                var lastRunRecord = accessPointRunGrouping[currentRun].Last();
+
+                var timeDifference = (accessPoint.LocalTimestamp - lastRunRecord.LocalTimestamp).TotalMinutes;
+                if (timeDifference < minutesThreshold)
+                {
+                    accessPointRunGrouping[currentRun].Add(accessPoint);
+                    continue;
+                }
+
+                currentRun = Guid.NewGuid();
+                accessPointRunGrouping.Add(currentRun, new List<AccessPointRecord>() { accessPoint });
+            }
+
+            return accessPointRunGrouping;
         }
 
         private static string SerializeRawAccessPointRecord(AccessPointRecord record)
