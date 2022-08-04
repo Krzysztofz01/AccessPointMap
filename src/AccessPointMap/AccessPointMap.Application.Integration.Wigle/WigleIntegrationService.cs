@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Integration.Wigle.Extensions;
 using AccessPointMap.Application.Integration.Wigle.Models;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
@@ -28,7 +29,7 @@ namespace AccessPointMap.Application.Integration.Wigle
         private const string _integrationDescription = "Integration for the bigest wardriving platform and their scanning application";
         private const string _integrationVersion = "1.1.0";
 
-        private const string _csvPreheader = $"WigleWifi-1.4,appRelease=1.0.0,model=AccessPointMap,release=AccessPointMap,device=AccessPointMap,display=AccessPointMap,board=AccessPointMap,brand=AccessPointMap";
+        private readonly string _csvPreheader = $"WigleWifi-1.4,appRelease=${_integrationVersion},model=AccessPointMap,release=AccessPointMap,device=AccessPointMap,display=AccessPointMap,board=AccessPointMap,brand=AccessPointMap";
 
         private const double _defaultFrequencyValue = default;
 
@@ -73,9 +74,7 @@ namespace AccessPointMap.Application.Integration.Wigle
                 throw new ArgumentNullException(nameof(cmd));
 
             using var sr = new StreamReader(cmd.ScanCsvFile.OpenReadStream());
-
-            // This line will shift the stream by one line to avoid the header
-            _ = sr.ReadLine();
+            sr.SkipLine();
 
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
@@ -96,9 +95,7 @@ namespace AccessPointMap.Application.Integration.Wigle
 
             using var compressionStream = new GZipStream(cmd.ScanCsvGzFile.OpenReadStream(), CompressionMode.Decompress);
             using var sr = new StreamReader(compressionStream);
-
-            // This line will shift the stream by one line to avoid the header
-            _ = sr.ReadLine();
+            sr.SkipLine();
 
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
@@ -111,21 +108,25 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private async Task HandleAccessPointRecords(IEnumerable<AccessPointRecord> accessPointRecords)
         {
-            Guid? runIdentifier = IsSingleRun(accessPointRecords)
-                ? Guid.NewGuid()
-                : null;
+            var filteredRecords = accessPointRecords
+                .Where(r => r.Type.ToUpper().Contains(_allowedType));
 
-            foreach (var record in accessPointRecords)
+            var runRecordGroups = GroupAccessPointsByRun(filteredRecords);
+
+            foreach (var runGroup in runRecordGroups)
             {
-                if (!record.Type.ToUpper().Contains(_allowedType)) continue;
+                var runIdentifier = runGroup.Key;
 
-                if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
+                foreach (var record in runGroup.Value)
                 {
-                    await CreateAccessPointStamp(record, runIdentifier);
-                    continue;
-                }
+                    if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
+                    {
+                        await CreateAccessPointStamp(record, runIdentifier);
+                        continue;
+                    }
 
-                await CreateAccessPoint(record, runIdentifier);
+                    await CreateAccessPoint(record, runIdentifier);
+                }
             }
 
             await UnitOfWork.Commit();
@@ -220,17 +221,36 @@ namespace AccessPointMap.Application.Integration.Wigle
             });
         }
 
-        private static bool IsSingleRun(IEnumerable<AccessPointRecord> records)
+
+        private static IDictionary<Guid, IList<AccessPointRecord>> GroupAccessPointsByRun(IEnumerable<AccessPointRecord> records)
         {
-            if (records.Count() < 2) return false;
+            var accessPointRunGrouping = new Dictionary<Guid, IList<AccessPointRecord>>();
 
-            var firstRecordDate = records.Min(r => r.FirstSeen);
-            var lastRecordData = records.Max(r => r.FirstSeen);
+            const double minutesThreshold = 30;
+            var currentRun = Guid.NewGuid();
 
-            const double hoursThreshold = 18;
-            var hoursDifference = (lastRecordData - firstRecordDate).TotalHours;
+            foreach (var accessPoint in records.OrderBy(r => r.FirstSeen))
+            {
+                if (accessPointRunGrouping.Count == 0)
+                {
+                    accessPointRunGrouping.Add(currentRun, new List<AccessPointRecord>() { accessPoint });
+                    continue;
+                }
 
-            return hoursDifference < hoursThreshold;
+                var lastRunRecord = accessPointRunGrouping[currentRun].Last();
+  
+                var timeDifference = (accessPoint.FirstSeen - lastRunRecord.FirstSeen).TotalMinutes;
+                if (timeDifference < minutesThreshold)
+                {
+                    accessPointRunGrouping[currentRun].Add(accessPoint);
+                    continue;
+                }
+
+                currentRun = Guid.NewGuid();
+                accessPointRunGrouping.Add(currentRun, new List<AccessPointRecord>() { accessPoint });
+            }
+
+            return accessPointRunGrouping;
         }
 
         private static AccessPointRecord CombineRecords(IEnumerable<AccessPointRecord> records)
