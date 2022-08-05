@@ -1,7 +1,9 @@
 ﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Domain.Identities;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.Identities.Commands;
@@ -12,15 +14,21 @@ namespace AccessPointMap.Application.Identities
     public class IdentityService : IIdentityService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<IdentityService> _logger;
 
-        public IdentityService(IUnitOfWork unitOfWork)
+        public IdentityService(IUnitOfWork unitOfWork, ILogger<IdentityService> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Handle(IApplicationCommand<Identity> command)
         {
+            _logger.LogApplicationCommand(command);
+
             switch(command)
             {
                 case V1.Delete c: await Apply(c.Id, new IdentityDeleted { Id = c.Id }); break;
@@ -34,6 +42,8 @@ namespace AccessPointMap.Application.Identities
         private async Task Apply(Guid id, IEventBase @event)
         {
             var identity = await _unitOfWork.IdentityRepository.Get(id);
+
+            _logger.LogDomainEvent(@event);
 
             identity.Apply(@event);
 

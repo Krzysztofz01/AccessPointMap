@@ -24,7 +24,9 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
             builder.OwnsOne(e => e.Positioning);
             builder.OwnsOne(e => e.Security);
             builder.OwnsRequiredOne(e => e.Note);
+            builder.OwnsRequiredOne(e => e.RunIdentifier);
             builder.OwnsOne(e => e.DisplayStatus);
+            builder.OwnsOne(e => e.Presence);
 
             builder.OwnsMany(e => e.Stamps, e =>
             {
@@ -39,6 +41,7 @@ namespace AccessPointMap.Infrastructure.MySql.Builders
                 e.OwnsOne(e => e.Positioning);
                 e.OwnsOne(e => e.Security);
                 e.OwnsOne(e => e.Status);
+                e.OwnsRequiredOne(e => e.RunIdentifier);
 
                 e.Property(e => e.DeletedAt).HasDefaultValue(null);
             });

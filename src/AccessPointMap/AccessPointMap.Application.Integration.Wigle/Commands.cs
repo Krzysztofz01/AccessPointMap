@@ -11,5 +11,11 @@ namespace AccessPointMap.Application.Integration.Wigle
             [Required]
             public IFormFile ScanCsvFile { get; set; }
         }
+
+        public class CreateAccessPointsFromCsvGzFile : IIntegrationCommand
+        {
+            [Required]
+            public IFormFile ScanCsvGzFile { get; set; }
+        }
     }
 }

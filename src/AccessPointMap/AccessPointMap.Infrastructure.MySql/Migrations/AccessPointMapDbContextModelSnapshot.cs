@@ -17,7 +17,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("apm")
-                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AccessPointMap.Domain.AccessPoints.AccessPoint", b =>
@@ -161,6 +161,22 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                 .HasForeignKey("AccessPointId");
                         });
 
+                    b.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointRunIdentifier", "RunIdentifier", b1 =>
+                        {
+                            b1.Property<Guid>("AccessPointId")
+                                .HasColumnType("char(36)");
+
+                            b1.Property<Guid?>("Value")
+                                .HasColumnType("char(36)");
+
+                            b1.HasKey("AccessPointId");
+
+                            b1.ToTable("AccessPoints", "apm");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AccessPointId");
+                        });
+
                     b.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointSecurity", "Security", b1 =>
                         {
                             b1.Property<Guid>("AccessPointId")
@@ -260,6 +276,22 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 
                             b1.Property<string>("Value")
                                 .HasColumnType("longtext");
+
+                            b1.HasKey("AccessPointId");
+
+                            b1.ToTable("AccessPoints", "apm");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AccessPointId");
+                        });
+
+                    b.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointPresence", "Presence", b1 =>
+                        {
+                            b1.Property<Guid>("AccessPointId")
+                                .HasColumnType("char(36)");
+
+                            b1.Property<bool>("Value")
+                                .HasColumnType("tinyint(1)");
 
                             b1.HasKey("AccessPointId");
 
@@ -579,6 +611,22 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                         .HasForeignKey("AccessPointStampId");
                                 });
 
+                            b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointRunIdentifier", "RunIdentifier", b2 =>
+                                {
+                                    b2.Property<Guid>("AccessPointStampId")
+                                        .HasColumnType("char(36)");
+
+                                    b2.Property<Guid?>("Value")
+                                        .HasColumnType("char(36)");
+
+                                    b2.HasKey("AccessPointStampId");
+
+                                    b2.ToTable("AccessPointStamp", "apm");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AccessPointStampId");
+                                });
+
                             b1.OwnsOne("AccessPointMap.Domain.AccessPoints.AccessPointSecurity", "Security", b2 =>
                                 {
                                     b2.Property<Guid>("AccessPointStampId")
@@ -647,6 +695,9 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 
                             b1.Navigation("Positioning");
 
+                            b1.Navigation("RunIdentifier")
+                                .IsRequired();
+
                             b1.Navigation("Security");
 
                             b1.Navigation("Ssid")
@@ -680,6 +731,11 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                     b.Navigation("Packets");
 
                     b.Navigation("Positioning");
+
+                    b.Navigation("Presence");
+
+                    b.Navigation("RunIdentifier")
+                        .IsRequired();
 
                     b.Navigation("Security");
 

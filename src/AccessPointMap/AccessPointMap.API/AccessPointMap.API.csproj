@@ -21,19 +21,21 @@
     <PackageReference Include="Quartz.AspNetCore" Version="3.4.0" />
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.4.0" />
     <PackageReference Include="Serilog" Version="2.11.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
     <PackageReference Include="Serilog.Enrichers.Context" Version="4.6.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Kml.Core\AccessPointMap.Application.Kml.Core.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Application.Kml.Sharpkml\AccessPointMap.Application.Kml.Sharpkml.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.Core\AccessPointMap.Application.Oui.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Oui.MacTwoVendor\AccessPointMap.Application.Oui.MacTwoVendor.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Pcap.ApmPcapNative\AccessPointMap.Application.Pcap.ApmPcapNative.csproj" />

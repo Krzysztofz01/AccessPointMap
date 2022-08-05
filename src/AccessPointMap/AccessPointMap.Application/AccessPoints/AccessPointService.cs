@@ -1,8 +1,10 @@
 ﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Commands;
@@ -15,8 +17,9 @@ namespace AccessPointMap.Application.AccessPoints
         private readonly IUnitOfWork _unitOfWork;
         private readonly IScopeWrapperService _scopeWrapperService;
         private readonly IOuiLookupService _ouiLookupService;
+        private readonly ILogger<AccessPointService> _logger;
 
-        public AccessPointService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService, IOuiLookupService ouiLookupService)
+        public AccessPointService(IUnitOfWork unitOfWork, IScopeWrapperService scopeWrapperService, IOuiLookupService ouiLookupService, ILogger<AccessPointService> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
@@ -26,10 +29,15 @@ namespace AccessPointMap.Application.AccessPoints
 
             _ouiLookupService = ouiLookupService ??
                 throw new ArgumentNullException(nameof(ouiLookupService));
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Handle(IApplicationCommand<AccessPoint> command)
         {
+            _logger.LogApplicationCommand(command);
+
             switch (command)
             {
                 case V1.Create c: await HandleCreate(c); break;
@@ -50,6 +58,8 @@ namespace AccessPointMap.Application.AccessPoints
         {
             var accessPoint = await _unitOfWork.AccessPointRepository.Get(id);
 
+            _logger.LogDomainEvent(@event);
+
             accessPoint.Apply(@event);
 
             await _unitOfWork.Commit();
@@ -58,6 +68,7 @@ namespace AccessPointMap.Application.AccessPoints
         private async Task HandleCreate(V1.Create command)
         {
             var userId = _scopeWrapperService.GetUserId();
+            var runId = Guid.NewGuid();
 
             //Iterate through all pushed access points
             foreach (var ap in command.AccessPoints)
@@ -67,7 +78,7 @@ namespace AccessPointMap.Application.AccessPoints
                 {
                     var accessPoint = await _unitOfWork.AccessPointRepository.Get(ap.Bssid);
 
-                    accessPoint.Apply(new AccessPointStampCreated
+                    var accessPointStampCreateEvent = new AccessPointStampCreated
                     {
                         Id = accessPoint.Id,
                         Ssid = ap.Ssid,
@@ -80,14 +91,19 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate.Value
-                    });
+                        ScanDate = command.ScanDate.Value,
+                        RunIdentifier = runId
+                    };
+
+                    _logger.LogDomainEvent(accessPointStampCreateEvent);
+
+                    accessPoint.Apply(accessPointStampCreateEvent);
 
                     await _unitOfWork.Commit();
                 }
                 else
                 {
-                    var accessPoint = AccessPoint.Factory.Create(new AccessPointCreated
+                    var accessPointCreateEvent = new AccessPointCreated
                     {
                         Bssid = ap.Bssid,
                         Ssid = ap.Ssid,
@@ -100,14 +116,23 @@ namespace AccessPointMap.Application.AccessPoints
                         HighSignalLongitude = ap.HighSignalLongitude.Value,
                         RawSecurityPayload = ap.RawSecurityPayload,
                         UserId = userId,
-                        ScanDate = command.ScanDate.Value
-                    });
+                        ScanDate = command.ScanDate.Value,
+                        RunIdentifier = runId
+                    };
 
-                    accessPoint.Apply(new AccessPointManufacturerChanged
+                    _logger.LogDomainEvent(accessPointCreateEvent);
+
+                    var accessPoint = AccessPoint.Factory.Create(accessPointCreateEvent);
+
+                    var accessPointManufacturerChangedEvent = new AccessPointManufacturerChanged
                     {
                         Id = accessPoint.Id,
                         Manufacturer = await ResolveManufacturer(accessPoint.Bssid)
-                    });
+                    };
+
+                    _logger.LogDomainEvent(accessPointManufacturerChangedEvent);
+
+                    accessPoint.Apply(accessPointManufacturerChangedEvent);
 
                     await _unitOfWork.AccessPointRepository.Add(accessPoint);
 

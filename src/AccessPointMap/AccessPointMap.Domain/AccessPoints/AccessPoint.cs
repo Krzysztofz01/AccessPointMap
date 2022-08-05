@@ -25,7 +25,9 @@ namespace AccessPointMap.Domain.AccessPoints
         public AccessPointPositioning Positioning { get; private set; }
         public AccessPointSecurity Security { get; private set; }
         public AccessPointNote Note { get; private set; }
+        public AccessPointRunIdentifier RunIdentifier { get; private set; }
         public AccessPointDisplayStatus DisplayStatus { get; private set; }
+        public AccessPointPresence Presence { get; private set; }
 
         private readonly List<AccessPointStamp> _stamps;
         public IReadOnlyCollection<AccessPointStamp> Stamps => _stamps.SkipDeleted().AsReadOnly();
@@ -45,6 +47,7 @@ namespace AccessPointMap.Domain.AccessPoints
                 case V1.AccessPointDisplayStatusChanged e: When(e); break;
                 case V1.AccessPointManufacturerChanged e: When(e); break;
                 case V1.AccessPointMergedWithStamp e: When(e); break;
+                case V1.AccessPointPresenceStatusChanged e: When(e); break;
 
                 case V1.AccessPointStampCreated e: When(e); break;
                 case V1.AccessPointStampDeleted e: When(e); break;
@@ -62,7 +65,8 @@ namespace AccessPointMap.Domain.AccessPoints
         protected override void Validate()
         {
             bool isNull = Bssid == null || Manufacturer == null || Ssid == null || DeviceType == null || ContributorId == null ||
-                Frequency == null || CreationTimestamp == null || VersionTimestamp == null || Positioning == null || Security == null || Note == null || DisplayStatus == null;
+                Frequency == null || CreationTimestamp == null || VersionTimestamp == null || Positioning == null || Security == null ||
+                Note == null || DisplayStatus == null || RunIdentifier == null || Presence == null;
 
             if (isNull)
                 throw new BusinessLogicException("The accesspoint aggregate properties can not be null.");
@@ -86,6 +90,11 @@ namespace AccessPointMap.Domain.AccessPoints
         private void When(V1.AccessPointManufacturerChanged @event)
         {
             Manufacturer = AccessPointManufacturer.FromString(@event.Manufacturer);
+        }
+
+        private void When(V1.AccessPointPresenceStatusChanged @event)
+        {
+            Presence = AccessPointPresence.FromBool(@event.Presence);
         }
 
         private void When(V1.AccessPointMergedWithStamp @event)
@@ -169,6 +178,10 @@ namespace AccessPointMap.Domain.AccessPoints
                 highSignalLongitude);
 
             VersionTimestamp = updatedTimestamp;
+
+            // The accesspoint combines now data from multiple runs
+            // The RunIdentifier will be None from now
+            RunIdentifier = AccessPointRunIdentifier.None;
 
             // Send the domain event to stamp in order to set it as verified
             stamp.Apply(@event);
@@ -255,8 +268,12 @@ namespace AccessPointMap.Domain.AccessPoints
                         @event.HighSignalLongitude),
                     Security = AccessPointSecurity.FromString(@event.RawSecurityPayload),
                     Note = AccessPointNote.Empty,
-                    DisplayStatus = AccessPointDisplayStatus.Hidden
-                };
+                    DisplayStatus = AccessPointDisplayStatus.Hidden,
+                    Presence = AccessPointPresence.Present,
+                    RunIdentifier = @event.RunIdentifier.HasValue
+                        ? AccessPointRunIdentifier.FromGuid(@event.RunIdentifier.Value)
+                        : AccessPointRunIdentifier.None
+                };         
             }
         }
     }

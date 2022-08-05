@@ -15,6 +15,7 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointStamps
         public AccessPointCreationTimestamp CreationTimestamp { get; private set; }
         public AccessPointPositioning Positioning { get; private set; }
         public AccessPointSecurity Security { get; private set; }
+        public AccessPointRunIdentifier RunIdentifier { get; private set; }
         public AccessPointStampStatus Status { get; private set; }
 
         protected override void Handle(IEventBase @event)
@@ -68,7 +69,10 @@ namespace AccessPointMap.Domain.AccessPoints.AccessPointStamps
                         @event.HighSignalLatitude,
                         @event.HighSignalLongitude),
                     Security = AccessPointSecurity.FromString(@event.RawSecurityPayload),
-                    Status = AccessPointStampStatus.Default
+                    Status = AccessPointStampStatus.Default,
+                    RunIdentifier = @event.RunIdentifier.HasValue
+                        ? AccessPointRunIdentifier.FromGuid(@event.RunIdentifier.Value)
+                        : AccessPointRunIdentifier.None
                 };
             }
         }

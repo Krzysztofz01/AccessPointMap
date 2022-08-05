@@ -1,6 +1,7 @@
 using AccessPointMap.Application.Integration.Aircrackng;
 using AccessPointMap.Application.Integration.Wigle;
 using AccessPointMap.Application.Integration.Wireshark;
+using AccessPointMap.Application.Kml.Sharpkml.Extensions;
 using AccessPointMap.Application.Oui.MacTwoVendor.Extensions;
 using AccessPointMap.Application.Pcap.ApmPcapNative.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,9 @@ namespace AccessPointMap.API.Configuration
 
             // ApmPcapNative internal PCAP service provider
             services.AddApmPcapNativePcapParser();
+
+            // Sharpkml internal KML service provider
+            services.AddSharpkmlKmlParser();
 
             // Integrations
 

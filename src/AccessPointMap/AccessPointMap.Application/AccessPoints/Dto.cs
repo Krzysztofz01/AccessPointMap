@@ -9,15 +9,18 @@ namespace AccessPointMap.Application.AccessPoints
         {
             public Guid Id { get; set; }
             public string Bssid { get; set; }
+            public string Manufacturer { get; set; }
             public string Ssid { get; set; }
-            public double Frequency { get; set; }
             public string DeviceType { get; set; }
+            public DateTime CreationTimestamp { get; set; }
             public double HighSignalLatitude { get; set; }
             public double HighSignalLongitude { get; set; }
             public double SignalArea { get; set; }
             public string SecurityStandards { get; set; }
             public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
+            public bool IsPresent { get; set; }
+            public Guid? RunIdentifier { get; set; }
         }
 
         public class AccessPointDetails
@@ -43,6 +46,8 @@ namespace AccessPointMap.Application.AccessPoints
             public string SecurityStandards { get; set; }
             public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
+            public bool IsPresent { get; set; }
+            public Guid? RunIdentifier { get; set; }
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
         }
 
@@ -69,8 +74,10 @@ namespace AccessPointMap.Application.AccessPoints
             public string SecurityStandards { get; set; }
             public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
+            public bool IsPresent { get; set; }
             public string Note { get; set; }
             public bool DisplayStatus { get; set; }
+            public Guid? RunIdentifier { get; set; }
             public IEnumerable<AccessPointStampDetails> Stamps { get; set; }
             public IEnumerable<AccessPointAdnnotationDetails> Adnnotations { get; set; }
         }
@@ -96,6 +103,7 @@ namespace AccessPointMap.Application.AccessPoints
             public string SecurityProtocols { get; set; }
             public bool IsSecure { get; set; }
             public bool Status { get; set; }
+            public Guid? RunIdentifier { get; set; }
         }
 
         public class AccessPointAdnnotationDetails

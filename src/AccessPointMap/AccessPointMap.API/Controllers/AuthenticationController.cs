@@ -1,7 +1,9 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.Authentication.Requests;
@@ -14,7 +16,7 @@ namespace AccessPointMap.API.Controllers
     {
         private readonly IAuthenticationService _authenticationService;
 
-        public AuthenticationController(IAuthenticationService authenticationService) : base()
+        public AuthenticationController(IAuthenticationService authenticationService, ILogger<AuthenticationController> logger) : base(logger)
         {
             _authenticationService = authenticationService ??
                 throw new ArgumentNullException(nameof(authenticationService));
@@ -22,6 +24,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(Responses.V1.Login), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(V1.Login request)
         {
             return Ok(await _authenticationService.Login(request));
@@ -29,6 +32,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpPost("refresh")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(Responses.V1.Refresh), StatusCodes.Status200OK)]
         public async Task<IActionResult> Refresh(V1.Refresh request)
         {
             return Ok(await _authenticationService.Refresh(request));

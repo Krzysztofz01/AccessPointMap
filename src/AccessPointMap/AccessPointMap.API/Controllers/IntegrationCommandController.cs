@@ -5,6 +5,7 @@ using Wireshark = AccessPointMap.Application.Integration.Wireshark;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -17,9 +18,10 @@ namespace AccessPointMap.API.Controllers
         private readonly Wireshark.IWiresharkIntegrationService _wiresharkIntegrationService;
 
         public IntegrationCommandController(
+            ILogger<IntegrationCommandController> logger,
             Wigle.IWigleIntegrationService wigleIntegrationService,
             Aircrackng.IAircrackngIntegrationService aircrackngIntegrationService,
-            Wireshark.IWiresharkIntegrationService wiresharkIntegrationService) : base()
+            Wireshark.IWiresharkIntegrationService wiresharkIntegrationService) : base(logger)
         {
             _wigleIntegrationService = wigleIntegrationService ??
                 throw new ArgumentNullException(nameof(wigleIntegrationService));
@@ -33,6 +35,10 @@ namespace AccessPointMap.API.Controllers
 
         [HttpPost("wigle/csv")]
         public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
+            await ExecuteService(command, _wigleIntegrationService.Handle);
+
+        [HttpPost("wigle/csvgz")]
+        public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvGzFile command) =>
             await ExecuteService(command, _wigleIntegrationService.Handle);
 
         [HttpPost("aircrackng/csv")]

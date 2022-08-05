@@ -22,7 +22,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         private const string _integrationName = "Aircrack-ng";
         private const string _integrationDescription = "Integration for the popular WiFi security auditing tools suite.";
-        private const string _integrationVersion = "1.0.0";
+        private const string _integrationVersion = "1.1.0";
 
         private const double _defaultFrequencyValue = default;
 
@@ -32,9 +32,10 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         public AircrackngIntegrationService(
             IUnitOfWork unitOfWork,
+            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
 
         public async Task Handle(IIntegrationCommand command)
@@ -45,6 +46,14 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
 
                 default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+            }
+        }
+
+        public Task<object> Query(IIntegrationQuery query)
+        {
+            switch (query)
+            {
+                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
             }
         }
 
@@ -75,22 +84,28 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 throw new ArgumentNullException(nameof(cmd));
 
             var accessPoints = ParseCsvAccessPointScanFile(cmd.ScanCsvFile.OpenReadStream());
+            var runRecordGroups = GroupAccessPointsByRun(accessPoints);
 
-            foreach (var accessPoint in accessPoints)
+            foreach (var runGroup in runRecordGroups)
             {
-                if (await UnitOfWork.AccessPointRepository.Exists(accessPoint.Bssid))
-                {
-                    await CreateAccessPointStamp(accessPoint);
-                    continue;
-                }
+                var runIdentifier = runGroup.Key;
 
-                await CreateAccessPoint(accessPoint);
+                foreach (var record in runGroup.Value)
+                {
+                    if (await UnitOfWork.AccessPointRepository.Exists(record.Bssid))
+                    {
+                        await CreateAccessPointStamp(record, runIdentifier);
+                        continue;
+                    }
+
+                    await CreateAccessPoint(record, runIdentifier);
+                }
             }
 
             await UnitOfWork.Commit();
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record)
+        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
@@ -105,7 +120,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.LocalTimestamp
+                ScanDate = record.LocalTimestamp,
+                RunIdentifier = runIdentifier
             });
 
             var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
@@ -126,7 +142,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             await UnitOfWork.AccessPointRepository.Add(accessPoint);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Bssid);
 
@@ -143,7 +159,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 HighSignalLongitude = record.Longitude,
                 RawSecurityPayload = record.Security,
                 UserId = ScopeWrapperService.GetUserId(),
-                ScanDate = record.LocalTimestamp
+                ScanDate = record.LocalTimestamp,
+                RunIdentifier = runIdentifier
             });
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
@@ -178,6 +195,37 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
             });
+        }
+
+        private static IDictionary<Guid, IList<AccessPointRecord>> GroupAccessPointsByRun(IEnumerable<AccessPointRecord> records)
+        {
+            var accessPointRunGrouping = new Dictionary<Guid, IList<AccessPointRecord>>();
+
+            const double minutesThreshold = 30;
+            var currentRun = Guid.NewGuid();
+
+            foreach (var accessPoint in records.OrderBy(r => r.LocalTimestamp))
+            {
+                if (accessPointRunGrouping.Count == 0)
+                {
+                    accessPointRunGrouping.Add(currentRun, new List<AccessPointRecord>() { accessPoint });
+                    continue;
+                }
+
+                var lastRunRecord = accessPointRunGrouping[currentRun].Last();
+
+                var timeDifference = (accessPoint.LocalTimestamp - lastRunRecord.LocalTimestamp).TotalMinutes;
+                if (timeDifference < minutesThreshold)
+                {
+                    accessPointRunGrouping[currentRun].Add(accessPoint);
+                    continue;
+                }
+
+                currentRun = Guid.NewGuid();
+                accessPointRunGrouping.Add(currentRun, new List<AccessPointRecord>() { accessPoint });
+            }
+
+            return accessPointRunGrouping;
         }
 
         private static string SerializeRawAccessPointRecord(AccessPointRecord record)
