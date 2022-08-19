@@ -33,9 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Integration.Wireshark", "AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj", "{35555C15-E8E0-4D1C-8BA6-524FE380412C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Kml.Core", "AccessPointMap.Application.Kml.Core\AccessPointMap.Application.Kml.Core.csproj", "{B0E7A087-147E-46B5-84BB-980245941A71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Kml.Core", "AccessPointMap.Application.Kml.Core\AccessPointMap.Application.Kml.Core.csproj", "{B0E7A087-147E-46B5-84BB-980245941A71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Kml.Sharpkml", "AccessPointMap.Application.Kml.Sharpkml\AccessPointMap.Application.Kml.Sharpkml.csproj", "{6689B4FE-9DAC-4718-98CF-11E9172EF171}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Kml.Sharpkml", "AccessPointMap.Application.Kml.Sharpkml\AccessPointMap.Application.Kml.Sharpkml.csproj", "{6689B4FE-9DAC-4718-98CF-11E9172EF171}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
