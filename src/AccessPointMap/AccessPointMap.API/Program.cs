@@ -15,7 +15,6 @@ namespace AccessPointMap.API
                 .Build();
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
