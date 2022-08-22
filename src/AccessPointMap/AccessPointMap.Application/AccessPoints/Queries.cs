@@ -163,6 +163,45 @@ namespace AccessPointMap.Application.AccessPoints
                 .SingleAsync(a => a.Id == packetId);
         }
 
+        public static async Task<AccessPoint> MatchAccessPointByAccessPointStampId(this IQueryable<AccessPoint> accessPoints, Guid stampId)
+        {
+            return await accessPoints
+                .Include(a => a.Stamps)
+                .Where(a => a.DisplayStatus.Value)
+                .Where(a => a.Stamps.Any(s => s.Id == stampId))
+                .AsNoTracking()
+                .SingleAsync();
+        }
+
+        public static async Task<AccessPoint> MatchAccessPointByAccessPointStampIdAdministration(this IQueryable<AccessPoint> accessPoints, Guid stampId)
+        {
+            return await accessPoints
+                .Include(a => a.Stamps)
+                .Where(a => a.Stamps.Any(s => s.Id == stampId))
+                .AsNoTracking()
+                .SingleAsync();
+        }
+
+        public static async Task<AccessPoint> MatchAccessPointByAccessPointPacketId(this IQueryable<AccessPoint> accessPoints, Guid packetId)
+        {
+            return await accessPoints
+                .Include(a => a.Packets)
+                .Where(a => a.DisplayStatus.Value)
+                .Where(a => a.Packets.Any(p => p.Id == packetId))
+                .AsNoTracking()
+                .SingleAsync();
+        }
+
+        public static async Task<AccessPoint> MatchAccessPointByAccessPointPacketIdAdministration(this IQueryable<AccessPoint> accessPoints, Guid packetId)
+        {
+            return await accessPoints
+                .Include(a => a.Stamps)
+                .Include(a => a.Packets)
+                .Where(a => a.Packets.Any(p => p.Id == packetId))
+                .AsNoTracking()
+                .SingleAsync();
+        }
+
         // TODO: Resolve problems related to this query
         // The main get endpoint can be used the same way, this endpoint were used
         // The filtering is happening now on the server side, which might be less efficient
