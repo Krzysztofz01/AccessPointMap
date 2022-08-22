@@ -82,6 +82,21 @@ namespace AccessPointMap.Application.AccessPoints
             public IEnumerable<AccessPointAdnnotationDetails> Adnnotations { get; set; }
         }
 
+        public class AccessPointStampSimple
+        {
+            public Guid Id { get; set; }
+            public string Ssid { get; set; }
+            public string DeviceType { get; set; }
+            public DateTime CreationTimestamp { get; set; }
+            public double HighSignalLatitude { get; set; }
+            public double HighSignalLongitude { get; set; }
+            public double SignalArea { get; set; }
+            public string SecurityStandards { get; set; }
+            public string SecurityProtocols { get; set; }
+            public bool IsSecure { get; set; }
+            public Guid? RunIdentifier { get; set; }
+        }
+
         public class AccessPointStampDetails
         {
             public Guid Id { get; set; }
