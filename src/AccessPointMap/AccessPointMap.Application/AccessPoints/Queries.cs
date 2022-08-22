@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Application.Extensions;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
+using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -100,22 +101,45 @@ namespace AccessPointMap.Application.AccessPoints
                 .ToListAsync();
         }
 
-        public static async Task<IEnumerable<object>> GetAllAccessPointRunIds(this IQueryable<AccessPoint> accessPoints)
+        public static async Task<IEnumerable<AccessPointStamp>> GetAllAccessPointStampsByRunId(this IQueryable<AccessPoint> accessPoints, Guid runId)
+        {
+            return await accessPoints
+                .Include(a => a.Stamps)
+                .Where(a => a.DisplayStatus.Value)
+                .SelectMany(a => a.Stamps)
+                .Where(a => a.RunIdentifier.Value.HasValue)
+                .Where(a => a.RunIdentifier.Value == runId)
+                .AsNoTracking()
+                .ToListAsync(); 
+        }
+
+        public static async Task<IEnumerable<AccessPointStamp>> GetAllAccessPointStampsByRunIdAdministration(this IQueryable<AccessPoint> accessPoints, Guid runId)
+        {
+            return await accessPoints
+                .Include(a => a.Stamps)
+                .SelectMany(a => a.Stamps)
+                .Where(a => a.RunIdentifier.Value.HasValue)
+                .Where(a => a.RunIdentifier.Value == runId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIds(this IQueryable<AccessPoint> accessPoints)
         {
             return await accessPoints
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .DistinctBy(a => a.RunIdentifier.Value.Value)
-                .Select(a => new { RunIdentifier = a.RunIdentifier.Value.Value })
+                .Select(a => a.RunIdentifier.Value.Value)
                 .ToListAsync();
         }
 
-        public static async Task<IEnumerable<object>> GetAllAccessPointRunIdsAdministration(this IQueryable<AccessPoint> accessPoints)
+        public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIdsAdministration(this IQueryable<AccessPoint> accessPoints)
         {
             return await accessPoints
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .DistinctBy(a => a.RunIdentifier.Value.Value)
-                .Select(a => new { RunIdentifier = a.RunIdentifier.Value.Value })
+                .Select(a => a.RunIdentifier.Value.Value)
                 .ToListAsync();
         }
 

@@ -81,6 +81,19 @@ namespace AccessPointMap.Application.AccessPoints
                 .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value))
                 .ForMember(d => d.Stamps, m => m.MapFrom(s => s.Stamps));
 
+            CreateMap<AccessPointStamp, AccessPointStampSimple>()
+                .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
+                .ForMember(d => d.Ssid, m => m.MapFrom(s => s.Ssid.Value))
+                .ForMember(d => d.DeviceType, m => m.MapFrom(s => s.DeviceType.Value))
+                .ForMember(d => d.CreationTimestamp, m => m.MapFrom(s => s.CreationTimestamp.Value))
+                .ForMember(d => d.HighSignalLatitude, m => m.MapFrom(s => s.Positioning.HighSignalLatitude))
+                .ForMember(d => d.HighSignalLongitude, m => m.MapFrom(s => s.Positioning.HighSignalLongitude))
+                .ForMember(d => d.SignalArea, m => m.MapFrom(s => s.Positioning.SignalArea))
+                .ForMember(d => d.SecurityStandards, m => m.MapFrom(s => s.Security.SecurityStandards))
+                .ForMember(d => d.SecurityProtocols, m => m.MapFrom(s => s.Security.SecurityProtocols))
+                .ForMember(d => d.IsSecure, m => m.MapFrom(s => s.Security.IsSecure))
+                .ForMember(d => d.RunIdentifier, m => m.MapFrom(s => s.RunIdentifier.Value));
+
             CreateMap<AccessPointStamp, AccessPointStampDetails>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => s.Id))
                 .ForMember(d => d.Ssid, m => m.MapFrom(s => s.Ssid.Value))
