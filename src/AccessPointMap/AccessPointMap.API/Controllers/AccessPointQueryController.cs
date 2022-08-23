@@ -225,7 +225,54 @@ namespace AccessPointMap.API.Controllers
 
             return Ok(mappedResponse);
         }
-            
+
+        [HttpGet("match/stamp/{accessPointStampId}")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByStampId(Guid accessPointStampId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampId(accessPointStampId);
+
+            var mappedResponse = MapToDto<AccessPointDetails>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("match/stamp/{accessPointStampId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByStampIdFull(Guid accessPointStampId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampIdAdministration(accessPointStampId);
+
+            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("match/packet/{accessPointPacketId}")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByPacketId(Guid accessPointPacketId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketId(accessPointPacketId);
+
+            var mappedResponse = MapToDto<AccessPointDetails>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("match/packet/{accessPointPacketId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByPacketIdFull(Guid accessPointPacketId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketIdAdministration(accessPointPacketId);
+
+            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
+
+            return Ok(mappedResponse);
+        }
+
         [HttpGet("statistics/signal")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange([FromQuery] int? limit)
