@@ -30,6 +30,11 @@ namespace AccessPointMap.API.Controllers
         public async Task<IActionResult> Delete(V1.Delete command) =>
             await Command(command, _accessPointService.Handle);
 
+        [HttpDelete("range")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> DeleteRange(V1.DeleteRange command) =>
+            await Command(command, _accessPointService.Handle);
+
         [HttpPut]
         [Authorize(Roles = "Admin, Support")]
         public async Task<IActionResult> Update(V1.Update command) =>
@@ -38,6 +43,11 @@ namespace AccessPointMap.API.Controllers
         [HttpPut("display")]
         [Authorize(Roles = "Admin, Support")]
         public async Task<IActionResult> DisplayStatusChange(V1.ChangeDisplayStatus command) =>
+            await Command(command, _accessPointService.Handle);
+
+        [HttpPut("range/display")]
+        [Authorize(Roles = "Admin, Support")]
+        public async Task<IActionResult> DisplayStatusChangeRange(V1.ChangeDisplayStatusRange command) =>
             await Command(command, _accessPointService.Handle);
 
         [HttpPut("merge")]
