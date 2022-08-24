@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Authentication;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Domain.Core.Events;
 using Microsoft.Extensions.Logging;
@@ -70,6 +71,12 @@ namespace AccessPointMap.Application.Logging
 
             const string message = "Application command: {CommandName} requested. Application command properties: {CommandPropertyDump}";
             logger.LogDebug(message, command.GetType().Name, values.ToString());
+        }
+
+        public static void LogAuthenticationRequest(this ILogger logger, IAuthenticationRequest request, string ipAddress)
+        {
+            const string message = "Authentication request: {RequestName} received from address: {IpAddress}";
+            logger.LogInformation(message, request.GetType().Name, ipAddress);
         }
 
         public static void LogCommandController(this ILogger logger, ICommand command)
