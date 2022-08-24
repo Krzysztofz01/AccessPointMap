@@ -75,50 +75,50 @@ namespace AccessPointMap.Application.Logging
 
         public static void LogAuthenticationRequest(this ILogger logger, IAuthenticationRequest request, string ipAddress)
         {
-            const string message = "Authentication request: {RequestName} received from address: {IpAddress}";
+            const string message = "Authentication request: {RequestName} received from address: {IpAddress}.";
             logger.LogInformation(message, request.GetType().Name, ipAddress);
         }
 
-        public static void LogCommandController(this ILogger logger, ICommand command)
+        public static void LogCommandController(this ILogger logger, ICommand command, string ipAddress)
         {
             if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
             {
-                logger.LogCommandControllerDebug(command);
+                logger.LogCommandControllerDebug(command, ipAddress);
                 return;
             }
 
-            logger.LogCommandControllerInformation(command);
+            logger.LogCommandControllerInformation(command, ipAddress);
         }
 
-        public static void LogCommandController(this ILogger logger, IIntegrationCommand command)
+        public static void LogCommandController(this ILogger logger, IIntegrationCommand command, string ipAddress)
         {
             if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
             {
-                logger.LogCommandControllerDebug(command);
+                logger.LogCommandControllerDebug(command, ipAddress);
                 return;
             }
 
-            logger.LogCommandControllerInformation(command);
+            logger.LogCommandControllerInformation(command, ipAddress);
         }
 
-        public static void LogCommandController(this ILogger logger, object request)
+        public static void LogCommandController(this ILogger logger, object request, string ipAddress)
         {
             if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
             {
-                logger.LogCommandControllerDebug(request);
+                logger.LogCommandControllerDebug(request, ipAddress);
                 return;
             }
 
-            logger.LogCommandControllerInformation(request);
+            logger.LogCommandControllerInformation(request, ipAddress);
         }
 
-        private static void LogCommandControllerInformation(this ILogger logger, object request)
+        private static void LogCommandControllerInformation(this ILogger logger, object request, string ipAddress)
         {
-            const string message = "Command controller request: {Request} for service execution received.";
-            logger.LogInformation(message, request.GetType().Name);
+            const string message = "Command controller request: {Request} for service execution received from: {IpAddress}.";
+            logger.LogInformation(message, request.GetType().Name, ipAddress);
         }
 
-        private static void LogCommandControllerDebug(this ILogger logger, object request)
+        private static void LogCommandControllerDebug(this ILogger logger, object request, string ipAddress)
         {
             var values = new StringBuilder(string.Empty);
             foreach (var prop in request.GetType().GetProperties())
@@ -129,38 +129,17 @@ namespace AccessPointMap.Application.Logging
                 values.Append(';');
             }
 
-            const string message = "Command controller request: {Request} for service execution received. Request properties: {CommandPropertyDump}";
-            logger.LogDebug(message, request.GetType().Name, values.ToString());
+            const string message = "Command controller request: {Request} for service execution received from: {IpAddress}. Request properties: {CommandPropertyDump}";
+            logger.LogDebug(message, request.GetType().Name, ipAddress, values.ToString());
         }
 
-        private static void LogCommandControllerInformation(this ILogger logger, ICommand command)
+        private static void LogCommandControllerInformation(this ILogger logger, ICommand command, string ipAddress)
         {
-            const string message = "Command controller command: {CommandName} received.";
-            logger.LogInformation(message, command.GetType().Name);
+            const string message = "Command controller command: {CommandName} received from: {IpAddress}.";
+            logger.LogInformation(message, command.GetType().Name, ipAddress);
         }
 
-        private static void LogCommandControllerDebug(this ILogger logger, ICommand command)
-        {
-            var values = new StringBuilder(string.Empty);
-            foreach (var prop in command.GetType().GetProperties())
-            {
-                values.Append(prop.Name);
-                values.Append('=');
-                values.Append(prop.GetValue(command, null));
-                values.Append(';');
-            }
-
-            const string message = "Command controller command: {CommandName} received. Command properties: {CommandPropertyDump}";
-            logger.LogDebug(message, command.GetType().Name, values.ToString());
-        }
-
-        private static void LogCommandControllerInformation(this ILogger logger, IIntegrationCommand command)
-        {
-            const string message = "Command controller integration command: {CommandName} received.";
-            logger.LogInformation(message, command.GetType().Name);
-        }
-
-        private static void LogCommandControllerDebug(this ILogger logger, IIntegrationCommand command)
+        private static void LogCommandControllerDebug(this ILogger logger, ICommand command, string ipAddress)
         {
             var values = new StringBuilder(string.Empty);
             foreach (var prop in command.GetType().GetProperties())
@@ -171,19 +150,40 @@ namespace AccessPointMap.Application.Logging
                 values.Append(';');
             }
 
-            const string message = "Command controller integration command: {CommandName} received. Command properties: {CommandPropertyDump}";
-            logger.LogDebug(message, command.GetType().Name, values.ToString());
+            const string message = "Command controller command: {CommandName} received from: {IpAddress}. Command properties: {CommandPropertyDump}";
+            logger.LogDebug(message, command.GetType().Name, ipAddress, values.ToString());
         }
 
-        public static void LogQueryController(this ILogger logger, string path)
+        private static void LogCommandControllerInformation(this ILogger logger, IIntegrationCommand command, string ipAddress)
         {
-            logger.LogQueryControllerInformation(path ?? string.Empty);
+            const string message = "Command controller integration command: {CommandName} received from: {IpAddress}.";
+            logger.LogInformation(message, command.GetType().Name, ipAddress);
         }
 
-        private static void LogQueryControllerInformation(this ILogger logger, string path)
+        private static void LogCommandControllerDebug(this ILogger logger, IIntegrationCommand command, string ipAddress)
         {
-            const string message = "Query controller on path: {QueryPath} resolved.";
-            logger.LogInformation(message, path);
+            var values = new StringBuilder(string.Empty);
+            foreach (var prop in command.GetType().GetProperties())
+            {
+                values.Append(prop.Name);
+                values.Append('=');
+                values.Append(prop.GetValue(command, null));
+                values.Append(';');
+            }
+
+            const string message = "Command controller integration command: {CommandName} received from: {IpAddress}. Command properties: {CommandPropertyDump}";
+            logger.LogDebug(message, command.GetType().Name, ipAddress, values.ToString());
+        }
+
+        public static void LogQueryController(this ILogger logger, string path, string ipAddress)
+        {
+            logger.LogQueryControllerInformation(path ?? "Unknown", ipAddress);
+        }
+
+        private static void LogQueryControllerInformation(this ILogger logger, string path, string ipAddress)
+        {
+            const string message = "Query controller on path: {QueryPath} resolved for: {IpAddress}.";
+            logger.LogInformation(message, path, ipAddress);
         }
     }
 }
