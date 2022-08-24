@@ -126,21 +126,46 @@ namespace AccessPointMap.Application.AccessPoints
 
         public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIds(this IQueryable<AccessPoint> accessPoints)
         {
-            return await accessPoints
+            var accessPointRunIds = await accessPoints
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.RunIdentifier.Value.HasValue)
-                .DistinctBy(a => a.RunIdentifier.Value.Value)
                 .Select(a => a.RunIdentifier.Value.Value)
+                .Distinct()
                 .ToListAsync();
+
+            var accessPointStampRunIds = await accessPoints
+                .Include(a => a.Stamps)
+                .Where(a => a.DisplayStatus.Value)
+                .SelectMany(a => a.Stamps)
+                .Where(s => s.RunIdentifier.Value.HasValue)
+                .Select(a => a.RunIdentifier.Value.Value)
+                .Distinct()
+                .ToListAsync();
+
+            return accessPointRunIds
+                .Union(accessPointStampRunIds)
+                .Distinct();
         }
 
         public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIdsAdministration(this IQueryable<AccessPoint> accessPoints)
         {
-            return await accessPoints
+            var accessPointRunIds = await accessPoints
                 .Where(a => a.RunIdentifier.Value.HasValue)
-                .DistinctBy(a => a.RunIdentifier.Value.Value)
                 .Select(a => a.RunIdentifier.Value.Value)
+                .Distinct()
                 .ToListAsync();
+
+            var accessPointStampRunIds = await accessPoints
+                .Include(a => a.Stamps)
+                .SelectMany(a => a.Stamps)
+                .Where(s => s.RunIdentifier.Value.HasValue)
+                .Select(a => a.RunIdentifier.Value.Value)
+                .Distinct()
+                .ToListAsync();
+
+            return accessPointRunIds
+                .Union(accessPointStampRunIds)
+                .Distinct();
         }
 
         public static async Task<IEnumerable<AccessPointPacket>> GetAllAccessPointsAccessPointPackets(this IQueryable<AccessPoint> accessPoints, Guid id)
