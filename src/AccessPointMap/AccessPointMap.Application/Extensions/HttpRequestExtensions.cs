@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 
-namespace AccessPointMap.API.Extensions
+namespace AccessPointMap.Application.Extensions
 {
     public static class HttpRequestExtensions
     {
-        public static Uri GetCurrentUri(this HttpRequest request)
+        public static Uri GetRequestUri(this HttpRequest request)
         {
             var uriBuilder = new UriBuilder
             {
@@ -21,19 +21,19 @@ namespace AccessPointMap.API.Extensions
             return uriBuilder.Uri;
         }
 
-        public static string GetCurrentIp(this HttpRequest request)
+        public static string GetIpAddressString(this HttpRequest httpRequest)
         {
-            string ip = request.Headers["X-Forwared-For"].FirstOrDefault();
+            string ip = httpRequest.Headers["X-Forwared-For"].FirstOrDefault();
 
             if (!ip.IsEmpty()) ip = ip.Split('.').First().Trim();
 
-            if (ip.IsEmpty()) ip = Convert.ToString(request.HttpContext.Connection.RemoteIpAddress);
+            if (ip.IsEmpty()) ip = Convert.ToString(httpRequest.HttpContext.Connection.RemoteIpAddress);
 
-            if (ip.IsEmpty()) ip = Convert.ToString(request.HttpContext.Connection.LocalIpAddress);
+            if (ip.IsEmpty()) ip = Convert.ToString(httpRequest.HttpContext.Connection.LocalIpAddress);
 
-            if (ip.IsEmpty()) ip = request.Headers["REMOTE_ADDR"].FirstOrDefault();
+            if (ip.IsEmpty()) ip = httpRequest.Headers["REMOTE_ADDR"].FirstOrDefault();
 
-            if (ip.IsEmpty()) ip = "Unknown";
+            if (ip.IsEmpty()) ip = string.Empty;
 
             return ip;
         }

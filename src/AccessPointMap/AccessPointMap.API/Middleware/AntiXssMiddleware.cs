@@ -1,4 +1,4 @@
-﻿using AccessPointMap.API.Extensions;
+﻿using AccessPointMap.Application.Extensions;
 using Ganss.XSS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -39,8 +39,9 @@ namespace AccessPointMap.API.Middleware
 
             if (newLineSafeRawRequestBody != sanitizedRequestBody)
             {
-                _logger.LogInformation("XSS injection detected from");
-                _logger.LogInformation($"{ httpContext.Request.GetCurrentIp() } - { httpContext.Request.GetCurrentUri() }");
+                _logger.LogWarning("Request from address: {IpAddress} requesting the resource under: {Uri} blocked by XSS middleware.",
+                    httpContext.Request.GetIpAddressString(),
+                    httpContext.Request.GetRequestUri());
 
                 throw new BadHttpRequestException("XSS injection detected.");
             } 
