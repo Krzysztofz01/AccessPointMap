@@ -126,46 +126,58 @@ namespace AccessPointMap.Application.AccessPoints
 
         public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIds(this IQueryable<AccessPoint> accessPoints)
         {
-            var accessPointRunIds = await accessPoints
+            var accessPointRunIds = (await accessPoints
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.RunIdentifier.Value.HasValue)
-                .Select(a => a.RunIdentifier.Value.Value)
-                .Distinct()
-                .ToListAsync();
+                .OrderBy(a => a.CreationTimestamp.Value)
+                .AsNoTracking()
+                .ToListAsync())
+                .DistinctBy(a => a.RunIdentifier.Value.Value)
+                .Select(a => new Tuple<Guid, DateTime>(a.RunIdentifier.Value.Value, a.CreationTimestamp.Value));
 
-            var accessPointStampRunIds = await accessPoints
+            var accessPointStampRunIds = (await accessPoints
                 .Include(a => a.Stamps)
                 .Where(a => a.DisplayStatus.Value)
                 .SelectMany(a => a.Stamps)
                 .Where(s => s.RunIdentifier.Value.HasValue)
-                .Select(a => a.RunIdentifier.Value.Value)
-                .Distinct()
-                .ToListAsync();
+                .OrderBy(s => s.CreationTimestamp.Value)
+                .AsNoTracking()
+                .ToListAsync())
+                .DistinctBy(s => s.RunIdentifier.Value.Value)
+                .Select(s => new Tuple<Guid, DateTime>(s.RunIdentifier.Value.Value, s.CreationTimestamp.Value));
 
             return accessPointRunIds
                 .Union(accessPointStampRunIds)
-                .Distinct();
+                .OrderBy(a => a.Item2)
+                .DistinctBy(a => a.Item1)
+                .Select(a => a.Item1);
         }
 
         public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIdsAdministration(this IQueryable<AccessPoint> accessPoints)
         {
-            var accessPointRunIds = await accessPoints
+            var accessPointRunIds = (await accessPoints
                 .Where(a => a.RunIdentifier.Value.HasValue)
-                .Select(a => a.RunIdentifier.Value.Value)
-                .Distinct()
-                .ToListAsync();
+                .OrderBy(a => a.CreationTimestamp.Value)
+                .AsNoTracking()
+                .ToListAsync())
+                .DistinctBy(a => a.RunIdentifier.Value.Value)
+                .Select(a => new Tuple<Guid, DateTime>(a.RunIdentifier.Value.Value, a.CreationTimestamp.Value));
 
-            var accessPointStampRunIds = await accessPoints
+            var accessPointStampRunIds = (await accessPoints
                 .Include(a => a.Stamps)
                 .SelectMany(a => a.Stamps)
                 .Where(s => s.RunIdentifier.Value.HasValue)
-                .Select(a => a.RunIdentifier.Value.Value)
-                .Distinct()
-                .ToListAsync();
+                .OrderBy(s => s.CreationTimestamp.Value)
+                .AsNoTracking()
+                .ToListAsync())
+                .DistinctBy(s => s.RunIdentifier.Value.Value)
+                .Select(s => new Tuple<Guid, DateTime>(s.RunIdentifier.Value.Value, s.CreationTimestamp.Value));
 
             return accessPointRunIds
                 .Union(accessPointStampRunIds)
-                .Distinct();
+                .OrderBy(a => a.Item2)
+                .DistinctBy(a => a.Item1)
+                .Select(a => a.Item1);
         }
 
         public static async Task<IEnumerable<AccessPointPacket>> GetAllAccessPointsAccessPointPackets(this IQueryable<AccessPoint> accessPoints, Guid id)
