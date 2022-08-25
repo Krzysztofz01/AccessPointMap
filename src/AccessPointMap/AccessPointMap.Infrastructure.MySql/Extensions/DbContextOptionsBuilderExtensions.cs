@@ -8,7 +8,11 @@ namespace AccessPointMap.Infrastructure.MySql.Extensions
         public static DbContextOptionsBuilder UseMySql(this DbContextOptionsBuilder builder, string connectionString)
         {
             return builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
-                options.SchemaBehavior(MySqlSchemaBehavior.Translate, (schema, table) => $"{schema}_{table}"));
+            {
+                options.SchemaBehavior(MySqlSchemaBehavior.Translate, (schema, table) => $"{schema}_{table}");
+
+                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
         }
     }
 }
