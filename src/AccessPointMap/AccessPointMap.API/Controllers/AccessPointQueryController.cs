@@ -121,9 +121,14 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByRunId(Guid runId)
         {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
             var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            StoreToCache(mappedResponse);
 
             return Ok(mappedResponse);
         }
