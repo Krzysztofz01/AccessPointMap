@@ -4,14 +4,14 @@
     {
         public static class V1
         {
-            public class Login
+            public class Login : IAuthenticationRequest
             {
                 public string Email { get; set; }
 
                 public string Password { get; set; }
             }
 
-            public class Register
+            public class Register : IAuthenticationRequest
             {
                 public string Email { get; set; }
 
@@ -22,19 +22,19 @@
                 public string PasswordRepeat { get; set; }
             }
 
-            public class Logout
+            public class Logout : IAuthenticationRequest
             {
                 public string RefreshToken { get; set; }
             }
 
-            public class PasswordReset
+            public class PasswordReset : IAuthenticationRequest
             {
                 public string Password { get; set; }
 
                 public string PasswordRepeat { get; set; }
             }
 
-            public class Refresh
+            public class Refresh : IAuthenticationRequest
             {
                 public string RefreshToken { get; set; }
             }

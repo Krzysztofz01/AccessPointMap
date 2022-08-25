@@ -21,6 +21,11 @@ namespace AccessPointMap.Application.AccessPoints
                 public Guid Id { get; set; }
             }
 
+            public class DeleteRange : IApplicationCommand<AccessPoint>
+            {
+                public IEnumerable<Guid> Ids { get; set; }
+            }
+
             public class Update : IApplicationCommand<AccessPoint>
             {
                 public Guid Id { get; set; }
@@ -31,6 +36,13 @@ namespace AccessPointMap.Application.AccessPoints
             public class ChangeDisplayStatus : IApplicationCommand<AccessPoint>
             {
                 public Guid Id { get; set; }
+
+                public bool? Status { get; set; }
+            }
+
+            public class ChangeDisplayStatusRange : IApplicationCommand<AccessPoint>
+            {
+                public IEnumerable<Guid> Ids { get; set; }
 
                 public bool? Status { get; set; }
             }

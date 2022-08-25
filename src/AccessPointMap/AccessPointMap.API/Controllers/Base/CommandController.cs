@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Extensions;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Logging;
 using AccessPointMap.Domain.Core.Models;
@@ -26,7 +27,7 @@ namespace AccessPointMap.API.Controllers.Base
 
         protected async Task<IActionResult> Command<TAggregateRoot>(IApplicationCommand<TAggregateRoot> command, Func<IApplicationCommand<TAggregateRoot>, Task> serviceHandler) where TAggregateRoot : AggregateRoot
         {
-            _logger.LogCommandController(command);
+            _logger.LogCommandController(command, Request.GetIpAddressString());
 
             await serviceHandler(command);
 
@@ -37,11 +38,11 @@ namespace AccessPointMap.API.Controllers.Base
         {
             if (request is IIntegrationCommand command)
             {
-                _logger.LogCommandController(command);
+                _logger.LogCommandController(command, Request.GetIpAddressString());
             }
             else
             {
-                _logger.LogCommandController(request);
+                _logger.LogCommandController(request, Request.GetIpAddressString());
             }
 
             await serviceHandler(request);

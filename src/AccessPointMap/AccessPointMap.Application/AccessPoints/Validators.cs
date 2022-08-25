@@ -1,9 +1,4 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Commands;
 using static AccessPointMap.Application.AccessPoints.Commands.V1;
 
@@ -31,6 +26,15 @@ namespace AccessPointMap.Application.AccessPoints
                 }
             }
 
+            public class DeleteRangeValidator : AbstractValidator<DeleteRange>
+            {
+                public DeleteRangeValidator()
+                {
+                    RuleFor(c => c.Ids).NotNull();
+                    RuleForEach(c => c.Ids).NotNull();
+                }
+            }
+
             public class UpdateValidator : AbstractValidator<Update>
             {
                 public UpdateValidator()
@@ -45,6 +49,16 @@ namespace AccessPointMap.Application.AccessPoints
                 public ChangeDisplayStatusValidator()
                 {
                     RuleFor(c => c.Id).NotEmpty();
+                    RuleFor(c => c.Status).NotNull();
+                }
+            }
+
+            public class ChangeDisplayStatusRangeValidator : AbstractValidator<ChangeDisplayStatusRange>
+            {
+                public ChangeDisplayStatusRangeValidator()
+                {
+                    RuleFor(c => c.Ids).NotNull();
+                    RuleForEach(c => c.Ids).NotNull();
                     RuleFor(c => c.Status).NotNull();
                 }
             }

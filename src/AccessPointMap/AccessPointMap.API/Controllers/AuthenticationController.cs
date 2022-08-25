@@ -1,5 +1,7 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.Authentication;
+using AccessPointMap.Application.Extensions;
+using AccessPointMap.Application.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +17,15 @@ namespace AccessPointMap.API.Controllers
     public class AuthenticationController : CommandController
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly ILogger<AuthenticationController> _logger;
 
         public AuthenticationController(IAuthenticationService authenticationService, ILogger<AuthenticationController> logger) : base(logger)
         {
             _authenticationService = authenticationService ??
                 throw new ArgumentNullException(nameof(authenticationService));
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpPost]
@@ -27,6 +33,8 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(Responses.V1.Login), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(V1.Login request)
         {
+            _logger.LogAuthenticationRequest(request, Request.GetIpAddressString());
+
             return Ok(await _authenticationService.Login(request));
         }
 
@@ -35,12 +43,16 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(Responses.V1.Refresh), StatusCodes.Status200OK)]
         public async Task<IActionResult> Refresh(V1.Refresh request)
         {
+            _logger.LogAuthenticationRequest(request, Request.GetIpAddressString());
+
             return Ok(await _authenticationService.Refresh(request));
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout(V1.Logout request)
         {
+            _logger.LogAuthenticationRequest(request, Request.GetIpAddressString());
+
             await _authenticationService.Logout(request);
 
             return Ok();
@@ -49,6 +61,8 @@ namespace AccessPointMap.API.Controllers
         [HttpPost("reset")]
         public async Task<IActionResult> PasswordReset(V1.PasswordReset request)
         {
+            _logger.LogAuthenticationRequest(request, Request.GetIpAddressString());
+
             await _authenticationService.PasswordReset(request);
 
             return Ok();
@@ -58,6 +72,8 @@ namespace AccessPointMap.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register(V1.Register request)
         {
+            _logger.LogAuthenticationRequest(request, Request.GetIpAddressString());
+
             await _authenticationService.Register(request);
 
             return Ok();

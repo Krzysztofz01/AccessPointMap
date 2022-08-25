@@ -98,13 +98,37 @@ namespace AccessPointMap.API.Controllers
             return MapToFile(response.FileBuffer, _kmlContentType);
         }
 
+        [HttpGet("run")]
+        [ProducesResponseType(typeof(IEnumerable<Guid>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllRunIds()
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointRunIds();
+
+            return Ok(response);
+        }
+
+        [HttpGet("run/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<Guid>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllRunIdsAdministration()
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointRunIdsAdministration();
+
+            return Ok(response);
+        }
+
         [HttpGet("run/{runId}")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByRunId(Guid runId)
         {
+            var cachedResponse = ResolveFromCache();
+            if (cachedResponse is not null) return Ok(cachedResponse);
+
             var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            StoreToCache(mappedResponse);
 
             return Ok(mappedResponse);
         }
@@ -117,6 +141,29 @@ namespace AccessPointMap.API.Controllers
             var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunIdAdministration(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("stamps/run/{runId}")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointStampSimple>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllStampsBysRunId(Guid runId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointStampsByRunId(runId);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointStampSimple>>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("stamps/run/{runId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointStampSimple>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllStampsBysRunIdAdministration(Guid runId)
+        {
+            var response = await _dataAccess.AccessPoints.GetAllAccessPointStampsByRunIdAdministration(runId);
+
+            var mappedResponse = MapToDto<IEnumerable<AccessPointStampSimple>>(response);
 
             return Ok(mappedResponse);
         }
@@ -183,7 +230,54 @@ namespace AccessPointMap.API.Controllers
 
             return Ok(mappedResponse);
         }
-            
+
+        [HttpGet("match/stamp/{accessPointStampId}")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByStampId(Guid accessPointStampId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampId(accessPointStampId);
+
+            var mappedResponse = MapToDto<AccessPointDetails>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("match/stamp/{accessPointStampId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByStampIdFull(Guid accessPointStampId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampIdAdministration(accessPointStampId);
+
+            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("match/packet/{accessPointPacketId}")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByPacketId(Guid accessPointPacketId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketId(accessPointPacketId);
+
+            var mappedResponse = MapToDto<AccessPointDetails>(response);
+
+            return Ok(mappedResponse);
+        }
+
+        [HttpGet("match/packet/{accessPointPacketId}/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByPacketIdFull(Guid accessPointPacketId)
+        {
+            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketIdAdministration(accessPointPacketId);
+
+            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
+
+            return Ok(mappedResponse);
+        }
+
         [HttpGet("statistics/signal")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange([FromQuery] int? limit)

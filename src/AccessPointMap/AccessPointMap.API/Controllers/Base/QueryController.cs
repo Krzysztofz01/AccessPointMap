@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Application.Logging;
+﻿using AccessPointMap.Application.Extensions;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -80,7 +81,7 @@ namespace AccessPointMap.API.Controllers.Base
 
         public override OkObjectResult Ok([ActionResultObjectValue] object value)
         {
-            _logger.LogQueryController(Request.GetEncodedPathAndQuery());
+            _logger.LogQueryController(Request.GetEncodedPathAndQuery(), Request.GetIpAddressString());
 
             return base.Ok(value);
         }

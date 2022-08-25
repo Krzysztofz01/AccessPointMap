@@ -1,5 +1,5 @@
-﻿using AccessPointMap.API.Extensions;
-using AccessPointMap.API.Services;
+﻿using AccessPointMap.API.Services;
+using AccessPointMap.Application.Extensions;
 using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Domain.Core.Exceptions;
 using Microsoft.AspNetCore.Hosting;
@@ -43,9 +43,9 @@ namespace AccessPointMap.API.Middleware
         {
             try
             {
-                _logger.LogDebug("Client with address: {IpAddress} requested resource under: {Url}",
-                    context.Request.GetCurrentIp(),
-                    context.Request.GetCurrentUri());
+                _logger.LogInformation("Client with address: {IpAddress} requested resource under: {Url}",
+                    context.Request.GetIpAddressString(),
+                    context.Request.GetRequestUri());
 
                 await _next(context);
             }
@@ -77,8 +77,8 @@ namespace AccessPointMap.API.Middleware
                 _healthStatusService.SetHealthStatusDegraded();
 
                 _logger.LogError("Client with address: {IpAddress} requested resource under: {Url} causing a failure.",
-                    context.Request.GetCurrentIp(),
-                    context.Request.GetCurrentUri());
+                    context.Request.GetIpAddressString(),
+                    context.Request.GetRequestUri());
 
                 _logger.LogError(ex, "Exception message: {Message}", ex.Message);
             }
