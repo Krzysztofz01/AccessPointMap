@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AccessPointMap.Infrastructure.MySql.Builders
 {
-    public class IdentityTypeBuilder
+    internal sealed class IdentityTypeBuilder
     {
         public IdentityTypeBuilder(EntityTypeBuilder<Identity> builder)
         {

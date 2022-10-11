@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AccessPointMap.Infrastructure.MySql
 {
-    public class UnitOfWork : IUnitOfWork
+    internal sealed class UnitOfWork : IUnitOfWork
     {
         private readonly AccessPointMapDbContext _dbcontext;
 
