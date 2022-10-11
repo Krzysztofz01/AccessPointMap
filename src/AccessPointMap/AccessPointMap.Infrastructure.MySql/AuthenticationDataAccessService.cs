@@ -17,6 +17,7 @@ namespace AccessPointMap.Infrastructure.MySql
         public async Task<bool> AnyUsersExists()
         {
             return await _context.Identities
+                .AsSingleQuery()
                 .AsNoTracking()
                 .AnyAsync();
         }
@@ -25,6 +26,7 @@ namespace AccessPointMap.Infrastructure.MySql
         {
             return await _context.Identities
                 .Include(e => e.Tokens)
+                .AsSingleQuery()
                 .SingleAsync(e => e.Email.Value == email);
         }
 
@@ -32,6 +34,7 @@ namespace AccessPointMap.Infrastructure.MySql
         {
             return await _context.Identities
                 .Include(e => e.Tokens)
+                .AsSingleQuery()
                 .SingleAsync(e => e.Tokens.Any(t => t.TokenHash == refreshTokenHash));
         }
 
@@ -39,6 +42,7 @@ namespace AccessPointMap.Infrastructure.MySql
         {
             return await _context.Identities
                 .AsNoTracking()
+                .AsSingleQuery()
                 .AnyAsync(e => e.Email.Value == email);
         }
     }
