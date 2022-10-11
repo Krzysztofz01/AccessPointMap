@@ -119,7 +119,8 @@ namespace AccessPointMap.Application.Integration.Wigle
 
                 foreach (var record in runGroup.Value)
                 {
-                    if (await UnitOfWork.AccessPointRepository.Exists(record.Mac))
+                    // TODO: Pass the CancellationToken to the repository method
+                    if (await UnitOfWork.AccessPointRepository.ExistsAsync(record.Mac))
                     {
                         await CreateAccessPointStamp(record, runIdentifier);
                         continue;
@@ -189,12 +190,14 @@ namespace AccessPointMap.Application.Integration.Wigle
                 Content = SerializeRawAccessPointRecord(record)
             });
 
-            await UnitOfWork.AccessPointRepository.Add(accessPoint);
+            // TODO: Pass the CancellationToken to the repository method
+            await UnitOfWork.AccessPointRepository.AddAsync(accessPoint);
         }
 
         private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
         {
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Mac);
+            // TODO: Pass the CancellationToken to the repository method
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Mac);
 
             accessPoint.Apply(new Events.V1.AccessPointStampCreated
             {
