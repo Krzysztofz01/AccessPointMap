@@ -66,7 +66,7 @@ namespace AccessPointMap.Domain.Identities
         private void When(V1.IdentityAuthenticated @event)
         {
             if (!Activation)
-                throw new InvalidOperationException("Given identity is not active.");
+                throw new BusinessLogicException("Given identity is not active.");
 
             LastLogin = IdentityLastLogin.FromString(@event.IpAddress);
 
@@ -98,7 +98,7 @@ namespace AccessPointMap.Domain.Identities
         private void When(V1.IdentityTokenRefreshed @event)
         {
             if (!Activation)
-                throw new InvalidOperationException("Given identity is not active.");
+                throw new BusinessLogicException("Given identity is not active.");
 
             //Create and push a new token
             var replacementToken = Token.Factory.Create(new V1.TokenCreated
