@@ -32,10 +32,9 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         public AircrackngIntegrationService(
             IUnitOfWork unitOfWork,
-            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
 
         public async Task Handle(IIntegrationCommand command)

@@ -39,10 +39,9 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         public WigleIntegrationService(
             IUnitOfWork unitOfWork,
-            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
         public async Task Handle(IIntegrationCommand command)
         {
@@ -135,7 +134,7 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv _)
         {
-            var accessPoints = DataAccess.AccessPoints
+            var accessPoints = UnitOfWork.AccessPointRepository.Entities
                 .Where(a => !a.DeletedAt.HasValue)
                 .Where(a => a.DisplayStatus.Value)
                 .ToList();
