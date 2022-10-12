@@ -25,11 +25,11 @@ namespace AccessPointMap.API.Controllers
         private const string _kmlContentType = "text/kml";
 
         public AccessPointQueryController(
-            IDataAccess dataAccess,
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IMemoryCache memoryCache,
             ILogger<AccessPointQueryController> logger,
-            IKmlParsingService kmlParsingService) : base(dataAccess, mapper, memoryCache, logger)
+            IKmlParsingService kmlParsingService) : base(unitOfWork, mapper, memoryCache, logger)
         {
             _kmlParsingService = kmlParsingService ??
                 throw new ArgumentNullException(nameof(kmlParsingService));

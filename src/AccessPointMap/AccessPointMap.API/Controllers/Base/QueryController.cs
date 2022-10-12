@@ -20,15 +20,15 @@ namespace AccessPointMap.API.Controllers.Base
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public abstract class QueryController : ControllerBase
     {
-        protected readonly IDataAccess _dataAccess;
+        protected readonly IUnitOfWork _unitOfWork;
         protected readonly IMapper _mapper;
         protected readonly IMemoryCache _memoryCache;
         protected readonly ILogger<QueryController> _logger;
 
-        public QueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<QueryController> logger)
+        public QueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<QueryController> logger)
         {
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
+            _unitOfWork = unitOfWork ??
+                throw new ArgumentNullException(nameof(unitOfWork));
 
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));

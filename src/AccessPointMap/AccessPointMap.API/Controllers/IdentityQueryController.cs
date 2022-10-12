@@ -19,7 +19,7 @@ namespace AccessPointMap.API.Controllers
     [Authorize(Roles = "Admin, Support")]
     public class IdentityQueryController : QueryController
     {
-        public IdentityQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<IdentityQueryController> logger) : base(dataAccess, mapper, memoryCache, logger)
+        public IdentityQueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<IdentityQueryController> logger) : base(unitOfWork, mapper, memoryCache, logger)
         {
         }
 

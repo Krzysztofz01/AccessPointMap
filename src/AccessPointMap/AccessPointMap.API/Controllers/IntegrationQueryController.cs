@@ -18,7 +18,7 @@ namespace AccessPointMap.API.Controllers
 
         private const string _csvContentType = "text/csv";
 
-        public IntegrationQueryController(IDataAccess dataAccess, IMapper mapper, IMemoryCache memoryCache, ILogger<IntegrationQueryController> logger, Wigle.IWigleIntegrationService wigleIntegrationService) : base(dataAccess, mapper, memoryCache, logger)
+        public IntegrationQueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<IntegrationQueryController> logger, Wigle.IWigleIntegrationService wigleIntegrationService) : base(unitOfWork, mapper, memoryCache, logger)
         {
             _wigleIntegrationService = wigleIntegrationService ??
                 throw new ArgumentNullException(nameof(wigleIntegrationService));
