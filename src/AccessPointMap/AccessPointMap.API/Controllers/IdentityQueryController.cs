@@ -30,7 +30,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.Identities.GetAllIdentities();
+            var response = await _unitOfWork.IdentityRepository.GetAllIdentities();
 
             var mappedResponse = MapToDto<IEnumerable<IdentitySimple>>(response);
 
@@ -43,7 +43,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<IdentityDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById(Guid identityId)
         {
-            var response = await _dataAccess.Identities.GetIdentityById(identityId);
+            var response = await _unitOfWork.IdentityRepository.GetIdentityById(identityId);
 
             var mappedResponse = MapToDto<IdentityDetails>(response);
 

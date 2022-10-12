@@ -50,7 +50,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
@@ -72,7 +72,7 @@ namespace AccessPointMap.API.Controllers
             [FromQuery] int? page,
             [FromQuery] int? pageSize)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
@@ -102,7 +102,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Guid>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllRunIds()
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointRunIds();
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointRunIds();
 
             return Ok(response);
         }
@@ -112,7 +112,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Guid>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllRunIdsAdministration()
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointRunIdsAdministration();
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointRunIdsAdministration();
 
             return Ok(response);
         }
@@ -124,7 +124,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointsByRunId(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
@@ -138,7 +138,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByRunIdFull(Guid runId)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunIdAdministration(runId);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointsByRunIdAdministration(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
@@ -149,7 +149,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointStampSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllStampsBysRunId(Guid runId)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointStampsByRunId(runId);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointStampsByRunId(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointStampSimple>>(response);
 
@@ -161,7 +161,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointStampSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllStampsBysRunIdAdministration(Guid runId)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointStampsByRunIdAdministration(runId);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointStampsByRunIdAdministration(runId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointStampSimple>>(response);
 
@@ -175,7 +175,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints.GetAccessPointById(accessPointId);
+            var response = await _unitOfWork.AccessPointRepository.GetAccessPointById(accessPointId);
 
             var mappedResponse = MapToDto<AccessPointDetails>(response);
 
@@ -189,7 +189,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByIdFull(Guid accessPointId)
         {
-            var response = await _dataAccess.AccessPoints.GetAccessPointByIdAdministration(accessPointId);
+            var response = await _unitOfWork.AccessPointRepository.GetAccessPointByIdAdministration(accessPointId);
 
             var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
 
@@ -201,7 +201,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointPacketDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllPackets(Guid accessPointId)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAccessPointPackets(accessPointId);
+            var response = await _unitOfWork.AccessPointRepository.GetAllAccessPointsAccessPointPackets(accessPointId);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointPacketDetails>>(response);
 
@@ -213,7 +213,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointPacketDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPacketById(Guid accessPointId, Guid accessPointPacketId)
         {
-            var response = await _dataAccess.AccessPoints.GetAccessPointsAccessPointPacketById(accessPointId, accessPointPacketId);
+            var response = await _unitOfWork.AccessPointRepository.GetAccessPointsAccessPointPacketById(accessPointId, accessPointPacketId);
 
             var mappedResponse = MapToDto<AccessPointPacketDetails>(response);
 
@@ -224,7 +224,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByKeyword([FromQuery] string keyword)
         {
-            var response = await _dataAccess.AccessPoints.SearchByKeyword(keyword);
+            var response = await _unitOfWork.AccessPointRepository.SearchByKeyword(keyword);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
 
@@ -235,7 +235,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByStampId(Guid accessPointStampId)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampId(accessPointStampId);
+            var response = await _unitOfWork.AccessPointRepository.MatchAccessPointByAccessPointStampId(accessPointStampId);
 
             var mappedResponse = MapToDto<AccessPointDetails>(response);
 
@@ -247,7 +247,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByStampIdFull(Guid accessPointStampId)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampIdAdministration(accessPointStampId);
+            var response = await _unitOfWork.AccessPointRepository.MatchAccessPointByAccessPointStampIdAdministration(accessPointStampId);
 
             var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
 
@@ -259,7 +259,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByPacketId(Guid accessPointPacketId)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketId(accessPointPacketId);
+            var response = await _unitOfWork.AccessPointRepository.MatchAccessPointByAccessPointPacketId(accessPointPacketId);
 
             var mappedResponse = MapToDto<AccessPointDetails>(response);
 
@@ -271,7 +271,7 @@ namespace AccessPointMap.API.Controllers
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByPacketIdFull(Guid accessPointPacketId)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketIdAdministration(accessPointPacketId);
+            var response = await _unitOfWork.AccessPointRepository.MatchAccessPointByAccessPointPacketIdAdministration(accessPointPacketId);
 
             var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
 
@@ -285,7 +285,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints
+            var response = await _unitOfWork.AccessPointRepository
                 .GetAccessPointsWithGreatestSignalRange(limit ?? _defaultLimit);
 
             var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
@@ -301,7 +301,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints
+            var response = await _unitOfWork.AccessPointRepository
                 .GetMostCommonUsedFrequency(limit ?? _defaultLimit);
 
             StoreToCache(response);
@@ -315,7 +315,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints
+            var response = await _unitOfWork.AccessPointRepository
                 .GetMostCommonUsedManufacturer(limit ?? _defaultLimit);
 
             StoreToCache(response);
@@ -329,7 +329,7 @@ namespace AccessPointMap.API.Controllers
             var cachedResponse = ResolveFromCache();
             if (cachedResponse is not null) return Ok(cachedResponse);
 
-            var response = await _dataAccess.AccessPoints
+            var response = await _unitOfWork.AccessPointRepository
                 .GetMostCommonUsedEncryptionTypes(limit ?? _defaultLimit);
 
             StoreToCache(response);
