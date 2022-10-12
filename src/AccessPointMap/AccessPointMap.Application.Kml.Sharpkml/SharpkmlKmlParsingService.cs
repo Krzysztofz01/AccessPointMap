@@ -17,7 +17,7 @@ namespace AccessPointMap.Application.Kml.Sharpkml
 {
     public class SharpkmlKmlParsingService : IKmlParsingService
     {
-        private readonly IDataAccess _dataAccess;
+        private readonly IUnitOfWork _unitOfWork;
 
         private const string _redPinUrl = "http://maps.google.com/mapfiles/ms/icons/red.png";
         private const string _yellowPinUrl = "http://maps.google.com/mapfiles/ms/icons/yellow.png";
@@ -29,10 +29,10 @@ namespace AccessPointMap.Application.Kml.Sharpkml
         private const string _pinGreen = "GREEN";
         private const string _pinBlue = "BLUE";
 
-        public SharpkmlKmlParsingService(IDataAccess dataAccess)
+        public SharpkmlKmlParsingService(IUnitOfWork unitOfWork)
         {
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
+            _unitOfWork = unitOfWork ??
+                throw new ArgumentNullException(nameof(unitOfWork));
         }
 
         public async Task<KmlResult> GenerateKml(Action<KmlGenerationOptions> options)
@@ -43,8 +43,8 @@ namespace AccessPointMap.Application.Kml.Sharpkml
                 options(kmlOptions);
 
                 var accessPoints = !kmlOptions.IncludeHiddenAccessPoints
-                    ? await _dataAccess.AccessPoints.Where(a => !a.DeletedAt.HasValue && a.DisplayStatus.Value).ToListAsync()
-                    : await _dataAccess.AccessPoints.Where(a => !a.DeletedAt.HasValue).ToListAsync();
+                    ? await _unitOfWork.AccessPointRepository.Entities.Where(a => !a.DeletedAt.HasValue && a.DisplayStatus.Value).ToListAsync()
+                    : await _unitOfWork.AccessPointRepository.Entities.Where(a => !a.DeletedAt.HasValue).ToListAsync();
 
                 var styleLookup = GenerateStyles();
 
