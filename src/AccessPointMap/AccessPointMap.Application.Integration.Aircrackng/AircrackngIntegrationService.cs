@@ -65,7 +65,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".cap")
                 throw new ArgumentNullException(nameof(cmd));
 
-            var packetMap = await PcapParsingService.MapPacketsToMacAddresses(cmd.ScanPcapFile);
+            // TODO: Pass CancellationToken to the method
+            var packetMap = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile);
 
             foreach (var map in packetMap)
             {
