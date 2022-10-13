@@ -1,5 +1,5 @@
 ﻿using AccessPointMap.Application.Extensions;
-using Ganss.XSS;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
