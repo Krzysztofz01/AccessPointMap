@@ -47,7 +47,8 @@ namespace AccessPointMap.Application.AccessPoints
 
                 foreach (var accessPoint in accessPoints)
                 {
-                    var manufacturerName = await _ouiLookupService.GetManufacturerName(accessPoint.Bssid.Value);
+                    // TODO: Pass CancellationToken to the method
+                    var manufacturerName = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid.Value);
 
                     accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
                     {

@@ -124,7 +124,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 RunIdentifier = runIdentifier
             });
 
-            var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
+            // TODO: Pass CancellationToken to the method
+            var manufacturer = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid);
 
             accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
             {
