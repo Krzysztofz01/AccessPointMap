@@ -10,6 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Dto;
 
@@ -83,9 +84,12 @@ namespace AccessPointMap.API.Controllers
         [Produces(_kmlContentType)]
         public async Task<IActionResult> GetAllInKml()
         {
-            var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = false);
+            // TODO: Pass CancellationToken to the method
+            // TODO: Implement klm specific query
+            var response = await _kmlParsingService.GenerateKmlAsync(_dataAccess.AccessPoints.Where(a => a.DisplayStatus.Value));
 
-            return MapToFile(response.FileBuffer, _kmlContentType);
+            // TODO: Null check?
+            return MapToFile(response, _kmlContentType);
         }
 
         [HttpGet("kml/full")]
@@ -93,9 +97,12 @@ namespace AccessPointMap.API.Controllers
         [Produces(_kmlContentType)]
         public async Task<IActionResult> GetAllInKmlFull()
         {
-            var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = true);
+            // TODO: Pass CancellationToken to the method
+            // TODO: Implement klm specific query
+            var response = await _kmlParsingService.GenerateKmlAsync(_dataAccess.AccessPoints);
 
-            return MapToFile(response.FileBuffer, _kmlContentType);
+            // TODO: Null check?
+            return MapToFile(response, _kmlContentType);
         }
 
         [HttpGet("run")]

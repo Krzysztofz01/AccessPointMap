@@ -1,6 +1,6 @@
 ﻿namespace AccessPointMap.Application.Pcap.ApmPcapNative
 {
-    internal class Constants
+    internal static class Constants
     {
         public const int PcapFileHeaderLength = 24;
 

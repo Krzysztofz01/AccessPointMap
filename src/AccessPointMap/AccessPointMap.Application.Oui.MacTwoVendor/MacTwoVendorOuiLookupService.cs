@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Oui.MacToVendor
 {
-    public class MacTwoVendorOuiLookupService : IOuiLookupService
+    internal sealed class MacTwoVendorOuiLookupService : IOuiLookupService
     {
         private readonly MacTwoVendorDbContext _dbContext;
 
@@ -18,7 +19,7 @@ namespace AccessPointMap.Application.Oui.MacToVendor
                 throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<IDictionary<string, string>> GetManufacturerLookupDictionary(IEnumerable<string> macAddresses)
+        public async Task<IDictionary<string, string>> GetManufacturerLookupDictionaryAsync(IEnumerable<string> macAddresses, CancellationToken cancellationToken = default)
         {
             var distinctOuiParts = macAddresses
                 .Select(a => GetOuiMacAddressPart(a))
@@ -28,18 +29,18 @@ namespace AccessPointMap.Application.Oui.MacToVendor
                 .Where(v => distinctOuiParts.Contains(v.MacAddress) && v.Visibility == 1)
                 .Select(v => new { Name = v.Name ?? string.Empty, v.MacAddress })
                 .AsNoTracking()
-                .ToDictionaryAsync(k => k.MacAddress, v => v.Name);
+                .ToDictionaryAsync(k => k.MacAddress, v => v.Name, cancellationToken);
 
             return macAddresses.ToDictionary(k => k, v => vendorsLookup[GetOuiMacAddressPart(v)]);
         }
 
-        public async Task<string> GetManufacturerName(string macAddress)
+        public async Task<string> GetManufacturerNameAsync(string macAddress, CancellationToken cancellationToken = default)
         {
             var vendor = await _dbContext.Vendors
                 .Where(v => v.MacAddress == GetOuiMacAddressPart(macAddress) && v.Visibility == 1)
                 .Select(v => v.Name)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             return (vendor is null) ? string.Empty : vendor;
         }

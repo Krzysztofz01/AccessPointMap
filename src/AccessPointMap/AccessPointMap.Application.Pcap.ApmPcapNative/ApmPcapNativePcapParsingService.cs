@@ -4,24 +4,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Pcap.ApmPcapNative
 {
-    public class ApmPcapNativePcapParsingService : IPcapParsingService
+    internal sealed class ApmPcapNativePcapParsingService : IPcapParsingService
     {
         private readonly string[] _allowedExtensions = new string[] { ".cap", ".pcap", "pcapng" };
 
-        public async Task<IDictionary<string, List<Packet>>> MapPacketsToMacAddresses(IFormFile pcapFile)
+        public async Task<IDictionary<string, List<Packet>>> MapPacketsToMacAddressesAsync(IFormFile pcapFile, CancellationToken cancellationToken = default)
         {
             ValidatePcapFile(pcapFile);
 
             using var fileMemoryStream = new MemoryStream();
-            await pcapFile.CopyToAsync(fileMemoryStream);
+            await pcapFile.CopyToAsync(fileMemoryStream, cancellationToken);
             fileMemoryStream.Seek(0, SeekOrigin.Begin); 
 
             using var pcapParser = new PcapParser(fileMemoryStream);
-            var parsedPackets = pcapParser.ParsePackets();
+            var parsedPackets = pcapParser.ParsePackets(cancellationToken);
 
             return parsedPackets
                 .GroupBy(k => k.SourceAddress)
