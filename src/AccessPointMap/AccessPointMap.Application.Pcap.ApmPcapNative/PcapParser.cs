@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace AccessPointMap.Application.Pcap.ApmPcapNative
 {
-    internal class PcapParser : IDisposable
+    internal sealed class PcapParser : IDisposable
     {
         private readonly BinaryReader _binaryReader;
 
@@ -22,7 +23,7 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
             _binaryReader = new BinaryReader(pcapFileStream);
         }
 
-        public IEnumerable<Packet> ParsePackets()
+        public IEnumerable<Packet> ParsePackets(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -31,13 +32,19 @@ namespace AccessPointMap.Application.Pcap.ApmPcapNative
                 var packets = new List<Packet>();
 
                 while (_binaryReader.BaseStream.Position < _binaryReader.BaseStream.Length)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
                     packets.Add(ParsePacket());
+                }  
 
                 return packets;
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                Console.WriteLine(ex);
+                throw;
+            }
+            catch (Exception)
+            {
                 return null;
             }
         }
