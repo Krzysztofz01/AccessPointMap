@@ -19,8 +19,6 @@ namespace AccessPointMap.Infrastructure.MySql.Extensions
 
             services.AddScoped<IAuthenticationDataAccessService, AuthenticationDataAccessService>();
 
-            services.AddScoped<IDataAccess, DataAccess>();
-
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;

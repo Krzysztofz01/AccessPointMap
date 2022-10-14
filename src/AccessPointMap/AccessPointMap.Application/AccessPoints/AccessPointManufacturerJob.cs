@@ -16,17 +16,13 @@ namespace AccessPointMap.Application.AccessPoints
         public const string JobName = "AccessPointManufacturerUpdate";
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDataAccess _dataAccess;
         private readonly IOuiLookupService _ouiLookupService;
         private readonly ILogger<AccessPointManufacturerJob> _logger;
 
-        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IDataAccess dataAccess, IOuiLookupService ouiLookupService, ILogger<AccessPointManufacturerJob> logger)
+        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IOuiLookupService ouiLookupService, ILogger<AccessPointManufacturerJob> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
-
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
 
             _ouiLookupService = ouiLookupService ??
                 throw new ArgumentNullException(nameof(ouiLookupService));
@@ -42,7 +38,7 @@ namespace AccessPointMap.Application.AccessPoints
             {
                 _logger.LogInformation($"{JobName} scheduled job started.");
 
-                var accessPoints = _dataAccess.AccessPointsTracked
+                var accessPoints = _unitOfWork.AccessPointRepository.Entities
                     .Where(a => a.Manufacturer.Value == string.Empty);
 
                 foreach (var accessPoint in accessPoints)

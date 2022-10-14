@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace AccessPointMap.Application.AccessPoints
 {
     [DisallowConcurrentExecution]
-    public class AccessPointPresenceJob : IJob
+    public sealed class AccessPointPresenceJob : IJob
     {
         public const string CronExpression = "0 0 4 ? * MON";
         public const string JobName = "AccessPointPresenceUpdate";
@@ -20,16 +20,12 @@ namespace AccessPointMap.Application.AccessPoints
         public const double _amountThresholdPercent = 80.0d;
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDataAccess _dataAccess;
         private readonly ILogger<AccessPointPresenceJob> _logger;
 
-        public AccessPointPresenceJob(IUnitOfWork unitOfWork, IDataAccess dataAccess, ILogger<AccessPointPresenceJob> logger)
+        public AccessPointPresenceJob(IUnitOfWork unitOfWork, ILogger<AccessPointPresenceJob> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
-
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
 
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
@@ -41,7 +37,7 @@ namespace AccessPointMap.Application.AccessPoints
             {
                 _logger.LogInformation($"{JobName} scheduled job started.");
 
-                var accessPointsTracked = await _dataAccess.AccessPointsTracked
+                var accessPointsTracked = await _unitOfWork.AccessPointRepository.Entities
                     .Include(a => a.Stamps)
                     .Where(a => !a.DeletedAt.HasValue)
                     .ToListAsync();
