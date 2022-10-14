@@ -185,7 +185,8 @@ namespace AccessPointMap.Application.AccessPoints
 
         private async Task<string> ResolveManufacturer(string bssid)
         {
-            return await _ouiLookupService.GetManufacturerName(bssid);
+            // TODO: Pass CancellationToken to the method
+            return await _ouiLookupService.GetManufacturerNameAsync(bssid);
         }
     }
 }
