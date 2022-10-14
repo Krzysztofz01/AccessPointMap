@@ -1,24 +1,20 @@
 ﻿using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Domain.AccessPoints;
-using AccessPointMap.Infrastructure.Core.Abstraction;
-using Microsoft.EntityFrameworkCore;
 using SharpKml.Base;
 using SharpKml.Dom;
 using SharpKml.Engine;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Kml.Sharpkml
 {
-    public class SharpkmlKmlParsingService : IKmlParsingService
+    internal sealed class SharpkmlKmlParsingService : IKmlParsingService
     {
-        private readonly IDataAccess _dataAccess;
-
         private const string _redPinUrl = "http://maps.google.com/mapfiles/ms/icons/red.png";
         private const string _yellowPinUrl = "http://maps.google.com/mapfiles/ms/icons/yellow.png";
         private const string _greenPinUrl = "http://maps.google.com/mapfiles/ms/icons/green.png";
@@ -29,30 +25,17 @@ namespace AccessPointMap.Application.Kml.Sharpkml
         private const string _pinGreen = "GREEN";
         private const string _pinBlue = "BLUE";
 
-        public SharpkmlKmlParsingService(IDataAccess dataAccess)
-        {
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
-        }
+        public SharpkmlKmlParsingService() { }
 
-        public async Task<KmlResult> GenerateKml(Action<KmlGenerationOptions> options)
+        public Task<KmlResult> GenerateKmlAsync(IEnumerable<AccessPoint> accessPoints, CancellationToken cancellationToken = default)
         {
             try
             {
-                var kmlOptions = new KmlGenerationOptions();
-                options(kmlOptions);
-
-                var accessPoints = !kmlOptions.IncludeHiddenAccessPoints
-                    ? await _dataAccess.AccessPoints.Where(a => !a.DeletedAt.HasValue && a.DisplayStatus.Value).ToListAsync()
-                    : await _dataAccess.AccessPoints.Where(a => !a.DeletedAt.HasValue).ToListAsync();
-
-                var styleLookup = GenerateStyles();
-
-                var accessPointsFolder = GenerateAccessPointPlacemarksFolder(accessPoints);
+                var accessPointsFolder = GenerateAccessPointPlacemarksFolder(accessPoints, cancellationToken);
 
                 var document = new Document();
 
-                foreach (var style in styleLookup) document.AddStyle(style);
+                foreach (var style in GenerateStyles()) document.AddStyle(style);
 
                 document.AddFeature(accessPointsFolder);
 
@@ -65,10 +48,14 @@ namespace AccessPointMap.Application.Kml.Sharpkml
                 using var memoryFileStream = new MemoryStream();
                 kml.Save(memoryFileStream);
 
-                return new KmlResult
+                return Task.FromResult(new KmlResult
                 {
                     FileBuffer = memoryFileStream.ToArray()
-                };
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -76,15 +63,25 @@ namespace AccessPointMap.Application.Kml.Sharpkml
             }
         }
 
-        private static Folder GenerateAccessPointPlacemarksFolder(IEnumerable<AccessPoint> accessPoints)
+        private static Folder GenerateAccessPointPlacemarksFolder(IEnumerable<AccessPoint> accessPoints, CancellationToken cancellationToken = default)
         {
             var folder = new Folder
             {
-                Name = "Access points"
+                Name = "Access points",
+                Description = new Description
+                {
+                    Text = "Access points collection exported from the AccessPointMap server."
+                }
             };
 
             foreach (var accessPoint in accessPoints)
-                folder.AddFeature(GetPlacemarkFromAccessPoint(accessPoint));
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var accessPointPlacemark = GetPlacemarkFromAccessPoint(accessPoint);
+
+                folder.AddFeature(accessPointPlacemark);
+            }
 
             return folder;
         }
