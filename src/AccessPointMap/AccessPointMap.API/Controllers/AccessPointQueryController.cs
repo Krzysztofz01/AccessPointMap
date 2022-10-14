@@ -84,9 +84,11 @@ namespace AccessPointMap.API.Controllers
         [Produces(_kmlContentType)]
         public async Task<IActionResult> GetAllInKml()
         {
-            // TODO: Pass CancellationToken to the method
             // TODO: Implement klm specific query
-            var response = await _kmlParsingService.GenerateKmlAsync(_dataAccess.AccessPoints.Where(a => a.DisplayStatus.Value));
+            var accessPoints = _unitOfWork.AccessPointRepository.Entities.Where(a => a.DisplayStatus.Value);
+
+            // TODO: Pass CancellationToken to the method
+            var response = await _kmlParsingService.GenerateKmlAsync(accessPoints);
 
             // TODO: Null check?
             return MapToFile(response, _kmlContentType);
@@ -97,9 +99,11 @@ namespace AccessPointMap.API.Controllers
         [Produces(_kmlContentType)]
         public async Task<IActionResult> GetAllInKmlFull()
         {
-            // TODO: Pass CancellationToken to the method
             // TODO: Implement klm specific query
-            var response = await _kmlParsingService.GenerateKmlAsync(_dataAccess.AccessPoints);
+            var accessPoints = _unitOfWork.AccessPointRepository.Entities;
+
+            // TODO: Pass CancellationToken to the method
+            var response = await _kmlParsingService.GenerateKmlAsync(accessPoints);
 
             // TODO: Null check?
             return MapToFile(response, _kmlContentType);
