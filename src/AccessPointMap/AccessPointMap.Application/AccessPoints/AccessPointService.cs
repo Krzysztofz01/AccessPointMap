@@ -59,7 +59,8 @@ namespace AccessPointMap.Application.AccessPoints
 
         private async Task Apply(Guid id, IEventBase @event)
         {
-            var accessPoint = await _unitOfWork.AccessPointRepository.Get(id);
+            // TODO: Pass the CancellationToken to the repository method
+            var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id);
 
             _logger.LogDomainEvent(@event);
 
@@ -72,7 +73,8 @@ namespace AccessPointMap.Application.AccessPoints
         {
             foreach (var id in ids)
             {
-                var accessPoint = await _unitOfWork.AccessPointRepository.Get(id);
+                // TODO: Pass the CancellationToken to the repository method
+                var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id);
 
                 var @event = new AccessPointDeleted
                 {
@@ -91,7 +93,8 @@ namespace AccessPointMap.Application.AccessPoints
         {
             foreach (var id in ids)
             {
-                var accessPoint = await _unitOfWork.AccessPointRepository.Get(id);
+                // TODO: Pass the CancellationToken to the repository method
+                var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id);
 
                 var @event = new AccessPointDisplayStatusChanged
                 {
@@ -116,9 +119,11 @@ namespace AccessPointMap.Application.AccessPoints
             foreach (var ap in command.AccessPoints)
             {
                 //If bssid does not exist create aggregate, otherwise a new stamp in existing aggregate
-                if (await _unitOfWork.AccessPointRepository.Exists(ap.Bssid))
+                // TODO: Pass the CancellationToken to the repository method
+                if (await _unitOfWork.AccessPointRepository.ExistsAsync(ap.Bssid))
                 {
-                    var accessPoint = await _unitOfWork.AccessPointRepository.Get(ap.Bssid);
+                    // TODO: Pass the CancellationToken to the repository method
+                    var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(ap.Bssid);
 
                     var accessPointStampCreateEvent = new AccessPointStampCreated
                     {
@@ -176,7 +181,8 @@ namespace AccessPointMap.Application.AccessPoints
 
                     accessPoint.Apply(accessPointManufacturerChangedEvent);
 
-                    await _unitOfWork.AccessPointRepository.Add(accessPoint);
+                    // TODO: Pass the CancellationToken to the repository method
+                    await _unitOfWork.AccessPointRepository.AddAsync(accessPoint);
 
                     await _unitOfWork.Commit();
                 }

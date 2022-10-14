@@ -93,7 +93,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
                 foreach (var record in runGroup.Value)
                 {
-                    if (await UnitOfWork.AccessPointRepository.Exists(record.Bssid))
+                    // TODO: Pass the CancellationToken to the repository method
+                    if (await UnitOfWork.AccessPointRepository.ExistsAsync(record.Bssid))
                     {
                         await CreateAccessPointStamp(record, runIdentifier);
                         continue;
@@ -141,12 +142,14 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 Content = SerializeRawAccessPointRecord(record)
             });
 
-            await UnitOfWork.AccessPointRepository.Add(accessPoint);
+            // TODO: Pass the CancellationToken to the repository method
+            await UnitOfWork.AccessPointRepository.AddAsync(accessPoint);
         }
 
         private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
         {
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Bssid);
+            // TODO: Pass the CancellationToken to the repository method
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Bssid);
 
             accessPoint.Apply(new Events.V1.AccessPointStampCreated
             {
@@ -175,9 +178,11 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets)
         {
-            if (!await UnitOfWork.AccessPointRepository.Exists(bssid)) return;
-            
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(bssid);
+            // TODO: Pass the CancellationToken to the repository method
+            if (!await UnitOfWork.AccessPointRepository.ExistsAsync(bssid)) return;
+
+            // TODO: Pass the CancellationToken to the repository method
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(bssid);
 
             foreach (var packet in packets)
             {

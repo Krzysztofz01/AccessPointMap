@@ -1,14 +1,12 @@
-﻿using System;
+﻿using AccessPointMap.Domain.Core.Contracts;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Domain.AccessPoints
 {
-    public interface IAccessPointRepository
+    public interface IAccessPointRepository : IRepository<AccessPoint>
     {
-        Task Add(AccessPoint accessPoint);
-        Task<AccessPoint> Get(Guid id);
-        Task<AccessPoint> Get(string bssid);
-        Task<bool> Exists(Guid id);
-        Task<bool> Exists(string bssid);
+        Task<AccessPoint> GetAsync(string bssid, CancellationToken cancellationToken = default);
+        Task<bool> ExistsAsync(string bssid, CancellationToken cancellationToken = default);
     }
 }

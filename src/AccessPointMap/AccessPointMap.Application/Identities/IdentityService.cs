@@ -41,7 +41,8 @@ namespace AccessPointMap.Application.Identities
 
         private async Task Apply(Guid id, IEventBase @event)
         {
-            var identity = await _unitOfWork.IdentityRepository.Get(id);
+            // TODO: Pass the CancellationToken to the repository method
+            var identity = await _unitOfWork.IdentityRepository.GetAsync(id);
 
             _logger.LogDomainEvent(@event);
 

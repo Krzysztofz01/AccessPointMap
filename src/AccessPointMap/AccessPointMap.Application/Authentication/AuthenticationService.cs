@@ -76,7 +76,8 @@ namespace AccessPointMap.Application.Authentication
 
         public async Task Logout(Requests.V1.Logout request)
         {
-            var identity = await _unitOfWork.IdentityRepository.Get(_scopeWrapperService.GetUserId());
+            // TODO: Pass the CancellationToken to the repository method
+            var identity = await _unitOfWork.IdentityRepository.GetAsync(_scopeWrapperService.GetUserId());
 
             string refreshTokenHash = _authenticationWrapperService.HashString(request.RefreshToken);
 
@@ -92,7 +93,8 @@ namespace AccessPointMap.Application.Authentication
 
         public async Task PasswordReset(Requests.V1.PasswordReset request)
         {
-            var identity = await _unitOfWork.IdentityRepository.Get(_scopeWrapperService.GetUserId());
+            // TODO: Pass the CancellationToken to the repository method
+            var identity = await _unitOfWork.IdentityRepository.GetAsync(_scopeWrapperService.GetUserId());
 
             if (!_authenticationWrapperService.ValidatePasswords(request.Password, request.PasswordRepeat))
                 throw new InvalidOperationException("Invalid authentication credentials");
@@ -174,7 +176,8 @@ namespace AccessPointMap.Application.Authentication
                 });
             }
 
-            await _unitOfWork.IdentityRepository.Add(identity);
+            // TODO: Pass the CancellationToken to the repository method
+            await _unitOfWork.IdentityRepository.AddAsync(identity);
 
             await _unitOfWork.Commit();
         }

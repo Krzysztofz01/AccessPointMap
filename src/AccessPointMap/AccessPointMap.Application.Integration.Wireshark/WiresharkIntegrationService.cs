@@ -70,9 +70,11 @@ namespace AccessPointMap.Application.Integration.Wireshark
 
         private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets)
         {
-            if (!await UnitOfWork.AccessPointRepository.Exists(bssid)) return;
+            // TODO: Pass the CancellationToken to the repository method
+            if (!await UnitOfWork.AccessPointRepository.ExistsAsync(bssid)) return;
 
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(bssid);
+            // TODO: Pass the CancellationToken to the repository method
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(bssid);
 
             foreach (var packet in packets)
             {

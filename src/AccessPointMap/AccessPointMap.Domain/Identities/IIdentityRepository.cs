@@ -1,12 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using AccessPointMap.Domain.Core.Contracts;
 
 namespace AccessPointMap.Domain.Identities
 {
-    public interface IIdentityRepository
+    public interface IIdentityRepository : IRepository<Identity>
     {
-        Task Add(Identity identity);
-        Task<Identity> Get(Guid id);
-        Task<bool> Exists(Guid id);
     }
 }
