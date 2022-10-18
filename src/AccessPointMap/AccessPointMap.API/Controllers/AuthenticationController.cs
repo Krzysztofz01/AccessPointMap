@@ -45,7 +45,12 @@ namespace AccessPointMap.API.Controllers
         {
             _logger.LogAuthenticationRequest(request, Request.GetIpAddressString());
 
-            return Ok(await _authenticationService.Refresh(request));
+            var result = await _authenticationService.Refresh(request);
+
+            // TODO: Result object will allow for better handling of such situations...
+            return (result is not null)
+                ? Ok(result)
+                : Forbid();
         }
 
         [HttpPost("logout")]
