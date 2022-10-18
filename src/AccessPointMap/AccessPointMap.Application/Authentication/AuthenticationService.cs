@@ -46,7 +46,9 @@ namespace AccessPointMap.Application.Authentication
 
         public async Task<Responses.V1.Login> Login(Requests.V1.Login request)
         {
-            var identity = await _authenticationDataAccessService.GetUserByEmail(request.Email);
+            // TODO: Pass CancellationToken to the method
+            var identity = await _authenticationDataAccessService.GetUserOrDefaultByEmailAsync(request.Email) ??
+                throw new InvalidOperationException("Invalid authentication credentials.");
 
             if (!_authenticationWrapperService.VerifyPasswordHashes(request.Password, identity.PasswordHash))
                 throw new InvalidOperationException("Invalid authentication credentials.");
@@ -117,8 +119,11 @@ namespace AccessPointMap.Application.Authentication
 
             var refreshTokenHash = _authenticationWrapperService.HashString(request.RefreshToken);
 
-            var identity = await _authenticationDataAccessService.GetUserByRefreshToken(refreshTokenHash);
-
+            // TODO: Pass CancellationToken to the method
+            var identity = await _authenticationDataAccessService.GetUserOrDefaultByActiveRefreshTokenAsync(refreshTokenHash);
+            // TODO: This is a dirty work-around. Use the result object later.
+            if (identity is null) return null;
+        
             var bearerToken = _authenticationWrapperService.GenerateJsonWebToken(identity);
 
             var replacementToken = _authenticationWrapperService.GenerateRefreshToken();
@@ -145,7 +150,8 @@ namespace AccessPointMap.Application.Authentication
 
         public async Task Register(Requests.V1.Register request)
         {
-            if (await _authenticationDataAccessService.UserWithEmailExsits(request.Email))
+            // TODO: Pass CancellationToken to the method
+            if (await _authenticationDataAccessService.AnyUserWithEmailExsitsAsync(request.Email))
                 throw new InvalidOperationException("Invalid authentication credentials");
 
             if (!_authenticationWrapperService.ValidatePasswords(request.Password, request.PasswordRepeat))
@@ -161,7 +167,8 @@ namespace AccessPointMap.Application.Authentication
                 PasswordHash = passwordHash
             });
 
-            if (_authorizationSettings.PromoteFirstAccount && !await _authenticationDataAccessService.AnyUsersExists())
+            // TODO: Pass CancellationToken to the method
+            if (_authorizationSettings.PromoteFirstAccount && !await _authenticationDataAccessService.AnyUserExistsAsync())
             {
                 identity.Apply(new Events.V1.IdentityActivationChanged
                 {
