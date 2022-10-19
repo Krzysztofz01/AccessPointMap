@@ -260,43 +260,80 @@ namespace AccessPointMap.Application.AccessPoints
 
         public static async Task<IEnumerable<AccessPoint>> GetAccessPointsWithGreatestSignalRange(this IAccessPointRepository accessPointRepository, int limit)
         {
-            return await accessPointRepository.Entities
+            var greatestSignalRangeQuery = accessPointRepository.Entities
                 .Where(x => x.DisplayStatus.Value)
                 .OrderByDescending(a => a.Positioning.SignalArea)
-                .Take(limit)
-                .AsNoTracking()
-                .ToListAsync();
+                .AsNoTracking();
+
+            return (limit == default)
+                ? await greatestSignalRangeQuery.ToListAsync()
+                : await greatestSignalRangeQuery.Take(limit).ToListAsync();
         }
 
         public static async Task<IEnumerable<object>> GetMostCommonUsedFrequency(this IAccessPointRepository accessPointRepository, int limit)
         {
-            return await accessPointRepository.Entities
+            // TODO: This query can return frequency as strings in the future to avoid "0 as other" hacking
+            // const string _other = "Other";
+            const double _other = 0;
+
+            var mostCommonFrequencyQuery = accessPointRepository.Entities
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.Frequency.Value != default)
                 .GroupBy(a => a.Frequency.Value)
                 .OrderByDescending(a => a.Count())
-                .Take(limit)
                 .Select(a => new { Frequency = a.Key, Count = a.Count() })
-                .AsNoTracking()
-                .ToListAsync();
+                .OrderByDescending(a => a.Count)
+                .AsNoTracking();
+
+            if (limit == default)
+            {
+                return await mostCommonFrequencyQuery
+                    .ToListAsync();
+            }
+            else if (limit == 1)
+            {
+                return await mostCommonFrequencyQuery
+                    .Take(1)
+                    .ToListAsync();
+            }
+            else
+            {
+                var frequenciesAboveLimit = await mostCommonFrequencyQuery
+                    .Take(limit - 1)
+                    .ToListAsync();
+
+                var frequenciesUnderLimit = await mostCommonFrequencyQuery
+                    .Skip(limit - 1)
+                    .SumAsync(a => a.Count);
+
+                if (frequenciesUnderLimit > 0)
+                {
+                    frequenciesAboveLimit.Add(new { Frequency = _other, Count = frequenciesUnderLimit });
+                }
+
+                return frequenciesAboveLimit;
+            }
         }
 
         public static async Task<IEnumerable<object>> GetMostCommonUsedManufacturer(this IAccessPointRepository accessPointRepository, int limit)
         {
-            return await accessPointRepository.Entities
+            var mostCommonManufacturerQuery = accessPointRepository.Entities
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => !string.IsNullOrEmpty(a.Manufacturer.Value))
                 .GroupBy(a => a.Manufacturer.Value)
                 .OrderByDescending(a => a.Count())
-                .Take(limit)
                 .Select(a => new { Manufacturer = a.Key, Count = a.Count() })
-                .AsNoTracking()
-                .ToListAsync();
+                .AsNoTracking();
+
+            return (limit == default)
+                ? await mostCommonManufacturerQuery.ToListAsync()
+                : await mostCommonManufacturerQuery.Take(limit).ToListAsync();
         }
 
         public static async Task<IEnumerable<object>> GetMostCommonUsedEncryptionTypes(this IAccessPointRepository accessPointRepository, int limit)
         {
             const string _none = "None";
+            const string _other = "Other";
 
             var encryptionCountMap = Constants.SecurityProtocols
                 .Where(e => e.Value.Type == SecurityProtocolType.Framework)
@@ -319,9 +356,35 @@ namespace AccessPointMap.Application.AccessPoints
                 if (encryption is not null) encryptionCountMap[encryption]++;
             }
 
-            return (limit == default)
-                ? encryptionCountMap.Select(e => new { Encryption = e.Key, Count = e.Value }).OrderByDescending(e => e.Count)
-                : encryptionCountMap.Select(e => new { Encryption = e.Key, Count = e.Value }).OrderByDescending(e => e.Count).Take(limit);                
+            var sortedEncryptionCountMap = encryptionCountMap
+                .Select(e => new { Encryption = e.Key, Count = e.Value })
+                .OrderByDescending(e => e.Count);
+
+            if (limit == default)
+            {
+                return sortedEncryptionCountMap;
+            }
+            else if (limit == 1)
+            {
+                return sortedEncryptionCountMap
+                    .Take(1);
+            }
+            else
+            {
+                var encryptionsAboveLimit = sortedEncryptionCountMap
+                    .Take(limit - 1).ToList();
+
+                var encryptionsUnderLimitCount = sortedEncryptionCountMap
+                    .Skip(limit - 1)
+                    .Sum(e => e.Count);
+
+                if (encryptionsUnderLimitCount > 0)
+                {
+                    encryptionsAboveLimit.Add(new { Encryption = _other, Count = encryptionsUnderLimitCount });
+                }
+
+                return encryptionsAboveLimit;
+            }            
         }
 
         private static class Helpers
