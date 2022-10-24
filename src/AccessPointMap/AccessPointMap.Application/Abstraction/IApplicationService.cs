@@ -6,6 +6,6 @@ namespace AccessPointMap.Application.Abstraction
 {
     public interface IApplicationService<TAggregateRoot> where TAggregateRoot : AggregateRoot
     {
-        public Task<Result> HandleAsync(IApplicationCommand<TAggregateRoot> command, CancellationToken cancellationToken = default)
+        public Task<Result> HandleAsync(IApplicationCommand<TAggregateRoot> command, CancellationToken cancellationToken = default);
     }
 }
