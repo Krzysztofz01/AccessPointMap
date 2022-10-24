@@ -1,10 +1,8 @@
 ﻿using AccessPointMap.Domain.Identities;
-using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Abstraction
 {
-    public interface IIdentityService
+    public interface IIdentityService : IApplicationService<Identity>
     {
-        Task Handle(IApplicationCommand<Identity> command);
     }
 }
