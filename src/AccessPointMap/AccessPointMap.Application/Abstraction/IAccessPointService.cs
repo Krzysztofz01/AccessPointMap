@@ -1,10 +1,8 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
-using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Abstraction
 {
-    public interface IAccessPointService
+    public interface IAccessPointService : IApplicationService<AccessPoint>
     {
-        Task Handle(IApplicationCommand<AccessPoint> command);
     }
 }
