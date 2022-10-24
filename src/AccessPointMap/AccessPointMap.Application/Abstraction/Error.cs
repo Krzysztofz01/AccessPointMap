@@ -6,7 +6,7 @@ namespace AccessPointMap.Application.Abstraction
     {
         public string Message { get; protected init; }
 
-        private Error() { }
+        protected Error() { }
 
         protected Error(string message)
         {
