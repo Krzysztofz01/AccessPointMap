@@ -5,32 +5,65 @@ namespace AccessPointMap.Application.Abstraction
     public class Result
     {
         public bool IsSuccess { get; protected init; }
-        public string Message { get; protected init; }
         public bool IsFailure => !IsSuccess;
 
-        protected internal Result(bool isSuccess, string message = null)
-        {
-            IsSuccess = isSuccess;
+        protected readonly string _message;
+        public string Message => IsFailure
+            ? throw new InvalidOperationException("Can not retrieve the message from a failure result.")
+            : _message;
 
-            Message = string.IsNullOrWhiteSpace(message)
-                ? string.Empty : message;
+        protected readonly Error _error;
+        public Error Error => IsSuccess
+            ? throw new InvalidOperationException("Can not retrieve the error instanve from a success result.")
+            : _error;
+
+        protected internal Result(string message)
+        {
+            _message = string.IsNullOrWhiteSpace(message)
+                ? string.Empty : message.Trim();
+
+            IsSuccess = true;
+
+            _error = null;
         }
 
-        public static Result Success() => new(true, null);
-        public static Result Success(string message) => new(true, message);
-        public static Result<TValue> Success<TValue>(TValue value) where TValue : class => new(value, true, null);
+        protected internal Result(Error error, string message)
+        {
+            _message = string.IsNullOrWhiteSpace(message)
+                ? string.Empty : message.Trim();
 
-        public static Result Failure() => new(false, null);
-        public static Result Failure(string message) => new(false, message);
-        public static Result<TValue> Failure<TValue>(TValue value) where TValue : class => new(value, false, null);
-        public static Result<TValue> Failure<TValue>(TValue value, string message) where TValue : class => new(value, false, message);
+            if (error is null)
+            {
+                IsSuccess = true;
+                _error = null;
+            }
+            else
+            {
+                IsSuccess = false;
+                _error = error;
+            }
+        }
+
+        public static Result Success() => new(string.Empty);
+        public static Result Success(string message) => new(message);
+        public static Result<TValue> Success<TValue>(TValue value) where TValue : class => new(value, null);
+
+        public static Result Failure() => new(Error.Default, null);
+        public static Result Failure(Error error) => new(error, string.Empty);
+        public static Result<TValue> Failure<TValue>() where TValue : class => new(null, Error.Default, string.Empty);
+        public static Result<TValue> Failure<TValue>(Error error) where TValue : class => new(null, error, string.Empty);
     }
 
     public class Result<TValue> : Result where TValue : class
     {
         private readonly TValue _value;
 
-        protected internal Result(TValue value, bool isSuccess, string message = null) : base(isSuccess, message)
+        protected internal Result(TValue value, string message) : base(message)
+        {
+            _value = value;
+        }
+
+        protected internal Result(TValue value, Error error, string message) : base(error, message)
         {
             _value = value;
         }
@@ -40,6 +73,6 @@ namespace AccessPointMap.Application.Abstraction
             : _value;
 
         public static implicit operator TValue(Result<TValue> result) => result.Value;
-        public static implicit operator Result<TValue>(TValue value) => new(value, true, null);
+        public static implicit operator Result<TValue>(TValue value) => new(value, null, string.Empty);
     }
 }
