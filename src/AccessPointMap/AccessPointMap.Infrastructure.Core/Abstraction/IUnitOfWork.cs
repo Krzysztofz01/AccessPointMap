@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Identities;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Infrastructure.Core.Abstraction
@@ -9,6 +10,6 @@ namespace AccessPointMap.Infrastructure.Core.Abstraction
         IIdentityRepository IdentityRepository { get; }
         IAccessPointRepository AccessPointRepository { get; }
 
-        Task Commit();
+        Task Commit(CancellationToken cancellationToken = default);
     }
 }
