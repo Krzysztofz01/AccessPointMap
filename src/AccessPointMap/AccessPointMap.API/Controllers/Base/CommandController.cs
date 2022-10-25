@@ -5,10 +5,12 @@ using AccessPointMap.Application.Logging;
 using AccessPointMap.Domain.Core.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,24 +33,29 @@ namespace AccessPointMap.API.Controllers.Base
 
         protected async Task<IActionResult> ExecuteCommandAsync<TAggregateRoot>(IApplicationCommand<TAggregateRoot> command, IApplicationService<TAggregateRoot> handlerService, CancellationToken cancellationToken = default) where TAggregateRoot : AggregateRoot
         {
-            _logger.LogCommandController(command, Request.GetIpAddressString());
+            LogCurrentScope(command);
 
             var result = await handlerService.HandleAsync(command, cancellationToken);
 
-            // TODO: Pass error messages.
-            return result.IsSuccess
-                ? new OkResult()
-                : new BadRequestResult();
+            if (result.IsFailure) return GetFailureResponse(result.Error);
+            
+            return new OkResult();
         }
 
-        [Obsolete("Use the overload with the CancellationToken")]
-        protected async Task<IActionResult> Command<TAggregateRoot>(IApplicationCommand<TAggregateRoot> command, Func<IApplicationCommand<TAggregateRoot>, Task> serviceHandler) where TAggregateRoot : AggregateRoot
+        private void LogCurrentScope<TAggregateRoot>(IApplicationCommand<TAggregateRoot> command) where TAggregateRoot : AggregateRoot
         {
-            _logger.LogCommandController(command, Request.GetIpAddressString());
+            string currentPath = Request.GetEncodedPathAndQuery() ?? string.Empty;
+            string currentHost = Request.GetIpAddressString() ?? string.Empty;
+            string currentIdentityId = Request.HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                "Anonymous";
 
-            await serviceHandler(command);
+            _logger.LogCommandController(command, currentPath, currentIdentityId, currentHost);
+        }
 
-            return new OkResult();
+        private static IActionResult GetFailureResponse(Error error)
+        {
+            // TODO: Pass error message
+            return new BadRequestResult();
         }
 
         [Obsolete("Use the overload with the CancellationToken")]
