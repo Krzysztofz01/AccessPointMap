@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
@@ -47,7 +48,7 @@ namespace AccessPointMap.API.Controllers.Base
                 throw new ArgumentNullException(nameof(logger));
         }
 
-        protected async Task<IActionResult> HandleQueryResult(Task<Result<object>> queryResultTask, bool useCaching, CancellationToken cancellationToken = default)
+        protected async Task<IActionResult> HandleQueryResult<T>(Task<Result<T>> queryResultTask, bool useCaching, CancellationToken cancellationToken = default) where T : class
         {
             if (useCaching)
             {
@@ -80,7 +81,7 @@ namespace AccessPointMap.API.Controllers.Base
             return new OkObjectResult(result.Value);
         }
 
-        protected async Task<IActionResult> HandleQueryResult(Task<Result<object>> queryResultTask, bool useCaching, Type mappingType, CancellationToken cancellationToken = default)
+        protected async Task<IActionResult> HandleQueryResult<T>(Task<Result<T>> queryResultTask, bool useCaching, Type mappingType, CancellationToken cancellationToken = default) where T : class
         {
             if (useCaching)
             {
@@ -115,7 +116,7 @@ namespace AccessPointMap.API.Controllers.Base
             return new OkObjectResult(mappedResultValue);
         }
 
-        protected async Task<IActionResult> HandleFileResult(Task<Result<object>> fileResultTask, bool useCaching, string mimeType, CancellationToken cancellationToken = default)
+        protected async Task<IActionResult> HandleFileResult(byte[] fileBuffer, bool useCaching, string mimeType, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(mimeType.Trim()))
                 throw new ArgumentException("Invalid mime type specified.", nameof(mimeType));
@@ -126,36 +127,26 @@ namespace AccessPointMap.API.Controllers.Base
             {
                 if (_memoryCache.TryGetValue(GetCacheEntryKey(false), out object cachedFileBuffer))
                 {
-                    return File((byte[])cachedFileBuffer, mimeType);
+                    return await Task.FromResult(File((byte[])cachedFileBuffer, mimeType));
                 }
-            }
 
-            var result = await fileResultTask;
-
-            // TODO: Pass error message
-            if (result.IsFailure)
-            {
-                if (result.Error is NotFoundError)
-                    return new NotFoundResult();
-
-                return new BadRequestResult();
-            }
-
-            if (result.Value is not byte[])
-                throw new InvalidOperationException("File results should be used internal as byte buffers.");
-
-            if (useCaching)
-            {
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(DateTime.Now.AddMinutes(15))
                     .SetSlidingExpiration(TimeSpan.FromMinutes(2))
                     .SetPriority(CacheItemPriority.High);
 
                 cancellationToken.ThrowIfCancellationRequested();
-                _memoryCache.Set(GetCacheEntryKey(false), (byte[])result.Value, cacheOptions);
+                _memoryCache.Set(GetCacheEntryKey(false), fileBuffer, cacheOptions);
             }
 
-            return File((byte[])result.Value, mimeType);
+            return await Task.FromResult(File(fileBuffer, mimeType));
+        }
+
+        protected int NormalizePaginationLimit(int? limit)
+        {
+            if (!limit.HasValue) return default;
+
+            return Math.Max(limit.Value, default);
         }
 
         private string GetCacheEntryKey(bool retrieveMapped)
