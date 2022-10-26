@@ -87,11 +87,11 @@ namespace AccessPointMap.Application.Integration.Wigle
             }
             catch (DomainException ex)
             {
-                return Result.Failure(IntegrationError.FromDomainException(ex));
+                return Result.Failure<object>(IntegrationError.FromDomainException(ex));
             }
             catch (IntegrationException ex)
             {
-                return Result.Failure(IntegrationError.FromIntegrationException(ex));
+                return Result.Failure<object>(IntegrationError.FromIntegrationException(ex));
             }
             catch (TaskCanceledException)
             {
@@ -189,23 +189,24 @@ namespace AccessPointMap.Application.Integration.Wigle
             var records = accessPoints
                 .Select(a => AccessPointToRecord(a));
 
-            using var stream = new MemoryStream();
-            using var writer = new StreamWriter(stream, Encoding.UTF8);
-
-            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-
-            foreach (var field in _csvPreheader.Split(','))
+            using (var memoryStream = new MemoryStream())
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+                using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
+                {
+                    foreach (var preheaderField in _csvPreheader.Split(','))
+                    {
+                        csvWriter.WriteField(preheaderField);
+                    }
 
-                csv.WriteField(field);
+                    await csvWriter.NextRecordAsync();
+
+                    await csvWriter.WriteRecordsAsync(records);
+                }
+
+                var exportFile = ExportFile.FromBuffer(memoryStream.ToArray());
+                return Result.Success<object>(exportFile);
             }
-
-            await csv.NextRecordAsync();
-
-            await csv.WriteRecordsAsync(records, cancellationToken);
-
-            return Result.Success(stream.ToArray());
         }
 
         private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
