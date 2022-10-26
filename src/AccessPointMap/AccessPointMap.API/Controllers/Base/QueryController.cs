@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -151,21 +150,6 @@ namespace AccessPointMap.API.Controllers.Base
                 "Anonymous";
 
             _logger.LogQueryController(currentPath, currentIdentityId, currentHost);
-        }
-
-        [Obsolete("Use the overload with the CancellationToken")]
-        protected FileStreamResult MapToFile(Stream fileStream, string mimeType)
-        {
-            if (fileStream is null || string.IsNullOrEmpty(mimeType)) return null;
-
-            Response.ContentType = new MediaTypeHeaderValue(mimeType).ToString();
-            return File(fileStream, mimeType);
-        }
-
-        [Obsolete("Use the overload with the CancellationToken")]
-        protected FileStreamResult MapToFile(byte[] fileBuffer, string mimeType)
-        {
-            return MapToFile(new MemoryStream(fileBuffer), mimeType);
         }
     }
 }
