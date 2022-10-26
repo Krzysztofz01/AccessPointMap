@@ -1,6 +1,5 @@
 ﻿using AccessPointMap.Application.Abstraction;
 using AccessPointMap.Application.Authentication;
-using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Domain.Core.Events;
 using Microsoft.Extensions.Logging;
 using System;
@@ -131,90 +130,6 @@ namespace AccessPointMap.Application.Logging
                     identityId,
                     hostAddress);
             }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        [Obsolete]
-        private static void LogCommandControllerInformation(this ILogger logger, IIntegrationCommand command, string ipAddress)
-        {
-            const string message = "Command controller integration command: {CommandName} received from: {IpAddress}.";
-            logger.LogInformation(message, command.GetType().Name, ipAddress);
-        }
-
-        [Obsolete]
-        private static void LogCommandControllerDebug(this ILogger logger, IIntegrationCommand command, string ipAddress)
-        {
-            var values = new StringBuilder(string.Empty);
-            foreach (var prop in command.GetType().GetProperties())
-            {
-                values.Append(prop.Name);
-                values.Append('=');
-                values.Append(prop.GetValue(command, null));
-                values.Append(';');
-            }
-
-            const string message = "Command controller integration command: {CommandName} received from: {IpAddress}. Command properties: {CommandPropertyDump}";
-            logger.LogDebug(message, command.GetType().Name, ipAddress, values.ToString());
-        }
-
-        [Obsolete]
-        public static void LogCommandController(this ILogger logger, IIntegrationCommand command, string ipAddress)
-        {
-            if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
-            {
-                logger.LogCommandControllerDebug(command, ipAddress);
-                return;
-            }
-
-            logger.LogCommandControllerInformation(command, ipAddress);
-        }
-
-        [Obsolete]
-        public static void LogCommandController(this ILogger logger, object request, string ipAddress)
-        {
-            if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
-            {
-                logger.LogCommandControllerDebug(request, ipAddress);
-                return;
-            }
-
-            logger.LogCommandControllerInformation(request, ipAddress);
-        }
-
-        [Obsolete]
-        private static void LogCommandControllerInformation(this ILogger logger, object request, string ipAddress)
-        {
-            const string message = "Command controller request: {Request} for service execution received from: {IpAddress}.";
-            logger.LogInformation(message, request.GetType().Name, ipAddress);
-        }
-
-        [Obsolete]
-        private static void LogCommandControllerDebug(this ILogger logger, object request, string ipAddress)
-        {
-            var values = new StringBuilder(string.Empty);
-            foreach (var prop in request.GetType().GetProperties())
-            {
-                values.Append(prop.Name);
-                values.Append('=');
-                values.Append(prop.GetValue(request, null));
-                values.Append(';');
-            }
-
-            const string message = "Command controller request: {Request} for service execution received from: {IpAddress}. Request properties: {CommandPropertyDump}";
-            logger.LogDebug(message, request.GetType().Name, ipAddress, values.ToString());
         }
     }
 }
