@@ -75,7 +75,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             }
         }
 
-        public async Task<Result<object>> HandleQueryAsync<TValue>(IIntegrationQuery query, CancellationToken cancellationToken = default)
+        public async Task<Result<object>> HandleQueryAsync(IIntegrationQuery query, CancellationToken cancellationToken = default)
         {
             try
             {
