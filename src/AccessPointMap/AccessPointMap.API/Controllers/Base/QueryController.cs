@@ -86,7 +86,7 @@ namespace AccessPointMap.API.Controllers.Base
             return new OkObjectResult(mappedResultValue);
         }
 
-        protected async Task<IActionResult> HandleFileResult(byte[] fileBuffer, bool useCaching, string mimeType, CancellationToken cancellationToken = default)
+        protected async Task<IActionResult> HandleFileResult(ExportFile file, bool useCaching, string mimeType, CancellationToken cancellationToken = default)
         {
             LogCurrentScope();
 
@@ -102,10 +102,10 @@ namespace AccessPointMap.API.Controllers.Base
                     return await Task.FromResult(File((byte[])cachedFileBuffer, mimeType));
                 }
 
-                StoreToMemoryCache(fileBuffer, cancellationToken);
+                StoreToMemoryCache(file.FileBuffer, cancellationToken);
             }
 
-            return await Task.FromResult(File(fileBuffer, mimeType));
+            return await Task.FromResult(File(file.FileBuffer, mimeType));
         }
 
         protected int NormalizePaginationLimit(int? limit)

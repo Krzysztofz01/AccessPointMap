@@ -1,4 +1,5 @@
 ﻿using AccessPointMap.API.Controllers.Base;
+using AccessPointMap.Application.Abstraction;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ namespace AccessPointMap.API.Controllers
             // TODO: Error message
             if (result.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
 
-            return await HandleFileResult((byte[])result.Value, true, CsvContentMimeType, cancellationToken);
+            return await HandleFileResult(result.Value as ExportFile, true, CsvContentMimeType, cancellationToken);
         }
     }
 }
