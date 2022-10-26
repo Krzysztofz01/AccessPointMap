@@ -71,11 +71,11 @@ namespace AccessPointMap.Application.Integration.Wireshark
             }
             catch (DomainException ex)
             {
-                return await Task.FromResult(Result.Failure(IntegrationError.FromDomainException(ex)));
+                return await Task.FromResult(Result.Failure<object>(IntegrationError.FromDomainException(ex)));
             }
             catch (IntegrationException ex)
             {
-                return await Task.FromResult(Result.Failure(IntegrationError.FromIntegrationException(ex)));
+                return await Task.FromResult(Result.Failure<object>(IntegrationError.FromIntegrationException(ex)));
             }
             catch (TaskCanceledException)
             {
