@@ -1,12 +1,15 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Infrastructure.Core.Abstraction;
-using Wigle = AccessPointMap.Application.Integration.Wigle;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Wigle = AccessPointMap.Application.Integration.Wigle;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -16,7 +19,7 @@ namespace AccessPointMap.API.Controllers
     {
         private readonly Wigle.IWigleIntegrationService _wigleIntegrationService;
 
-        private const string _csvContentType = "text/csv";
+        private const string CsvContentMimeType = "text/csv";
 
         public IntegrationQueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<IntegrationQueryController> logger, Wigle.IWigleIntegrationService wigleIntegrationService) : base(unitOfWork, mapper, memoryCache, logger)
         {
@@ -25,12 +28,16 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("wigle/csv")]
-        [Produces(_csvContentType)]
-        public async Task<IActionResult> DownloadWigleCsv()
+        [Produces(CsvContentMimeType)]
+        public async Task<IActionResult> DownloadWigleCsv(
+            CancellationToken cancellationToken)
         {
-            var response = await _wigleIntegrationService.Query(new Wigle.Queries.ExportAccessPointsToCsv());
+            var result = await _wigleIntegrationService.HandleQueryAsync(new Wigle.Queries.ExportAccessPointsToCsv(), cancellationToken);
 
-            return MapToFile((byte[])response, _csvContentType);
+            // TODO: Error message
+            if (result.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
+
+            return await HandleFileResult((byte[])result.Value, true, CsvContentMimeType, cancellationToken);
         }
     }
 }
