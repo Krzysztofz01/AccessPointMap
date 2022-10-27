@@ -1,4 +1,4 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Extensions;
 using AccessPointMap.Application.Logging;
 using AccessPointMap.Infrastructure.Core.Abstraction;

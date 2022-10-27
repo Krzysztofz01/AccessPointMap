@@ -1,4 +1,4 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Pcap.Core;
 using Microsoft.AspNetCore.Http;
 using System;

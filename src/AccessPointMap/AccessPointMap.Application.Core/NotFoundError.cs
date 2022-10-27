@@ -1,4 +1,4 @@
-﻿namespace AccessPointMap.Application.Abstraction
+﻿namespace AccessPointMap.Application.Core
 {
     public class NotFoundError : Error
     {

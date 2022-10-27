@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AccessPointMap.Application.Abstraction
+namespace AccessPointMap.Application.Core.Abstraction
 {
     public interface IApplicationService<TAggregateRoot> where TAggregateRoot : AggregateRoot
     {

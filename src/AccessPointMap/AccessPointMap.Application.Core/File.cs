@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AccessPointMap.Application.Abstraction
+namespace AccessPointMap.Application.Core
 {
     public class ExportFile
     {
@@ -8,7 +8,7 @@ namespace AccessPointMap.Application.Abstraction
         public byte[] FileBuffer => _fileBuffer;
 
         protected ExportFile() { }
-        protected ExportFile(byte[] fileBuffer) => 
+        protected ExportFile(byte[] fileBuffer) =>
             _fileBuffer = fileBuffer;
 
         public static ExportFile FromBuffer(byte[] buffer) => new(buffer);

@@ -1,5 +1,5 @@
 ﻿using AccessPointMap.API.Controllers.Base;
-using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;

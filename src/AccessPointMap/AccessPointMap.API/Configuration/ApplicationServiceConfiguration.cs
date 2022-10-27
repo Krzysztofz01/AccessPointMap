@@ -1,5 +1,5 @@
-﻿using AccessPointMap.Application.Abstraction;
-using AccessPointMap.Application.AccessPoints;
+﻿using AccessPointMap.Application.AccessPoints;
+using AccessPointMap.Application.Core.Abstraction;
 using AccessPointMap.Application.Identities;
 using Microsoft.Extensions.DependencyInjection;
 

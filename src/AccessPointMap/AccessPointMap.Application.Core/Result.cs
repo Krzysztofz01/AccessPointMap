@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AccessPointMap.Application.Abstraction
+namespace AccessPointMap.Application.Core
 {
     public class Result
     {

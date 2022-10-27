@@ -1,6 +1,6 @@
 ﻿using AccessPointMap.Domain.AccessPoints;
 
-namespace AccessPointMap.Application.Abstraction
+namespace AccessPointMap.Application.Core.Abstraction
 {
     public interface IAccessPointService : IApplicationService<AccessPoint>
     {

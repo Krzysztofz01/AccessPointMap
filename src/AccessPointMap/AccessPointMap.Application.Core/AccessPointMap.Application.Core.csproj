@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AccessPointMap.Application.Core\AccessPointMap.Application.Core.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Domain.Core\AccessPointMap.Domain.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Domain\AccessPointMap.Domain.csproj" />
   </ItemGroup>
 

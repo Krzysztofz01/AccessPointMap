@@ -1,4 +1,4 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

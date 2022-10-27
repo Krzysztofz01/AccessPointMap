@@ -1,4 +1,4 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Domain.AccessPoints;
 using SharpKml.Base;
