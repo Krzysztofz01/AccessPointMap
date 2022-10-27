@@ -111,7 +111,7 @@ namespace AccessPointMap.Application.Logging
 
             if (logger.IsEnabled(LogLevel.Information))
             {
-                logger.LogDebug(_commandControllerInformationMessage,
+                logger.LogInformation(_commandControllerInformationMessage,
                     typeof(TCategoryName).Name,
                     command.GetType().Name,
                     path,
