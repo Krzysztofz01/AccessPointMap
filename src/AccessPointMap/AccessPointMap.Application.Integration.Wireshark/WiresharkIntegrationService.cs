@@ -95,9 +95,11 @@ namespace AccessPointMap.Application.Integration.Wireshark
             if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".pcap")
                 return Result.Failure(WiresharkIntegrationError.UploadedFileHasInvalidFormat);
 
-            var packetMap = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile, cancellationToken);
+            var packetMapResult = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile, cancellationToken);
 
-            foreach (var map in packetMap)
+            if (packetMapResult.IsFailure) return Result.Failure(packetMapResult.Error);
+
+            foreach (var map in packetMapResult.Value)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
