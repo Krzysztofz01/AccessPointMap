@@ -43,19 +43,27 @@ namespace AccessPointMap.Application.AccessPoints
 
                 foreach (var accessPoint in accessPoints)
                 {
-                    // TODO: Pass CancellationToken to the method
-                    var manufacturerName = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid.Value);
+                    context.CancellationToken.ThrowIfCancellationRequested();
+
+                    var ouiLookupResult = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid.Value, context.CancellationToken);
+
+                    if (ouiLookupResult.IsFailure) continue;
 
                     accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
                     {
                         Id = accessPoint.Id,
-                        Manufacturer = manufacturerName
+                        Manufacturer = ouiLookupResult.Value
                     });
                 }
 
-                await _unitOfWork.Commit();
+                await _unitOfWork.Commit(context.CancellationToken);
 
                 _logger.LogInformation($"{JobName} scheduled job finished.");
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogInformation($"{JobName} scheduled job interupted via task cancellation.");
+                throw;
             }
             catch (Exception ex)
             {

@@ -186,17 +186,20 @@ namespace AccessPointMap.Application.AccessPoints
 
                     var accessPoint = AccessPoint.Factory.Create(accessPointCreateEvent);
 
-                    var manufacturer = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
+                    var ouiLookupResult = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
 
-                    var accessPointManufacturerChangedEvent = new AccessPointManufacturerChanged
+                    if (ouiLookupResult.IsSuccess)
                     {
-                        Id = accessPoint.Id,
-                        Manufacturer = manufacturer
-                    };
+                        var accessPointManufacturerChangedEvent = new AccessPointManufacturerChanged
+                        {
+                            Id = accessPoint.Id,
+                            Manufacturer = ouiLookupResult.Value
+                        };
 
-                    _logger.LogDomainEvent(accessPointManufacturerChangedEvent);
+                        _logger.LogDomainEvent(accessPointManufacturerChangedEvent);
 
-                    accessPoint.Apply(accessPointManufacturerChangedEvent);
+                        accessPoint.Apply(accessPointManufacturerChangedEvent);
+                    }
 
                     await _unitOfWork.AccessPointRepository.AddAsync(accessPoint, cancellationToken);
                 }

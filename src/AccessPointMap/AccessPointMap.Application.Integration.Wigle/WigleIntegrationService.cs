@@ -228,13 +228,16 @@ namespace AccessPointMap.Application.Integration.Wigle
                 RunIdentifier = runIdentifier
             });
 
-            var manufacturer = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
+            var ouiLookupResult = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
 
-            accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+            if (ouiLookupResult.IsSuccess)
             {
-                Id = accessPoint.Id,
-                Manufacturer = manufacturer
-            });
+                accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+                {
+                    Id = accessPoint.Id,
+                    Manufacturer = ouiLookupResult.Value
+                });
+            }
 
             accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
             {
