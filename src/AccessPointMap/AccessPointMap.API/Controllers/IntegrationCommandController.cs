@@ -1,11 +1,13 @@
 using AccessPointMap.API.Controllers.Base;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 using Aircrackng = AccessPointMap.Application.Integration.Aircrackng;
 using Wigle = AccessPointMap.Application.Integration.Wigle;
 using Wireshark = AccessPointMap.Application.Integration.Wireshark;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -34,23 +36,33 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpPost("wigle/csv")]
-        public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvFile command) =>
-            await ExecuteService(command, _wigleIntegrationService.Handle);
+        public async Task<IActionResult> CreateFromWigle(
+            [FromForm] Wigle.Commands.CreateAccessPointsFromCsvFile command,
+            CancellationToken cancellationToken) =>
+                await ExecuteIntegrationCommandAsync(command, _wigleIntegrationService, cancellationToken);
 
         [HttpPost("wigle/csvgz")]
-        public async Task<IActionResult> CreateFromWigle([FromForm] Wigle.Commands.CreateAccessPointsFromCsvGzFile command) =>
-            await ExecuteService(command, _wigleIntegrationService.Handle);
+        public async Task<IActionResult> CreateFromWigle(
+            [FromForm] Wigle.Commands.CreateAccessPointsFromCsvGzFile command,
+            CancellationToken cancellationToken) =>
+                await ExecuteIntegrationCommandAsync(command, _wigleIntegrationService, cancellationToken);
 
         [HttpPost("aircrackng/csv")]
-        public async Task<IActionResult> CreateAccessPointsFromCsvFile([FromForm] Aircrackng.Commands.CreateAccessPointsFromCsvFile command) =>
-            await ExecuteService(command, _aircrackngIntegrationService.Handle);
+        public async Task<IActionResult> CreateAccessPointsFromCsvFile(
+            [FromForm] Aircrackng.Commands.CreateAccessPointsFromCsvFile command,
+            CancellationToken cancellationToken = default) =>
+                await ExecuteIntegrationCommandAsync(command, _aircrackngIntegrationService, cancellationToken);
 
         [HttpPost("aircrackng/cap")]
-        public async Task<IActionResult> CreatePacketsFromPcapFile([FromForm] Aircrackng.Commands.CreatePacketsFromPcapFile command) =>
-            await ExecuteService(command, _aircrackngIntegrationService.Handle);
+        public async Task<IActionResult> CreatePacketsFromPcapFile(
+            [FromForm] Aircrackng.Commands.CreatePacketsFromPcapFile command,
+            CancellationToken cancellationToken) =>
+                await ExecuteIntegrationCommandAsync(command, _aircrackngIntegrationService, cancellationToken);
 
         [HttpPost("wireshark/pcap")]
-        public async Task<IActionResult> CreatePacketsFromPcapFile([FromForm] Wireshark.Commands.CreatePacketsFromPcapFile command) =>
-            await ExecuteService(command, _wiresharkIntegrationService.Handle);
+        public async Task<IActionResult> CreatePacketsFromPcapFile(
+            [FromForm] Wireshark.Commands.CreatePacketsFromPcapFile command,
+            CancellationToken cancellationToken) =>
+                await ExecuteIntegrationCommandAsync(command, _wiresharkIntegrationService, cancellationToken);
     }
 }

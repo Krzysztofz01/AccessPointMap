@@ -72,7 +72,8 @@ namespace AccessPointMap.Application.Abstraction
             ? throw new InvalidOperationException("Can not retrieve the value from a failure result.")
             : _value;
 
-        public static implicit operator TValue(Result<TValue> result) => result.Value;
-        public static implicit operator Result<TValue>(TValue value) => new(value, null, string.Empty);
+        // NOTE: Is causing unexpected bahaviour
+        // public static implicit operator TValue(Result<TValue> result) => result.Value;
+        // public static implicit operator Result<TValue>(TValue value) => new(value, null, string.Empty);
     }
 }

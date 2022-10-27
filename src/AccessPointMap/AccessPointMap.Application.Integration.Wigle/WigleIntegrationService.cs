@@ -1,10 +1,12 @@
-﻿using AccessPointMap.Application.Integration.Core;
+﻿using AccessPointMap.Application.Abstraction;
+using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Application.Integration.Wigle.Extensions;
 using AccessPointMap.Application.Integration.Wigle.Models;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
+using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
 using System;
@@ -15,6 +17,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Integration.Wigle
@@ -43,54 +46,94 @@ namespace AccessPointMap.Application.Integration.Wigle
             IPcapParsingService pcapParsingService,
             IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
 
-        public async Task Handle(IIntegrationCommand command)
+        public async Task<Result> HandleCommandAsync(IIntegrationCommand command, CancellationToken cancellationToken = default)
         {
-            switch (command)
+            try
             {
-                case Commands.CreateAccessPointsFromCsvFile cmd: await HandleCommand(cmd); break;
-                case Commands.CreateAccessPointsFromCsvGzFile cmd: await HandleCommand(cmd); break;
-
-                default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+                return command switch
+                {
+                    Commands.CreateAccessPointsFromCsvFile cmd => await HandleCommand(cmd, cancellationToken),
+                    Commands.CreateAccessPointsFromCsvGzFile cmd => await HandleCommand(cmd, cancellationToken),
+                    _ => throw new IntegrationException($"This command is not supported by the {IntegrationName} integration."),
+                };
+            }
+            catch (DomainException ex)
+            {
+                return Result.Failure(IntegrationError.FromDomainException(ex));
+            }
+            catch (IntegrationException ex)
+            {
+                return Result.Failure(IntegrationError.FromIntegrationException(ex));
+            }
+            catch (TaskCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
             }
         }
 
-        public async Task<object> Query(IIntegrationQuery query)
+        public async Task<Result<object>> HandleQueryAsync(IIntegrationQuery query, CancellationToken cancellationToken = default)
         {
-            switch (query)
+            try
             {
-                case Queries.ExportAccessPointsToCsv q: return await HandleQuery(q);
-
-                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
+                return query switch
+                {
+                    Queries.ExportAccessPointsToCsv q => await HandleQuery(q, cancellationToken),
+                    _ => throw new IntegrationException($"This query is not supported by the {IntegrationName} integration."),
+                };
+            }
+            catch (DomainException ex)
+            {
+                return Result.Failure<object>(IntegrationError.FromDomainException(ex));
+            }
+            catch (IntegrationException ex)
+            {
+                return Result.Failure<object>(IntegrationError.FromIntegrationException(ex));
+            }
+            catch (TaskCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
             }
         }
 
-        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvFile cmd)
+        private async Task<Result> HandleCommand(Commands.CreateAccessPointsFromCsvFile cmd, CancellationToken cancellationToken = default)
         {
             if (cmd.ScanCsvFile is null)
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(WigleIntegrationError.UploadedCsvFileIsNull);
 
             if (Path.GetExtension(cmd.ScanCsvFile.FileName).ToLower() != ".csv")
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(WigleIntegrationError.UploadedFileHasInvalidFormat);
 
             using var sr = new StreamReader(cmd.ScanCsvFile.OpenReadStream());
             sr.SkipLine();
 
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             var records = csv.GetRecords<AccessPointRecord>()
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
-            await HandleAccessPointRecords(records);
+            await HandleAccessPointRecords(records, cancellationToken);
+            
+            return Result.Success();
         }
 
-        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvGzFile cmd)
+        private async Task<Result> HandleCommand(Commands.CreateAccessPointsFromCsvGzFile cmd, CancellationToken cancellationToken = default)
         {
             if (cmd.ScanCsvGzFile is null)
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(WigleIntegrationError.UploadedCsvGzFileIsNull);
 
             if (!cmd.ScanCsvGzFile.FileName.ToLower().EndsWith(".csv.gz"))
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(WigleIntegrationError.UploadedFileHasInvalidFormat);
 
             using var compressionStream = new GZipStream(cmd.ScanCsvGzFile.OpenReadStream(), CompressionMode.Decompress);
             using var sr = new StreamReader(compressionStream);
@@ -98,14 +141,18 @@ namespace AccessPointMap.Application.Integration.Wigle
 
             using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             var records = csv.GetRecords<AccessPointRecord>()
                 .GroupBy(r => r.Mac, (k, v) => CombineRecords(v))
                 .ToList();
 
-            await HandleAccessPointRecords(records);
+            await HandleAccessPointRecords(records, cancellationToken);
+
+            return Result.Success();
         }
 
-        private async Task HandleAccessPointRecords(IEnumerable<AccessPointRecord> accessPointRecords)
+        private async Task HandleAccessPointRecords(IEnumerable<AccessPointRecord> accessPointRecords, CancellationToken cancellationToken = default)
         {
             var filteredRecords = accessPointRecords
                 .Where(r => r.Type.ToUpper().Contains(_allowedType));
@@ -118,22 +165,22 @@ namespace AccessPointMap.Application.Integration.Wigle
 
                 foreach (var record in runGroup.Value)
                 {
-                    // TODO: Pass the CancellationToken to the repository method
-                    if (await UnitOfWork.AccessPointRepository.ExistsAsync(record.Mac))
+                    if (await UnitOfWork.AccessPointRepository.ExistsAsync(record.Mac, cancellationToken))
                     {
-                        await CreateAccessPointStamp(record, runIdentifier);
+                        await CreateAccessPointStamp(record, runIdentifier, cancellationToken);
                         continue;
                     }
 
-                    await CreateAccessPoint(record, runIdentifier);
+                    await CreateAccessPoint(record, runIdentifier, cancellationToken);
                 }
             }
 
-            await UnitOfWork.Commit();
+            await UnitOfWork.Commit(cancellationToken);
         }
 
-        private async Task<object> HandleQuery(Queries.ExportAccessPointsToCsv _)
+        private async Task<Result<object>> HandleQuery(Queries.ExportAccessPointsToCsv _, CancellationToken cancellationToken = default)
         {
+            // TODO: Prepare specific query
             var accessPoints = UnitOfWork.AccessPointRepository.Entities
                 .Where(a => !a.DeletedAt.HasValue)
                 .Where(a => a.DisplayStatus.Value)
@@ -142,20 +189,27 @@ namespace AccessPointMap.Application.Integration.Wigle
             var records = accessPoints
                 .Select(a => AccessPointToRecord(a));
 
-            using var stream = new MemoryStream();
-            using var writer = new StreamWriter(stream, Encoding.UTF8);
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+                using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
+                {
+                    foreach (var preheaderField in _csvPreheader.Split(','))
+                    {
+                        csvWriter.WriteField(preheaderField);
+                    }
 
-            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                    await csvWriter.NextRecordAsync();
 
-            foreach (var field in _csvPreheader.Split(',')) csv.WriteField(field);
-            await csv.NextRecordAsync();
+                    await csvWriter.WriteRecordsAsync(records);
+                }
 
-            await csv.WriteRecordsAsync(records);
-
-            return stream.ToArray();
+                var exportFile = ExportFile.FromBuffer(memoryStream.ToArray());
+                return Result.Success<object>(exportFile);
+            }
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
+        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
         {
             var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
             {
@@ -174,8 +228,7 @@ namespace AccessPointMap.Application.Integration.Wigle
                 RunIdentifier = runIdentifier
             });
 
-            // TODO: Pass CancellationToken to the method
-            var manufacturer = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid);
+            var manufacturer = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
 
             accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
             {
@@ -190,14 +243,12 @@ namespace AccessPointMap.Application.Integration.Wigle
                 Content = SerializeRawAccessPointRecord(record)
             });
 
-            // TODO: Pass the CancellationToken to the repository method
-            await UnitOfWork.AccessPointRepository.AddAsync(accessPoint);
+            await UnitOfWork.AccessPointRepository.AddAsync(accessPoint, cancellationToken);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
         {
-            // TODO: Pass the CancellationToken to the repository method
-            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Mac);
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Mac, cancellationToken);
 
             accessPoint.Apply(new Events.V1.AccessPointStampCreated
             {

@@ -42,7 +42,18 @@ namespace AccessPointMap.API.Controllers.Base
             return new OkResult();
         }
 
-        private void LogCurrentScope<TAggregateRoot>(IApplicationCommand<TAggregateRoot> command) where TAggregateRoot : AggregateRoot
+        protected async Task<IActionResult> ExecuteIntegrationCommandAsync(IIntegrationCommand command, IIntegrationContract handlerIntegrationService, CancellationToken cancellationToken = default)
+        {
+            LogCurrentScope(command);
+
+            var result = await handlerIntegrationService.HandleCommandAsync(command, cancellationToken);
+
+            if (result.IsFailure) return GetFailureResponse(result.Error);
+
+            return new OkResult();
+        }
+
+        private void LogCurrentScope(ICommand command)
         {
             string currentPath = Request.GetEncodedPathAndQuery() ?? string.Empty;
             string currentHost = Request.GetIpAddressString() ?? string.Empty;
@@ -56,23 +67,6 @@ namespace AccessPointMap.API.Controllers.Base
         {
             // TODO: Pass error message
             return new BadRequestResult();
-        }
-
-        [Obsolete("Use the overload with the CancellationToken")]
-        protected async Task<IActionResult> ExecuteService<TRequest>(TRequest request, Func<TRequest, Task> serviceHandler) where TRequest : class
-        {
-            if (request is IIntegrationCommand command)
-            {
-                _logger.LogCommandController(command, Request.GetIpAddressString());
-            }
-            else
-            {
-                _logger.LogCommandController(request, Request.GetIpAddressString());
-            }
-
-            await serviceHandler(request);
-
-            return new OkResult();
         }
     }
 }

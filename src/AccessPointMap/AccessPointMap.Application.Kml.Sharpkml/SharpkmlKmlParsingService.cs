@@ -49,10 +49,8 @@ namespace AccessPointMap.Application.Kml.Sharpkml
                 using var memoryFileStream = new MemoryStream();
                 kml.Save(memoryFileStream);
 
-                return Task.FromResult(Result.Success(new KmlResult
-                {
-                    FileBuffer = memoryFileStream.ToArray()
-                }));
+                var kmlFile = KmlResult.FromBuffer(memoryFileStream.ToArray());
+                return Task.FromResult(Result.Success(kmlFile));
             }
             catch (OperationCanceledException)
             {

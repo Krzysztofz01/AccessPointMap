@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -87,7 +86,7 @@ namespace AccessPointMap.API.Controllers.Base
             return new OkObjectResult(mappedResultValue);
         }
 
-        protected async Task<IActionResult> HandleFileResult(byte[] fileBuffer, bool useCaching, string mimeType, CancellationToken cancellationToken = default)
+        protected async Task<IActionResult> HandleFileResult(ExportFile file, bool useCaching, string mimeType, CancellationToken cancellationToken = default)
         {
             LogCurrentScope();
 
@@ -103,10 +102,10 @@ namespace AccessPointMap.API.Controllers.Base
                     return await Task.FromResult(File((byte[])cachedFileBuffer, mimeType));
                 }
 
-                StoreToMemoryCache(fileBuffer, cancellationToken);
+                StoreToMemoryCache(file.FileBuffer, cancellationToken);
             }
 
-            return await Task.FromResult(File(fileBuffer, mimeType));
+            return await Task.FromResult(File(file.FileBuffer, mimeType));
         }
 
         protected int NormalizePaginationLimit(int? limit)
@@ -151,21 +150,6 @@ namespace AccessPointMap.API.Controllers.Base
                 "Anonymous";
 
             _logger.LogQueryController(currentPath, currentIdentityId, currentHost);
-        }
-
-        [Obsolete("Use the overload with the CancellationToken")]
-        protected FileStreamResult MapToFile(Stream fileStream, string mimeType)
-        {
-            if (fileStream is null || string.IsNullOrEmpty(mimeType)) return null;
-
-            Response.ContentType = new MediaTypeHeaderValue(mimeType).ToString();
-            return File(fileStream, mimeType);
-        }
-
-        [Obsolete("Use the overload with the CancellationToken")]
-        protected FileStreamResult MapToFile(byte[] fileBuffer, string mimeType)
-        {
-            return MapToFile(new MemoryStream(fileBuffer), mimeType);
         }
     }
 }
