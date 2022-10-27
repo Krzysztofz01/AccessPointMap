@@ -103,9 +103,11 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".cap")
                 return Result.Failure(AircrackngIntegrationError.UploadedFileHasInvalidFormat);
 
-            var packetMap = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile, cancellationToken);
+            var packetMapResult = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile, cancellationToken);
 
-            foreach (var map in packetMap)
+            if (packetMapResult.IsFailure) return Result.Failure(packetMapResult.Error);
+
+            foreach (var map in packetMapResult.Value)
             {
                 await CreateAccessPointPackets(map.Key, map.Value, cancellationToken);
             }
