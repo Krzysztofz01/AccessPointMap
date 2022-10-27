@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Application.Oui.Core;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Oui.MacToVendor.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,7 +20,7 @@ namespace AccessPointMap.Application.Oui.MacToVendor
                 throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<IDictionary<string, string>> GetManufacturerLookupDictionaryAsync(IEnumerable<string> macAddresses, CancellationToken cancellationToken = default)
+        public async Task<Result<IDictionary<string, string>>> GetManufacturerLookupDictionaryAsync(IEnumerable<string> macAddresses, CancellationToken cancellationToken = default)
         {
             var distinctOuiParts = macAddresses
                 .Select(a => GetOuiMacAddressPart(a))
@@ -31,10 +32,11 @@ namespace AccessPointMap.Application.Oui.MacToVendor
                 .AsNoTracking()
                 .ToDictionaryAsync(k => k.MacAddress, v => v.Name, cancellationToken);
 
-            return macAddresses.ToDictionary(k => k, v => vendorsLookup[GetOuiMacAddressPart(v)]);
+            var addressToVendorLookup = macAddresses.ToDictionary(k => k, v => vendorsLookup[GetOuiMacAddressPart(v)]);
+            return Result.Success<IDictionary<string, string>>(addressToVendorLookup);
         }
 
-        public async Task<string> GetManufacturerNameAsync(string macAddress, CancellationToken cancellationToken = default)
+        public async Task<Result<string>> GetManufacturerNameAsync(string macAddress, CancellationToken cancellationToken = default)
         {
             var vendor = await _dbContext.Vendors
                 .Where(v => v.MacAddress == GetOuiMacAddressPart(macAddress) && v.Visibility == 1)
@@ -42,7 +44,9 @@ namespace AccessPointMap.Application.Oui.MacToVendor
                 .AsNoTracking()
                 .SingleOrDefaultAsync(cancellationToken);
 
-            return (vendor is null) ? string.Empty : vendor;
+            if (vendor is null) return Result.Failure<string>(OuiServiceError.OuiNotFound);
+
+            return Result.Success<string>(vendor);
         }
 
         private static int GetOuiMacAddressPart(string macAddress)
