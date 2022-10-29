@@ -18,7 +18,7 @@ namespace AccessPointMap.API.Controllers
     [Route("api/v{version:apiVersion}/identities")]
     [ApiVersion("1.0")]
     [Authorize(Roles = "Admin, Support")]
-    public class IdentityQueryController : QueryController
+    public class IdentityQueryController : QueryController<IdentityQueryController>
     {
         public IdentityQueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<IdentityQueryController> logger) : base(unitOfWork, mapper, memoryCache, logger)
         {

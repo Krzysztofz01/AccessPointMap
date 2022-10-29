@@ -18,7 +18,7 @@ namespace AccessPointMap.API.Controllers
 {
     [Route("api/v{version:apiVersion}/accesspoints")]
     [ApiVersion("1.0")]
-    public class AccessPointQueryController : QueryController
+    public class AccessPointQueryController : QueryController<AccessPointQueryController>
     {
         private readonly IKmlParsingService _kmlParsingService;
 
