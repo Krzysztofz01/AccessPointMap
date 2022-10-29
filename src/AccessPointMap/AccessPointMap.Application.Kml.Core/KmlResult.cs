@@ -1,9 +1,11 @@
-﻿namespace AccessPointMap.Application.Kml.Core
-{
-    public sealed class KmlResult
-    {
-        public byte[] FileBuffer { get; init; }
+﻿using AccessPointMap.Application.Core;
 
-        public static implicit operator byte[](KmlResult kmlResult) => kmlResult.FileBuffer;
+namespace AccessPointMap.Application.Kml.Core
+{
+    public sealed class KmlResult : ExportFile
+    {
+        private KmlResult(byte[] fileBuffer) : base(fileBuffer) { }
+
+        public static new KmlResult FromBuffer(byte[] buffer) => new(buffer);
     }
 }

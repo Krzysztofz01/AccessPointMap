@@ -7,7 +7,7 @@ using System;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class PersistenceConfiguration
+    internal static class PersistenceConfiguration
     {
         public static IServiceCollection AddMySqlPersistence(this IServiceCollection services, IConfiguration configuration)
         {

@@ -4,4 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AccessPointMap.Application.Core\AccessPointMap.Application.Core.csproj" />
+  </ItemGroup>
+
 </Project>

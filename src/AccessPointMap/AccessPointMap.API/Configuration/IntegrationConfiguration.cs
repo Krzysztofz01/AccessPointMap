@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class IntegrationConfiguration
+    internal static class IntegrationConfiguration
     {
         public static IServiceCollection AddIntegrationServices(this IServiceCollection services)
         {

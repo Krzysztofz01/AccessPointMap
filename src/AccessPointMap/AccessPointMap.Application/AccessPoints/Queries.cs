@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Application.Extensions;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Extensions;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
@@ -7,13 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.AccessPoints
 {
     public static class Queries
     {
-        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPoints(
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAllAccessPoints(
             this IAccessPointRepository accessPointRepository,
             DateTime? startingDate,
             DateTime? endingData,
@@ -22,24 +24,28 @@ namespace AccessPointMap.Application.AccessPoints
             double? distance,
             string keyword,
             int? page,
-            int? pageSize)
+            int? pageSize,
+            CancellationToken cancellationToken = default)
         {
-            // Database handled query filtering
+            // NOTE: Filtering performed on the database-site
             var databaseResult = await accessPointRepository.Entities
                 .Where(a => a.DisplayStatus.Value)
                 .WhereParamPresent(startingDate.HasValue, a => a.CreationTimestamp.Value > startingDate.Value)
                 .WhereParamPresent(endingData.HasValue, a => a.CreationTimestamp.Value < endingData.Value)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            // Server handled query filtering
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // NOTE: Filtering performed on the server-site
             return databaseResult
                 .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
                 .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
-                .Paginate(page, pageSize);
+                .Paginate(page, pageSize)
+                .ToResultObject();
         }
 
-        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsAdministration(
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAllAccessPointsAdministration(
             this IAccessPointRepository accessPointRepository,
             DateTime? startingDate,
             DateTime? endingData,
@@ -48,60 +54,83 @@ namespace AccessPointMap.Application.AccessPoints
             double? distance,
             string keyword,
             int? page,
-            int? pageSize)
+            int? pageSize,
+            CancellationToken cancellationToken = default)
         {
-            // Database handled query filtering
+            // NOTE: Filtering performed on the database-site
             var databaseResult = await accessPointRepository.Entities
                 .WhereParamPresent(startingDate.HasValue, a => a.CreationTimestamp.Value > startingDate.Value)
                 .WhereParamPresent(endingData.HasValue, a => a.CreationTimestamp.Value < endingData.Value)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            // Server handled query filtering
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // NOTE: Filtering performed on the server-site
             return databaseResult
                 .WhereParamPresent(latitude.HasValue && longitude.HasValue && distance.HasValue, a => Helpers.IsAccessPointInArea(latitude.Value, longitude.Value, distance.Value, a))
                 .WhereParamPresent(keyword is not null, a => Helpers.IsMatchingKeyword(keyword, a))
-                .Paginate(page, pageSize);
+                .Paginate(page, pageSize)
+                .ToResultObject();
         }
 
-        public static async Task<AccessPoint> GetAccessPointById(this IAccessPointRepository accessPointRepository, Guid id)
+        public static async Task<Result<AccessPoint>> GetAccessPointById(
+            this IAccessPointRepository accessPointRepository,
+            Guid id,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
                 .Where(a => a.DisplayStatus.Value)
                 .AsNoTracking()
-                .SingleAsync(a => a.Id == id);
+                .SingleOrDefaultAsync(a => a.Id == id, cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<AccessPoint> GetAccessPointByIdAdministration(this IAccessPointRepository accessPointRepository, Guid id)
+        public static async Task<Result<AccessPoint>> GetAccessPointByIdAdministration(
+            this IAccessPointRepository accessPointRepository,
+            Guid id,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
                 .Include(a => a.Adnnotations)
                 .AsNoTracking()
-                .SingleAsync(a => a.Id == id); 
+                .SingleOrDefaultAsync(a => a.Id == id, cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsByRunId(this IAccessPointRepository accessPointRepository, Guid runId)
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAllAccessPointsByRunId(
+            this IAccessPointRepository accessPointRepository,
+            Guid runId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .Where(a => a.RunIdentifier.Value.Value == runId)
                 .Where(a => a.DisplayStatus.Value)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<IEnumerable<AccessPoint>> GetAllAccessPointsByRunIdAdministration(this IAccessPointRepository accessPointRepository, Guid runId)
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAllAccessPointsByRunIdAdministration(
+            this IAccessPointRepository accessPointRepository,
+            Guid runId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .Where(a => a.RunIdentifier.Value.Value == runId)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<IEnumerable<AccessPointStamp>> GetAllAccessPointStampsByRunId(this IAccessPointRepository accessPointRepository, Guid runId)
+        public static async Task<Result<IEnumerable<AccessPointStamp>>> GetAllAccessPointStampsByRunId(
+            this IAccessPointRepository accessPointRepository,
+            Guid runId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
@@ -110,10 +139,14 @@ namespace AccessPointMap.Application.AccessPoints
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .Where(a => a.RunIdentifier.Value == runId)
                 .AsNoTracking()
-                .ToListAsync(); 
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<IEnumerable<AccessPointStamp>> GetAllAccessPointStampsByRunIdAdministration(this IAccessPointRepository accessPointRepository, Guid runId)
+        public static async Task<Result<IEnumerable<AccessPointStamp>>> GetAllAccessPointStampsByRunIdAdministration(
+            this IAccessPointRepository accessPointRepository,
+            Guid runId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
@@ -121,17 +154,20 @@ namespace AccessPointMap.Application.AccessPoints
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .Where(a => a.RunIdentifier.Value == runId)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIds(this IAccessPointRepository accessPointRepository)
+        public static async Task<Result<IEnumerable<string>>> GetAllAccessPointRunIds(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
         {
             var accessPointRunIds = (await accessPointRepository.Entities
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .OrderBy(a => a.CreationTimestamp.Value)
                 .AsNoTracking()
-                .ToListAsync())
+                .ToListAsync(cancellationToken))
                 .DistinctBy(a => a.RunIdentifier.Value.Value)
                 .Select(a => new Tuple<Guid, DateTime>(a.RunIdentifier.Value.Value, a.CreationTimestamp.Value));
 
@@ -142,7 +178,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .Where(s => s.RunIdentifier.Value.HasValue)
                 .OrderBy(s => s.CreationTimestamp.Value)
                 .AsNoTracking()
-                .ToListAsync())
+                .ToListAsync(cancellationToken))
                 .DistinctBy(s => s.RunIdentifier.Value.Value)
                 .Select(s => new Tuple<Guid, DateTime>(s.RunIdentifier.Value.Value, s.CreationTimestamp.Value));
 
@@ -150,16 +186,20 @@ namespace AccessPointMap.Application.AccessPoints
                 .Union(accessPointStampRunIds)
                 .OrderBy(a => a.Item2)
                 .DistinctBy(a => a.Item1)
-                .Select(a => a.Item1);
+                .Select(a => a.Item1.ToString())
+                .ToList()
+                .ToResultObject();
         }
 
-        public static async Task<IEnumerable<Guid>> GetAllAccessPointRunIdsAdministration(this IAccessPointRepository accessPointRepository)
+        public static async Task<Result<IEnumerable<string>>> GetAllAccessPointRunIdsAdministration(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
         {
             var accessPointRunIds = (await accessPointRepository.Entities
                 .Where(a => a.RunIdentifier.Value.HasValue)
                 .OrderBy(a => a.CreationTimestamp.Value)
                 .AsNoTracking()
-                .ToListAsync())
+                .ToListAsync(cancellationToken))
                 .DistinctBy(a => a.RunIdentifier.Value.Value)
                 .Select(a => new Tuple<Guid, DateTime>(a.RunIdentifier.Value.Value, a.CreationTimestamp.Value));
 
@@ -169,7 +209,7 @@ namespace AccessPointMap.Application.AccessPoints
                 .Where(s => s.RunIdentifier.Value.HasValue)
                 .OrderBy(s => s.CreationTimestamp.Value)
                 .AsNoTracking()
-                .ToListAsync())
+                .ToListAsync(cancellationToken))
                 .DistinctBy(s => s.RunIdentifier.Value.Value)
                 .Select(s => new Tuple<Guid, DateTime>(s.RunIdentifier.Value.Value, s.CreationTimestamp.Value));
 
@@ -177,66 +217,93 @@ namespace AccessPointMap.Application.AccessPoints
                 .Union(accessPointStampRunIds)
                 .OrderBy(a => a.Item2)
                 .DistinctBy(a => a.Item1)
-                .Select(a => a.Item1);
+                .Select(a => a.Item1.ToString())
+                .ToList()
+                .ToResultObject();
         }
 
-        public static async Task<IEnumerable<AccessPointPacket>> GetAllAccessPointsAccessPointPackets(this IAccessPointRepository accessPointRepository, Guid id)
+        public static async Task<Result<IEnumerable<AccessPointPacket>>> GetAllAccessPointsAccessPointPackets(
+            this IAccessPointRepository accessPointRepository,
+            Guid id,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Packets)
                 .Where(a => a.Id == id)
                 .SelectMany(a => a.Packets)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<AccessPointPacket> GetAccessPointsAccessPointPacketById(this IAccessPointRepository accessPointRepository, Guid id, Guid packetId)
+        public static async Task<Result<AccessPointPacket>> GetAccessPointsAccessPointPacketById(
+            this IAccessPointRepository accessPointRepository,
+            Guid id,
+            Guid packetId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Packets)
                 .Where(a => a.Id == id)
                 .SelectMany(a => a.Packets)
                 .AsNoTracking()
-                .SingleAsync(a => a.Id == packetId);
+                .SingleOrDefaultAsync(a => a.Id == packetId, cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<AccessPoint> MatchAccessPointByAccessPointStampId(this IAccessPointRepository accessPointRepository, Guid stampId)
+        public static async Task<Result<AccessPoint>> MatchAccessPointByAccessPointStampId(
+            this IAccessPointRepository accessPointRepository,
+            Guid stampId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.Stamps.Any(s => s.Id == stampId))
                 .AsNoTracking()
-                .SingleAsync();
+                .SingleOrDefaultAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<AccessPoint> MatchAccessPointByAccessPointStampIdAdministration(this IAccessPointRepository accessPointRepository, Guid stampId)
+        public static async Task<Result<AccessPoint>> MatchAccessPointByAccessPointStampIdAdministration(
+            this IAccessPointRepository accessPointRepository,
+            Guid stampId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
                 .Where(a => a.Stamps.Any(s => s.Id == stampId))
                 .AsNoTracking()
-                .SingleAsync();
+                .SingleOrDefaultAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<AccessPoint> MatchAccessPointByAccessPointPacketId(this IAccessPointRepository accessPointRepository, Guid packetId)
+        public static async Task<Result<AccessPoint>> MatchAccessPointByAccessPointPacketId(
+            this IAccessPointRepository accessPointRepository,
+            Guid packetId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Packets)
                 .Where(a => a.DisplayStatus.Value)
                 .Where(a => a.Packets.Any(p => p.Id == packetId))
                 .AsNoTracking()
-                .SingleAsync();
+                .SingleOrDefaultAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<AccessPoint> MatchAccessPointByAccessPointPacketIdAdministration(this IAccessPointRepository accessPointRepository, Guid packetId)
+        public static async Task<Result<AccessPoint>> MatchAccessPointByAccessPointPacketIdAdministration(
+            this IAccessPointRepository accessPointRepository,
+            Guid packetId,
+            CancellationToken cancellationToken = default)
         {
             return await accessPointRepository.Entities
                 .Include(a => a.Stamps)
                 .Include(a => a.Packets)
                 .Where(a => a.Packets.Any(p => p.Id == packetId))
                 .AsNoTracking()
-                .SingleAsync();
+                .SingleOrDefaultAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
         // TODO: Resolve problems related to this query
@@ -245,32 +312,53 @@ namespace AccessPointMap.Application.AccessPoints
         // We can remove this method (breaking change) or leave it as a alternative way
         //
         // For now the query will stay, but will be removed in the next braking-changes release
-        public static async Task<IEnumerable<AccessPoint>> SearchByKeyword(this IAccessPointRepository accessPointRepository, string keyword)
+        [Obsolete("This query will be removed in the future release. Use the GetAllAccessPoints() method instead.")]
+        public static async Task<Result<IEnumerable<AccessPoint>>> SearchByKeyword(
+            this IAccessPointRepository accessPointRepository,
+            string keyword,
+            CancellationToken cancellationToken = default)
         {
             string kw = keyword.Trim().ToLower();
 
             return await accessPointRepository.Entities
-                .Where(a => 
+                .Where(a =>
                     a.Ssid.Value.ToLower().Contains(kw) ||
                     a.DeviceType.Value.ToLower().Contains(kw) ||
                     a.Security.RawSecurityPayload.ToLower().Contains(kw))
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
-        public static async Task<IEnumerable<AccessPoint>> GetAccessPointsWithGreatestSignalRange(this IAccessPointRepository accessPointRepository, int limit)
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAccessPointsWithGreatestSignalRange(
+            this IAccessPointRepository accessPointRepository,
+            int limit,
+            CancellationToken cancellationToken = default)
         {
             var greatestSignalRangeQuery = accessPointRepository.Entities
                 .Where(x => x.DisplayStatus.Value)
                 .OrderByDescending(a => a.Positioning.SignalArea)
                 .AsNoTracking();
 
-            return (limit == default)
-                ? await greatestSignalRangeQuery.ToListAsync()
-                : await greatestSignalRangeQuery.Take(limit).ToListAsync();
+            if (limit == default)
+            {
+                return await greatestSignalRangeQuery
+                    .ToListAsync(cancellationToken)
+                    .ToResultObjectAsync();
+            }
+            else
+            {
+                return await greatestSignalRangeQuery
+                    .Take(limit)
+                    .ToListAsync(cancellationToken)
+                    .ToResultObjectAsync();
+            }
         }
 
-        public static async Task<IEnumerable<object>> GetMostCommonUsedFrequency(this IAccessPointRepository accessPointRepository, int limit)
+        public static async Task<Result<IEnumerable<object>>> GetMostCommonUsedFrequency(
+            this IAccessPointRepository accessPointRepository,
+            int limit,
+            CancellationToken cancellationToken = default)
         {
             // TODO: This query can return frequency as strings in the future to avoid "0 as other" hacking
             // const string _other = "Other";
@@ -287,35 +375,48 @@ namespace AccessPointMap.Application.AccessPoints
 
             if (limit == default)
             {
-                return await mostCommonFrequencyQuery
-                    .ToListAsync();
+                var queryResult = await mostCommonFrequencyQuery
+                    .ToListAsync(cancellationToken);
+
+                return queryResult.Count == 0
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(queryResult);
             }
             else if (limit == 1)
             {
-                return await mostCommonFrequencyQuery
+                var queryResult = await mostCommonFrequencyQuery
                     .Take(1)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
+
+                return queryResult.Count == 0
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(queryResult);
             }
             else
             {
                 var frequenciesAboveLimit = await mostCommonFrequencyQuery
                     .Take(limit - 1)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var frequenciesUnderLimit = await mostCommonFrequencyQuery
                     .Skip(limit - 1)
-                    .SumAsync(a => a.Count);
+                    .SumAsync(a => a.Count, cancellationToken);
 
                 if (frequenciesUnderLimit > 0)
                 {
                     frequenciesAboveLimit.Add(new { Frequency = _other, Count = frequenciesUnderLimit });
                 }
 
-                return frequenciesAboveLimit;
+                return frequenciesAboveLimit.Count == 0
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(frequenciesAboveLimit);
             }
         }
 
-        public static async Task<IEnumerable<object>> GetMostCommonUsedManufacturer(this IAccessPointRepository accessPointRepository, int limit)
+        public static async Task<Result<IEnumerable<object>>> GetMostCommonUsedManufacturer(
+            this IAccessPointRepository accessPointRepository,
+            int limit,
+            CancellationToken cancellationToken = default)
         {
             var mostCommonManufacturerQuery = accessPointRepository.Entities
                 .Where(a => a.DisplayStatus.Value)
@@ -325,12 +426,31 @@ namespace AccessPointMap.Application.AccessPoints
                 .Select(a => new { Manufacturer = a.Key, Count = a.Count() })
                 .AsNoTracking();
 
-            return (limit == default)
-                ? await mostCommonManufacturerQuery.ToListAsync()
-                : await mostCommonManufacturerQuery.Take(limit).ToListAsync();
+            if (limit == default)
+            {
+                var queryResult = await mostCommonManufacturerQuery
+                    .ToListAsync(cancellationToken);
+
+                return queryResult.Count == 0
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(queryResult);
+            }
+            else
+            {
+                var queryResult = await mostCommonManufacturerQuery
+                    .Take(limit)
+                    .ToListAsync(cancellationToken);
+
+                return queryResult.Count == 0
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(queryResult);
+            }
         }
 
-        public static async Task<IEnumerable<object>> GetMostCommonUsedEncryptionTypes(this IAccessPointRepository accessPointRepository, int limit)
+        public static async Task<Result<IEnumerable<object>>> GetMostCommonUsedEncryptionTypes(
+            this IAccessPointRepository accessPointRepository,
+            int limit,
+            CancellationToken cancellationToken = default)
         {
             const string _none = "None";
             const string _other = "Other";
@@ -346,10 +466,12 @@ namespace AccessPointMap.Application.AccessPoints
                 .Where(a => a.DisplayStatus.Value)
                 .Select(a => a.Security.SecurityStandards)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            foreach(var serializedEncryption in accessPointsEncryptions)
+            foreach (var serializedEncryption in accessPointsEncryptions)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var encryption = JsonSerializer.Deserialize<string[]>(serializedEncryption).FirstOrDefault();
 
                 if (encryption is null) encryptionCountMap[_none]++;
@@ -362,12 +484,18 @@ namespace AccessPointMap.Application.AccessPoints
 
             if (limit == default)
             {
-                return sortedEncryptionCountMap;
+                return (!sortedEncryptionCountMap.Any())
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(sortedEncryptionCountMap);
             }
             else if (limit == 1)
             {
-                return sortedEncryptionCountMap
+                var queryResult = sortedEncryptionCountMap
                     .Take(1);
+
+                return (!queryResult.Any())
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(sortedEncryptionCountMap);
             }
             else
             {
@@ -383,8 +511,10 @@ namespace AccessPointMap.Application.AccessPoints
                     encryptionsAboveLimit.Add(new { Encryption = _other, Count = encryptionsUnderLimitCount });
                 }
 
-                return encryptionsAboveLimit;
-            }            
+                return (encryptionsAboveLimit.Count == 0)
+                    ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
+                    : Result.Success<IEnumerable<object>>(encryptionsAboveLimit);
+            }
         }
 
         private static class Helpers

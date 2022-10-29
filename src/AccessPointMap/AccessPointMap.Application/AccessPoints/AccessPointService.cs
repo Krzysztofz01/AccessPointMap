@@ -1,12 +1,15 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Core.Abstraction;
 using AccessPointMap.Application.Logging;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Events;
+using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Commands;
 using static AccessPointMap.Domain.AccessPoints.Events.V1;
@@ -35,46 +38,63 @@ namespace AccessPointMap.Application.AccessPoints
                 throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task Handle(IApplicationCommand<AccessPoint> command)
+        public async Task<Result> HandleAsync(IApplicationCommand<AccessPoint> command, CancellationToken cancellationToken = default)
         {
-            _logger.LogApplicationCommand(command);
-
-            switch (command)
+            try
             {
-                case V1.Create c: await HandleCreate(c); break;
+                _logger.LogApplicationCommand(command);
 
-                case V1.Delete c: await Apply(c.Id, new AccessPointDeleted { Id = c.Id }); break;
-                case V1.DeleteRange c: await ApplyDeleteRange(c.Ids); break;
-                case V1.Update c: await Apply(c.Id, new AccessPointUpdated { Id = c.Id, Note = c.Note }); break;
-                case V1.ChangeDisplayStatus c: await Apply(c.Id, new AccessPointDisplayStatusChanged { Id = c.Id, Status = c.Status.Value }); break;
-                case V1.ChangeDisplayStatusRange c: await ApplyChangeDisplayStatusRange(c.Ids, c.Status.Value); break;
-                case V1.MergeWithStamp c: await Apply(c.Id, new AccessPointMergedWithStamp { Id = c.Id, StampId = c.StampId, MergeSsid = c.MergeSsid.Value, MergeLowSignalLevel = c.MergeLowSignalLevel.Value, MergeHighSignalLevel = c.MergeHighSignalLevel.Value, MergeSecurityData = c.MergeSecurityData.Value }); break;
-                case V1.DeleteStamp c: await Apply(c.Id, new AccessPointStampDeleted { Id = c.Id, StampId = c.StampId }); break;
-                case V1.CreateAdnnotation c: await Apply(c.Id, new AccessPointAdnnotationCreated { Id = c.Id, Title = c.Title, Content = c.Content }); break;
-                case V1.DeleteAdnnotation c: await Apply(c.Id, new AccessPointAdnnotationDeleted { Id = c.Id, AdnnotationId = c.AdnnotationId }); break;
+                switch (command)
+                {
+                    case V1.Create c: await HandleCreateAsync(c, cancellationToken); break;
 
-                default: throw new InvalidOperationException("This command is not supported.");
+                    case V1.Delete c: await ApplyAsync(c.Id, new AccessPointDeleted { Id = c.Id }, cancellationToken); break;
+                    case V1.DeleteRange c: await ApplyDeleteRangeAsync(c.Ids, cancellationToken); break;
+                    case V1.Update c: await ApplyAsync(c.Id, new AccessPointUpdated { Id = c.Id, Note = c.Note }, cancellationToken); break;
+                    case V1.ChangeDisplayStatus c: await ApplyAsync(c.Id, new AccessPointDisplayStatusChanged { Id = c.Id, Status = c.Status.Value }, cancellationToken); break;
+                    case V1.ChangeDisplayStatusRange c: await ApplyChangeDisplayStatusRangeAsync(c.Ids, c.Status.Value, cancellationToken); break;
+                    case V1.MergeWithStamp c: await ApplyAsync(c.Id, new AccessPointMergedWithStamp { Id = c.Id, StampId = c.StampId, MergeSsid = c.MergeSsid.Value, MergeLowSignalLevel = c.MergeLowSignalLevel.Value, MergeHighSignalLevel = c.MergeHighSignalLevel.Value, MergeSecurityData = c.MergeSecurityData.Value }, cancellationToken); break;
+                    case V1.DeleteStamp c: await ApplyAsync(c.Id, new AccessPointStampDeleted { Id = c.Id, StampId = c.StampId }, cancellationToken); break;
+                    case V1.CreateAdnnotation c: await ApplyAsync(c.Id, new AccessPointAdnnotationCreated { Id = c.Id, Title = c.Title, Content = c.Content }, cancellationToken); break;
+                    case V1.DeleteAdnnotation c: await ApplyAsync(c.Id, new AccessPointAdnnotationDeleted { Id = c.Id, AdnnotationId = c.AdnnotationId }, cancellationToken); break;
+
+                    default: return Result.Failure(Error.FromString("This command is not supported."));
+                }
+
+                return Result.Success("Access point command applied successful.");
+            }
+            catch (DomainException ex)
+            {
+                var error = Error.FromException(ex);         
+                
+                return Result.Failure(error);
+            }
+            catch (TaskCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
             }
         }
 
-        private async Task Apply(Guid id, IEventBase @event)
+        private async Task ApplyAsync(Guid id, IEventBase @event, CancellationToken cancellationToken = default)
         {
-            // TODO: Pass the CancellationToken to the repository method
-            var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id);
+            var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id, cancellationToken);
 
             _logger.LogDomainEvent(@event);
 
             accessPoint.Apply(@event);
 
-            await _unitOfWork.Commit();
+            await _unitOfWork.Commit(cancellationToken);
         }
 
-        private async Task ApplyDeleteRange(IEnumerable<Guid> ids)
+        private async Task ApplyDeleteRangeAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
         {
             foreach (var id in ids)
             {
-                // TODO: Pass the CancellationToken to the repository method
-                var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id);
+                var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id, cancellationToken);
 
                 var @event = new AccessPointDeleted
                 {
@@ -86,15 +106,14 @@ namespace AccessPointMap.Application.AccessPoints
                 accessPoint.Apply(@event);
             }
 
-            await _unitOfWork.Commit();
+            await _unitOfWork.Commit(cancellationToken);
         }
 
-        private async Task ApplyChangeDisplayStatusRange(IEnumerable<Guid> ids, bool displayStatus)
+        private async Task ApplyChangeDisplayStatusRangeAsync(IEnumerable<Guid> ids, bool displayStatus, CancellationToken cancellationToken = default)
         {
             foreach (var id in ids)
             {
-                // TODO: Pass the CancellationToken to the repository method
-                var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id);
+                var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id, cancellationToken);
 
                 var @event = new AccessPointDisplayStatusChanged
                 {
@@ -107,10 +126,10 @@ namespace AccessPointMap.Application.AccessPoints
                 accessPoint.Apply(@event);
             }
 
-            await _unitOfWork.Commit();
+            await _unitOfWork.Commit(cancellationToken);
         }
 
-        private async Task HandleCreate(V1.Create command)
+        private async Task HandleCreateAsync(V1.Create command, CancellationToken cancellationToken = default)
         {
             var userId = _scopeWrapperService.GetUserId();
             var runId = Guid.NewGuid();
@@ -119,11 +138,9 @@ namespace AccessPointMap.Application.AccessPoints
             foreach (var ap in command.AccessPoints)
             {
                 //If bssid does not exist create aggregate, otherwise a new stamp in existing aggregate
-                // TODO: Pass the CancellationToken to the repository method
-                if (await _unitOfWork.AccessPointRepository.ExistsAsync(ap.Bssid))
+                if (await _unitOfWork.AccessPointRepository.ExistsAsync(ap.Bssid, cancellationToken))
                 {
-                    // TODO: Pass the CancellationToken to the repository method
-                    var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(ap.Bssid);
+                    var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(ap.Bssid, cancellationToken);
 
                     var accessPointStampCreateEvent = new AccessPointStampCreated
                     {
@@ -145,8 +162,6 @@ namespace AccessPointMap.Application.AccessPoints
                     _logger.LogDomainEvent(accessPointStampCreateEvent);
 
                     accessPoint.Apply(accessPointStampCreateEvent);
-
-                    await _unitOfWork.Commit();
                 }
                 else
                 {
@@ -171,28 +186,26 @@ namespace AccessPointMap.Application.AccessPoints
 
                     var accessPoint = AccessPoint.Factory.Create(accessPointCreateEvent);
 
-                    var accessPointManufacturerChangedEvent = new AccessPointManufacturerChanged
+                    var ouiLookupResult = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
+
+                    if (ouiLookupResult.IsSuccess)
                     {
-                        Id = accessPoint.Id,
-                        Manufacturer = await ResolveManufacturer(accessPoint.Bssid)
-                    };
+                        var accessPointManufacturerChangedEvent = new AccessPointManufacturerChanged
+                        {
+                            Id = accessPoint.Id,
+                            Manufacturer = ouiLookupResult.Value
+                        };
 
-                    _logger.LogDomainEvent(accessPointManufacturerChangedEvent);
+                        _logger.LogDomainEvent(accessPointManufacturerChangedEvent);
 
-                    accessPoint.Apply(accessPointManufacturerChangedEvent);
+                        accessPoint.Apply(accessPointManufacturerChangedEvent);
+                    }
 
-                    // TODO: Pass the CancellationToken to the repository method
-                    await _unitOfWork.AccessPointRepository.AddAsync(accessPoint);
-
-                    await _unitOfWork.Commit();
+                    await _unitOfWork.AccessPointRepository.AddAsync(accessPoint, cancellationToken);
                 }
             }
-        }
 
-        private async Task<string> ResolveManufacturer(string bssid)
-        {
-            // TODO: Pass CancellationToken to the method
-            return await _ouiLookupService.GetManufacturerNameAsync(bssid);
+            await _unitOfWork.Commit(cancellationToken);
         }
     }
 }

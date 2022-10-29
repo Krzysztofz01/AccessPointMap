@@ -11,6 +11,7 @@ using AccessPointMap.API.Controllers.Base;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using System.Threading;
 
 namespace AccessPointMap.API.Controllers
 {
@@ -25,31 +26,23 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<IdentitySimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.IdentityRepository.GetAllIdentities(cancellationToken);
 
-            var response = await _unitOfWork.IdentityRepository.GetAllIdentities();
-
-            var mappedResponse = MapToDto<IEnumerable<IdentitySimple>>(response);
-
-            StoreToCache(mappedResponse);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, true, typeof(IEnumerable<IdentitySimple>), cancellationToken);
         }
 
         [HttpGet("{identityId}")]
         [ProducesResponseType(typeof(IEnumerable<IdentityDetails>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetById(Guid identityId)
+        public async Task<IActionResult> GetById(
+            Guid identityId,
+            CancellationToken cancellationToken)
         {
-            var response = await _unitOfWork.IdentityRepository.GetIdentityById(identityId);
+            var query = _unitOfWork.IdentityRepository.GetIdentityById(identityId, cancellationToken);
 
-            var mappedResponse = MapToDto<IdentityDetails>(response);
-
-            StoreToCache(mappedResponse);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(IdentityDetails), cancellationToken);
         }
     }
 }

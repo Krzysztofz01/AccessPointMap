@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Application.Kml.Core;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Domain.AccessPoints;
 using SharpKml.Base;
 using SharpKml.Dom;
@@ -27,7 +28,7 @@ namespace AccessPointMap.Application.Kml.Sharpkml
 
         public SharpkmlKmlParsingService() { }
 
-        public Task<KmlResult> GenerateKmlAsync(IEnumerable<AccessPoint> accessPoints, CancellationToken cancellationToken = default)
+        public Task<Result<KmlResult>> GenerateKmlAsync(IEnumerable<AccessPoint> accessPoints, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -48,18 +49,16 @@ namespace AccessPointMap.Application.Kml.Sharpkml
                 using var memoryFileStream = new MemoryStream();
                 kml.Save(memoryFileStream);
 
-                return Task.FromResult(new KmlResult
-                {
-                    FileBuffer = memoryFileStream.ToArray()
-                });
+                var kmlFile = KmlResult.FromBuffer(memoryFileStream.ToArray());
+                return Task.FromResult(Result.Success(kmlFile));
             }
             catch (OperationCanceledException)
             {
                 throw;
             }
-            catch (Exception)
+            catch
             {
-                return null;
+                return Task.FromResult(Result.Failure<KmlResult>(KmlParserError.FatalError));
             }
         }
 

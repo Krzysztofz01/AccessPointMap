@@ -1,6 +1,8 @@
-﻿namespace AccessPointMap.Application.Integration.Core
+﻿using AccessPointMap.Application.Core.Abstraction;
+
+namespace AccessPointMap.Application.Integration.Core
 {
-    public interface IIntegrationCommand
+    public interface IIntegrationCommand : ICommand
     {
     }
 }

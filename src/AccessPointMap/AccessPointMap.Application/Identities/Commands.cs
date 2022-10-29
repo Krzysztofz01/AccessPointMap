@@ -1,4 +1,4 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Core.Abstraction;
 using AccessPointMap.Domain.Identities;
 using System;
 
