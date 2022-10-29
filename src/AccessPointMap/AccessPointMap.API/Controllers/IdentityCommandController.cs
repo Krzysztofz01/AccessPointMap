@@ -13,7 +13,7 @@ namespace AccessPointMap.API.Controllers
     [Route("api/v{version:apiVersion}/identities")]
     [ApiVersion("1.0")]
     [Authorize(Roles = "Admin")]
-    public class IdentityCommandController : CommandController
+    public class IdentityCommandController : CommandController<IdentityCommandController>
     {
         private readonly IIdentityService _identityService;
 

@@ -15,7 +15,7 @@ namespace AccessPointMap.API.Controllers
 {
     [Route("api/v{version:apiVersion}/integrations")]
     [ApiVersion("1.0")]
-    public class IntegrationQueryController : QueryController
+    public class IntegrationQueryController : QueryController<IntegrationQueryController>
     {
         private readonly Wigle.IWigleIntegrationService _wigleIntegrationService;
 

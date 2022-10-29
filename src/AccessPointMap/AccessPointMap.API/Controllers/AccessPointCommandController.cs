@@ -12,7 +12,7 @@ namespace AccessPointMap.API.Controllers
 {
     [Route("api/v{version:apiVersion}/accesspoints")]
     [ApiVersion("1.0")]
-    public class AccessPointCommandController : CommandController
+    public class AccessPointCommandController : CommandController<AccessPointCommandController>
     {
         private readonly IAccessPointService _accessPointService;
 

@@ -17,7 +17,7 @@ namespace AccessPointMap.API.Controllers
     [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [Route("api/v{version:apiVersion}/auth")]
     [ApiVersion("1.0")]
-    public class AuthenticationController : CommandController
+    public class AuthenticationController : CommandController<AuthenticationController>
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly ILogger<AuthenticationController> _logger;
