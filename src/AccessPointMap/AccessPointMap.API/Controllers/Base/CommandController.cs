@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Application.Core;
+﻿using AccessPointMap.Application.Authentication;
+using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Core.Abstraction;
 using AccessPointMap.Application.Extensions;
 using AccessPointMap.Application.Integration.Core;
@@ -34,7 +35,7 @@ namespace AccessPointMap.API.Controllers.Base
 
         protected async Task<IActionResult> ExecuteCommandAsync<TAggregateRoot>(IApplicationCommand<TAggregateRoot> command, IApplicationService<TAggregateRoot> handlerService, CancellationToken cancellationToken = default) where TAggregateRoot : AggregateRoot
         {
-            LogCurrentScope(command);
+            LogIncomingCommandReuqest(command);
 
             var result = await handlerService.HandleAsync(command, cancellationToken);
 
@@ -45,7 +46,7 @@ namespace AccessPointMap.API.Controllers.Base
 
         protected async Task<IActionResult> ExecuteIntegrationCommandAsync(IIntegrationCommand command, IIntegrationContract handlerIntegrationService, CancellationToken cancellationToken = default)
         {
-            LogCurrentScope(command);
+            LogIncomingCommandReuqest(command);
 
             var result = await handlerIntegrationService.HandleCommandAsync(command, cancellationToken);
 
@@ -54,7 +55,7 @@ namespace AccessPointMap.API.Controllers.Base
             return new OkResult();
         }
 
-        private void LogCurrentScope(ICommand command)
+        protected void LogIncomingCommandReuqest(ICommand command)
         {
             string currentPath = Request.GetEncodedPathAndQuery() ?? string.Empty;
             string currentHost = Request.GetIpAddressString() ?? string.Empty;
@@ -62,6 +63,16 @@ namespace AccessPointMap.API.Controllers.Base
                 "Anonymous";
 
             _logger.LogCommandController(command, currentPath, currentIdentityId, currentHost);
+        }
+
+        protected void LogIncomingAuthenticationRequest(IAuthenticationRequest request)
+        {
+            string currentPath = Request.GetEncodedPathAndQuery() ?? string.Empty;
+            string currentHost = Request.GetIpAddressString() ?? string.Empty;
+            string currentIdentityId = Request.HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                "Anonymous";
+
+            _logger.LogAuthenticationController(request, currentPath, currentIdentityId, currentHost);
         }
 
         private static IActionResult GetFailureResponse(Error error)

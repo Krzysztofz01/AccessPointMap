@@ -22,6 +22,8 @@ namespace AccessPointMap.Application.Logging
         const string _commandControllerInformationMessage = "Command controller: {ControllerName} | Command: {CommandName} | Path: {CommandPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
         const string _commandControllerDebugMessage = "Command controller: {ControllerName} | Command: {CommandName} | Path: {CommandPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedCommand}";
         const string _queryControllerInformationMessage = "Query controller: {ControllerName} | Path: {QueryPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
+        const string _authenticationControllerInformationMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
+        const string _authenticationControllerDebugMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedRequest}";
 
         public static void LogDomainEvent(this ILogger logger, IEventBase @event)
         {
@@ -87,10 +89,28 @@ namespace AccessPointMap.Application.Logging
             logger.LogDebug(message, command.GetType().Name, values.ToString());
         }
 
-        public static void LogAuthenticationRequest(this ILogger logger, IAuthenticationRequest request, string ipAddress)
+        public static void LogAuthenticationController<TCategoryName>(this ILogger<TCategoryName> logger, IAuthenticationRequest request, string path, string identityId, string hostAddress)
         {
-            const string message = "Authentication request: {RequestName} received from address: {IpAddress}.";
-            logger.LogInformation(message, request.GetType().Name, ipAddress);
+            if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
+            {
+                logger.LogDebug(_authenticationControllerDebugMessage,
+                    typeof(TCategoryName).Name,
+                    request.GetType().Name,
+                    path,
+                    identityId,
+                    hostAddress,
+                    "Request body hidden");
+            }
+
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(_authenticationControllerInformationMessage,
+                    typeof(TCategoryName).Name,
+                    request.GetType().Name,
+                    path,
+                    identityId,
+                    hostAddress);
+            }
         }
 
         public static void LogCommandController<TCategoryName>(this ILogger<TCategoryName> logger, ICommand command, string path, string identityId, string hostAddress)
