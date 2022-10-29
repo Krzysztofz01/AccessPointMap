@@ -10,7 +10,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Dto;
@@ -83,13 +82,11 @@ namespace AccessPointMap.API.Controllers
             var accessPointsResult = await _unitOfWork.AccessPointRepository
                 .GetAllAccessPoints(null, null, null, null, null, null, null, null, cancellationToken);
 
-            // TODO: Error message
-            if (accessPointsResult.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
+            if (accessPointsResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
 
             var kmlFileResult = await _kmlParsingService.GenerateKmlAsync(accessPointsResult.Value, cancellationToken);
 
-            // TODO: Error message
-            if (kmlFileResult.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
+            if (kmlFileResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
 
             return await HandleFileResult(kmlFileResult.Value, true, KmlContentMimeType, cancellationToken);
         }
@@ -103,13 +100,11 @@ namespace AccessPointMap.API.Controllers
             var accessPointsResult = await _unitOfWork.AccessPointRepository
                 .GetAllAccessPointsAdministration(null, null, null, null, null, null, null, null, cancellationToken);
 
-            // TODO: Error message
-            if (accessPointsResult.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
+            if (accessPointsResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
 
             var kmlFileResult = await _kmlParsingService.GenerateKmlAsync(accessPointsResult.Value, cancellationToken);
 
-            // TODO: Error message
-            if (kmlFileResult.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
+            if (kmlFileResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
 
             return await HandleFileResult(kmlFileResult.Value, true, KmlContentMimeType, cancellationToken);
         }

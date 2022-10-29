@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,8 +34,7 @@ namespace AccessPointMap.API.Controllers
         {
             var result = await _wigleIntegrationService.HandleQueryAsync(new Wigle.Queries.ExportAccessPointsToCsv(), cancellationToken);
 
-            // TODO: Error message
-            if (result.IsFailure) return StatusCode((int)HttpStatusCode.InternalServerError);
+            if (result.IsFailure) return GetFailureResponse(result.Error);
 
             return await HandleFileResult(result.Value as ExportFile, true, CsvContentMimeType, cancellationToken);
         }

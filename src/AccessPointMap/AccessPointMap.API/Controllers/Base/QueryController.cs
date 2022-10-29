@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
@@ -133,13 +134,20 @@ namespace AccessPointMap.API.Controllers.Base
             _memoryCache.Set(GetCacheEntryKey(false), value, cacheOptions);
         }
 
-        private static IActionResult GetFailureResponse(Error error)
+        protected IActionResult GetFailureResponse(Error error)
         {
-            // TODO: Pass error message
-            if (error is NotFoundError)
-                return new NotFoundResult();
+            var problemDetails = ProblemDetailsFactory.CreateProblemDetails(HttpContext);
+            problemDetails.Title = error.Message;
+            problemDetails.Detail = null;
 
-            return new BadRequestResult();
+            if (error is NotFoundError)
+            {
+                problemDetails.Status = (int)HttpStatusCode.NotFound;
+                return NotFound(problemDetails);
+            }
+
+            problemDetails.Status = (int)HttpStatusCode.BadRequest;
+            return BadRequest(problemDetails);
         }
 
         private void LogCurrentScope()

@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.Authentication;
+using AccessPointMap.Application.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using static AccessPointMap.Application.Authentication.Requests;
 
 namespace AccessPointMap.API.Controllers
 {
+    [ProducesResponseType((int)HttpStatusCode.Forbidden)]
     [Route("api/v{version:apiVersion}/auth")]
     [ApiVersion("1.0")]
     public class AuthenticationController : CommandController
@@ -39,16 +41,8 @@ namespace AccessPointMap.API.Controllers
             LogIncomingAuthenticationRequest(request);
 
             var result = await _authenticationService.Login(request, cancellationToken);
-            if (result.IsFailure)
-            {
-                // TODO: Failure message
-                return result.Error switch
-                {
-                    AuthenticationCredentialsError => Forbid(),
-                    AuthenticationIdentityError => BadRequest(),
-                    _ => StatusCode((int)HttpStatusCode.InternalServerError)
-                };
-            }
+            if (result.IsFailure) return GetFailureResponse(result.Error);
+
 
             return Ok(result.Value);
         }
@@ -63,16 +57,7 @@ namespace AccessPointMap.API.Controllers
             LogIncomingAuthenticationRequest(request);
 
             var result = await _authenticationService.Refresh(request, cancellationToken);
-            if (result.IsFailure)
-            {
-                // TODO: Failure message
-                return result.Error switch
-                {
-                    AuthenticationCredentialsError => Forbid(),
-                    AuthenticationIdentityError => BadRequest(),
-                    _ => StatusCode((int)HttpStatusCode.InternalServerError)
-                };
-            }
+            if (result.IsFailure) return GetFailureResponse(result.Error);
 
             return Ok(result.Value);
         }
@@ -85,11 +70,7 @@ namespace AccessPointMap.API.Controllers
             LogIncomingAuthenticationRequest(request);
 
             var result = await _authenticationService.Logout(request, cancellationToken);
-            if (result.IsFailure)
-            {
-                // TODO: Failure message
-                return BadRequest();
-            }
+            if (result.IsFailure) return GetFailureResponse(result.Error);
 
             return Ok();
         }
@@ -102,11 +83,7 @@ namespace AccessPointMap.API.Controllers
             LogIncomingAuthenticationRequest(request);
 
             var result = await _authenticationService.PasswordReset(request, cancellationToken);
-            if (result.IsFailure)
-            {
-                // TODO: Failure message
-                return BadRequest();
-            }
+            if (result.IsFailure) return GetFailureResponse(result.Error);
 
             return Ok();
         }
@@ -120,13 +97,32 @@ namespace AccessPointMap.API.Controllers
             LogIncomingAuthenticationRequest(request);
 
             var result = await _authenticationService.Register(request, cancellationToken);
-            if (result.IsFailure)
-            {
-                // TODO: Failure message
-                return BadRequest();
-            }
+            if (result.IsFailure) return GetFailureResponse(result.Error);
 
             return Ok();
+        }
+
+        private IActionResult GetFailureResponse(Error error)
+        {
+            var problemDetails = ProblemDetailsFactory.CreateProblemDetails(HttpContext);
+
+            problemDetails.Title = error.Message;
+            problemDetails.Detail = null;
+
+            if (error is AuthenticationCredentialsError)
+            {
+                problemDetails.Status = (int)HttpStatusCode.Forbidden;
+                return StatusCode((int)HttpStatusCode.Forbidden, problemDetails);
+            }
+
+            if (error is AuthenticationIdentityError)
+            {
+                problemDetails.Status = (int)HttpStatusCode.BadRequest;
+                return StatusCode((int)HttpStatusCode.BadRequest, problemDetails);
+            }
+
+            problemDetails.Status = (int)HttpStatusCode.BadRequest;
+            return StatusCode((int)HttpStatusCode.BadRequest, problemDetails);
         }
     }
 }

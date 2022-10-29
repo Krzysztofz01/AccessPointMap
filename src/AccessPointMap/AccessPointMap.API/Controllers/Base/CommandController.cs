@@ -75,10 +75,15 @@ namespace AccessPointMap.API.Controllers.Base
             _logger.LogAuthenticationController(request, currentPath, currentIdentityId, currentHost);
         }
 
-        private static IActionResult GetFailureResponse(Error error)
+        private IActionResult GetFailureResponse(Error error)
         {
-            // TODO: Pass error message
-            return new BadRequestResult();
+            var problemDetails = ProblemDetailsFactory.CreateProblemDetails(HttpContext);
+
+            problemDetails.Title = error.Message;
+            problemDetails.Detail = null;
+            problemDetails.Status = (int)HttpStatusCode.BadRequest;
+
+            return BadRequest(problemDetails);
         }
     }
 }
