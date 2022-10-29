@@ -23,11 +23,11 @@ namespace AccessPointMap.API.Controllers.Base
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public abstract class CommandController : ControllerBase
+    public abstract class CommandController<TController> : ControllerBase where TController : CommandController<TController>
     {
-        private readonly ILogger<CommandController> _logger;
+        private readonly ILogger<TController> _logger;
 
-        public CommandController(ILogger<CommandController> logger)
+        public CommandController(ILogger<TController> logger)
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
