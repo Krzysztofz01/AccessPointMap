@@ -5,7 +5,7 @@ using Quartz;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class BackgroundJobConfiguration
+    internal static class BackgroundJobConfiguration
     {
         private const string _schedulerId = "AccessPointMapQuartz";
       

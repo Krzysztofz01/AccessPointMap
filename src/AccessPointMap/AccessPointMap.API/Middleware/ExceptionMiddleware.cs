@@ -43,6 +43,8 @@ namespace AccessPointMap.API.Middleware
                 LogCurrentBehaviour(context, "Request piped to the global error filter.");
 
                 await _next(context);
+
+                LogCurrentBehaviour(context, "Request handled without unexpected errors.");
             }
             catch (TaskCanceledException ex)
             {

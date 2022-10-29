@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class ValidationConfiguration
+    internal static class ValidationConfiguration
     {
         public static IServiceCollection AddValidation(this IServiceCollection services)
         {

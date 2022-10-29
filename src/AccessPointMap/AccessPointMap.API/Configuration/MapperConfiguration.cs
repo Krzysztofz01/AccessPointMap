@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class MapperConfiguration
+    internal static class MapperConfiguration
     {
         public static IServiceCollection AddMapper(this IServiceCollection services)
         {

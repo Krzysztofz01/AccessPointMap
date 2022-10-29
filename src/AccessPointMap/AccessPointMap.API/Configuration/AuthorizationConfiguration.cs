@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class AuthorizationConfiguration
+    internal static class AuthorizationConfiguration
     {
         public static IServiceCollection AddAuthorization(this IServiceCollection services, IConfiguration configuration)
         {
