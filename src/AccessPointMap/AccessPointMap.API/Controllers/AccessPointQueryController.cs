@@ -261,7 +261,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("match/stamp/{accessPointStampId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByStampIdFull(
             Guid accessPointStampId,
             CancellationToken cancellationToken)
@@ -273,7 +273,6 @@ namespace AccessPointMap.API.Controllers
         }
 
         [HttpGet("match/packet/{accessPointPacketId}")]
-        [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByPacketId(
             Guid accessPointPacketId,
@@ -287,7 +286,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("match/packet/{accessPointPacketId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
         public async Task<IActionResult> MatchByPacketIdFull(
             Guid accessPointPacketId,
             CancellationToken cancellationToken)
