@@ -527,6 +527,27 @@ namespace AccessPointMap.Application.AccessPoints
                 .ToResultObjectAsync();
         }
 
+        public static async Task<Result<IEnumerable<string>>> GetAccessPointIdsWithoutManufacturerSpecified(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
+        {
+            return await accessPointRepository.Entities
+                .Where(a => a.Manufacturer.Value == string.Empty)
+                .Select(a => a.Id.ToString())
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
+        }
+
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAccessPointsForPresenceCheckJob(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
+        {
+            return await accessPointRepository.Entities
+                .Include(a => a.Stamps)
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
+        }
+
         private static class Helpers
         {
             public static bool IsAccessPointInArea(

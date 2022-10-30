@@ -2,6 +2,7 @@
 using AccessPointMap.Application.Core.Abstraction;
 using AccessPointMap.Domain.Core.Events;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Text;
 using System.Text.Json;
 
@@ -24,7 +25,8 @@ namespace AccessPointMap.Application.Logging
         const string _queryControllerInformationMessage = "Query controller: {ControllerName} | Path: {QueryPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
         const string _authenticationControllerInformationMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
         const string _authenticationControllerDebugMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedRequest}";
-
+        const string _jobBehaviourInformationMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}";
+        const string _jobBehaviourErrorMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}\n    {Exception}";
         public static void LogDomainEvent(this ILogger logger, IEventBase @event)
         {
             if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
@@ -148,6 +150,27 @@ namespace AccessPointMap.Application.Logging
                     path,
                     identityId,
                     hostAddress);
+            }
+        }
+
+        public static void LogScheduledJobBehaviour<TCategoryName>(this ILogger<TCategoryName> logger, string behaviourDescription)
+        {
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(_jobBehaviourInformationMessage,
+                    typeof(TCategoryName).Name,
+                    behaviourDescription);
+            }
+        }
+
+        public static void LogScheduledJobBehaviour<TCategoryName>(this ILogger<TCategoryName> logger, string behaviourDescription, Exception exception)
+        {
+            if (logger.IsEnabled(LogLevel.Error))
+            {
+                logger.LogError(_jobBehaviourErrorMessage,
+                    typeof(TCategoryName).Name,
+                    behaviourDescription,
+                    exception);
             }
         }
     }
