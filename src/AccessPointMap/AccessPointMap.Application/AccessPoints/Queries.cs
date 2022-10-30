@@ -3,7 +3,6 @@ using AccessPointMap.Application.Extensions;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
-using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
