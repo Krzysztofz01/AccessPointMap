@@ -1,6 +1,7 @@
-﻿using AccessPointMap.Domain.AccessPoints;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Logging;
+using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
@@ -35,37 +36,48 @@ namespace AccessPointMap.Application.AccessPoints
         {
             try
             {
-                _logger.LogInformation($"{JobName} scheduled job started.");
+                _logger.LogScheduledJobBehaviour("Scheduled job started.");
 
-                var accessPointsTracked = await _unitOfWork.AccessPointRepository.Entities
-                    .Include(a => a.Stamps)
-                    .Where(a => !a.DeletedAt.HasValue)
-                    .ToListAsync();
+                var accessPointsResult = await _unitOfWork.AccessPointRepository
+                    .GetAccessPointsForPresenceCheckJob(context.CancellationToken);
 
-                var accessPointsRepresentation = accessPointsTracked
+                if (accessPointsResult.IsFailure && accessPointsResult.Error is NotFoundError)
+                {
+                    _logger.LogScheduledJobBehaviour("Quitting the scheduled job. No access points to perform presence check.");
+                    return;
+                }
+
+                var accessPointsRepresentation = accessPointsResult.Value
                     .Select(a => new AccessPointRepresentation(a));
 
                 foreach (var accessPointRepresentation in accessPointsRepresentation)
                 {
+                    context.CancellationToken.ThrowIfCancellationRequested();
+
                     if (!IsPresent(accessPointRepresentation, accessPointsRepresentation))
                     {
-                        var targetAccessPointEntity = accessPointsTracked.Single(a => a.Id == accessPointRepresentation.Id);
+                        var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(accessPointRepresentation.Id, context.CancellationToken);
 
-                        targetAccessPointEntity.Apply(new Events.V1.AccessPointPresenceStatusChanged
+                        accessPoint.Apply(new Events.V1.AccessPointPresenceStatusChanged
                         {
-                            Id = targetAccessPointEntity.Id,
+                            Id = accessPoint.Id,
                             Presence = false
                         });
                     }
                 }
 
-                await _unitOfWork.Commit();
+                await _unitOfWork.Commit(context.CancellationToken);
 
-                _logger.LogInformation($"{JobName} scheduled job finished.");         
+                _logger.LogScheduledJobBehaviour("Scheduled job finished.");        
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogScheduledJobBehaviour("Scheduled job interupted via task cancellation.");
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{JobName} scheduled job failed.", ex);
+                _logger.LogScheduledJobBehaviour("Scheduled job failed.", ex);
             }
         }
 
