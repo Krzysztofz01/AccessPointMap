@@ -25,14 +25,14 @@ namespace AccessPointMap.API.Controllers.Base
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public abstract class QueryController : ControllerBase
+    public abstract class QueryController<TController> : ControllerBase where TController : QueryController<TController>
     {
         protected readonly IUnitOfWork _unitOfWork;
         protected readonly IMapper _mapper;
         protected readonly IMemoryCache _memoryCache;
-        protected readonly ILogger<QueryController> _logger;
+        protected readonly ILogger<TController> _logger;
 
-        public QueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<QueryController> logger)
+        public QueryController(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache, ILogger<TController> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));

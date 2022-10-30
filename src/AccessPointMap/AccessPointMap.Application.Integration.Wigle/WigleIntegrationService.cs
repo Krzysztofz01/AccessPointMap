@@ -1,4 +1,5 @@
-﻿using AccessPointMap.Application.Core;
+﻿using AccessPointMap.Application.AccessPoints;
+using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
 using AccessPointMap.Application.Integration.Wigle.Extensions;
@@ -180,15 +181,6 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private async Task<Result<object>> HandleQuery(Queries.ExportAccessPointsToCsv _, CancellationToken cancellationToken = default)
         {
-            // TODO: Prepare specific query
-            var accessPoints = UnitOfWork.AccessPointRepository.Entities
-                .Where(a => !a.DeletedAt.HasValue)
-                .Where(a => a.DisplayStatus.Value)
-                .ToList();
-
-            var records = accessPoints
-                .Select(a => AccessPointToRecord(a));
-
             using (var memoryStream = new MemoryStream())
             {
                 using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
@@ -201,7 +193,13 @@ namespace AccessPointMap.Application.Integration.Wigle
 
                     await csvWriter.NextRecordAsync();
 
-                    await csvWriter.WriteRecordsAsync(records);
+                    var accessPointsResult = await UnitOfWork.AccessPointRepository.GetAccessPointsForCsvExport(cancellationToken);
+                    if (accessPointsResult.IsFailure) return Result.Failure<object>(accessPointsResult.Error);
+
+                    var accessPointRecords = accessPointsResult.Value
+                        .Select(a => AccessPointToRecord(a));
+
+                    await csvWriter.WriteRecordsAsync(accessPointRecords, cancellationToken);
                 }
 
                 var exportFile = ExportFile.FromBuffer(memoryStream.ToArray());
@@ -344,7 +342,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             return new AccessPointRecord
             {
                 Mac = accessPoint.Bssid.Value,
-                Ssid = accessPoint.Ssid.Value,
+                Ssid = accessPoint.Ssid.Value == "Hidden network" ? string.Empty : accessPoint.Ssid.Value,
                 AuthMode = accessPoint.Security.RawSecurityPayload,
                 FirstSeen = accessPoint.CreationTimestamp.Value,
                 Channel = 0,

@@ -518,6 +518,16 @@ namespace AccessPointMap.Application.AccessPoints
             }
         }
 
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAccessPointsForCsvExport(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
+        {
+            return await accessPointRepository.Entities
+                .Where(a => a.DisplayStatus.Value)
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
+        }
+
         public static async Task<Result<IEnumerable<string>>> GetAccessPointIdsWithoutManufacturerSpecified(
             this IAccessPointRepository accessPointRepository,
             CancellationToken cancellationToken = default)

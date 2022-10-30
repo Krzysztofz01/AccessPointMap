@@ -13,7 +13,7 @@ namespace AccessPointMap.API.Controllers
 {
     [Route("api/v{version:apiVersion}/integrations")]
     [ApiVersion("1.0")]
-    public class IntegrationCommandController : CommandController
+    public class IntegrationCommandController : CommandController<IntegrationCommandController>
     {
         private readonly Wigle.IWigleIntegrationService _wigleIntegrationService;
         private readonly Aircrackng.IAircrackngIntegrationService _aircrackngIntegrationService;
