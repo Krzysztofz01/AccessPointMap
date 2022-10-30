@@ -3,6 +3,7 @@ using AccessPointMap.Application.Extensions;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.AccessPoints.AccessPointPackets;
 using AccessPointMap.Domain.AccessPoints.AccessPointStamps;
+using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -515,6 +516,27 @@ namespace AccessPointMap.Application.AccessPoints
                     ? Result.Failure<IEnumerable<object>>(NotFoundError.Default)
                     : Result.Success<IEnumerable<object>>(encryptionsAboveLimit);
             }
+        }
+
+        public static async Task<Result<IEnumerable<string>>> GetAccessPointIdsWithoutManufacturerSpecified(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
+        {
+            return await accessPointRepository.Entities
+                .Where(a => a.Manufacturer.Value == string.Empty)
+                .Select(a => a.Id.ToString())
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
+        }
+
+        public static async Task<Result<IEnumerable<AccessPoint>>> GetAccessPointsForPresenceCheckJob(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
+        {
+            return await accessPointRepository.Entities
+                .Include(a => a.Stamps)
+                .ToListAsync(cancellationToken)
+                .ToResultObjectAsync();
         }
 
         private static class Helpers
