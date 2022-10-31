@@ -42,7 +42,7 @@ namespace AccessPointMap.Application.AccessPoints
         {
             try
             {
-                _logger.LogApplicationCommand(command);
+                LogCommand(command);
 
                 switch (command)
                 {
@@ -206,6 +206,14 @@ namespace AccessPointMap.Application.AccessPoints
             }
 
             await _unitOfWork.Commit(cancellationToken);
+        }
+
+        private void LogCommand(IApplicationCommand<AccessPoint> command)
+        {
+            var userId = _scopeWrapperService.GetUserIdOrDefault();
+            var userIdString = userId.HasValue ? userId.Value.ToString() : string.Empty;
+
+            _logger.LogApplicationCommand(command, userIdString);
         }
     }
 }
