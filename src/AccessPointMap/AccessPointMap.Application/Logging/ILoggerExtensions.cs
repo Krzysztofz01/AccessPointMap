@@ -56,7 +56,7 @@ namespace AccessPointMap.Application.Logging
 
             if (logger.IsEnabled(LogLevel.Information))
             {
-                logger.LogDebug(_domainEventInformationMessage,
+                logger.LogInformation(_domainEventInformationMessage,
                     typeof(TCategoryName).Name,
                     @event.GetType().Name,
                     entityId);
