@@ -4,7 +4,6 @@ using AccessPointMap.Domain.Core.Events;
 using AccessPointMap.Domain.Core.Models;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Text;
 using System.Text.Json;
 
 namespace AccessPointMap.Application.Logging
@@ -21,15 +20,17 @@ namespace AccessPointMap.Application.Logging
             MaxDepth = 8
         };
 
-        const string _commandControllerInformationMessage = "Command controller: {ControllerName} | Command: {CommandName} | Path: {CommandPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
-        const string _commandControllerDebugMessage = "Command controller: {ControllerName} | Command: {CommandName} | Path: {CommandPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedCommand}";
-        const string _queryControllerInformationMessage = "Query controller: {ControllerName} | Path: {QueryPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
-        const string _authenticationControllerInformationMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
-        const string _authenticationControllerDebugMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedRequest}";
-        const string _jobBehaviourInformationMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}";
-        const string _jobBehaviourErrorMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}\n    {Exception}";
-        const string _domainEventInformationMessage = "Domain event envoked at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}";
-        const string _domainEventDebugMessage = "Domain event envoked at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}\n    {SerializedEvent}";
+        private const string _commandControllerInformationMessage = "Command controller: {ControllerName} | Command: {CommandName} | Path: {CommandPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
+        private const string _commandControllerDebugMessage = "Command controller: {ControllerName} | Command: {CommandName} | Path: {CommandPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedCommand}";
+        private const string _queryControllerInformationMessage = "Query controller: {ControllerName} | Path: {QueryPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
+        private const string _authenticationControllerInformationMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}";
+        private const string _authenticationControllerDebugMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedRequest}";
+        private const string _jobBehaviourInformationMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}";
+        private const string _jobBehaviourErrorMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}\n    {Exception}";
+        private const string _domainEventInformationMessage = "Domain event raised at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}";
+        private const string _domainEventDebugMessage = "Domain event raised at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}\n    {SerializedEvent}";
+        private const string _applicationCommandInformationMessage = "Application command envoked at: {CommandEnvoker} | Command: {CommandName} | IdentityId: {IdentityId}";
+        private const string _applicationCommandDebugMessage = "Application command envoked at: {CommandEnvoker} | Command: {CommandName} | IdentityId: {IdentityId}\n  {SerializedCommand}";
 
         public static void LogDomainEvent<TCategoryName>(this ILogger<TCategoryName> logger, IEvent @event)
         {
@@ -63,36 +64,26 @@ namespace AccessPointMap.Application.Logging
             }
         }
 
-        public static void LogApplicationCommand(this ILogger logger, ICommand command)
+        public static void LogApplicationCommand<TCategoryName>(this ILogger<TCategoryName> logger, ICommand command, string identityId)
         {
             if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
             {
-                logger.LogApplicationCommandDebug(command);
-                return;
+                var serializedCommand = JsonSerializer.Serialize(command, _jsonSerialzierOptions);
+
+                logger.LogDebug(_applicationCommandDebugMessage,
+                    typeof(TCategoryName).Name,
+                    command.GetType().Name,
+                    identityId,
+                    serializedCommand);
             }
 
-            logger.LogApplicationCommandInformation(command);
-        }
-
-        private static void LogApplicationCommandInformation(this ILogger logger, ICommand command)
-        {
-            const string message = "Application command: {CommandName} requested.";
-            logger.LogInformation(message, command.GetType().Name);
-        }
-
-        private static void LogApplicationCommandDebug(this ILogger logger, ICommand command)
-        {
-            var values = new StringBuilder(string.Empty);
-            foreach (var prop in command.GetType().GetProperties())
+            if (logger.IsEnabled(LogLevel.Information))
             {
-                values.Append(prop.Name);
-                values.Append('=');
-                values.Append(prop.GetValue(command, null));
-                values.Append(';');
+                logger.LogInformation(_applicationCommandInformationMessage,
+                    typeof(TCategoryName).Name,
+                    command.GetType().Name,
+                    identityId);
             }
-
-            const string message = "Application command: {CommandName} requested. Application command properties: {CommandPropertyDump}";
-            logger.LogDebug(message, command.GetType().Name, values.ToString());
         }
 
         public static void LogAuthenticationController<TCategoryName>(this ILogger<TCategoryName> logger, IAuthenticationRequest request, string path, string identityId, string hostAddress)
