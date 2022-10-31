@@ -1,11 +1,13 @@
 ﻿using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Integration.Core.Extensions;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +32,8 @@ namespace AccessPointMap.Application.Integration.Wireshark
             IUnitOfWork unitOfWork,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService,
+            ILogger<WiresharkIntegrationService> logger) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService, logger) { }
 
         public async Task<Result> HandleCommandAsync(IIntegrationCommand command, CancellationToken cancellationToken = default)
         {
@@ -119,22 +122,22 @@ namespace AccessPointMap.Application.Integration.Wireshark
 
             foreach (var packet in packets)
             {
-                accessPoint.Apply(new Events.V1.AccessPointPacketCreated
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointPacketCreated
                 {
                     Id = accessPoint.Id,
                     SourceAddress = packet.SourceAddress,
                     DestinationAddress = packet.DestinationAddress,
                     FrameType = packet.FrameType,
                     Data = packet.Data
-                });
+                }, Logger);
             }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
-            });
+            }, Logger);
         }
     }
 }

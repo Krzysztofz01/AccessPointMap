@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace AccessPointMap.Application.Integration.Core
@@ -11,6 +12,7 @@ namespace AccessPointMap.Application.Integration.Core
         protected readonly IScopeWrapperService ScopeWrapperService;
         protected readonly IPcapParsingService PcapParsingService;
         protected readonly IOuiLookupService OuiLookupService;
+        protected readonly ILogger<TIntegration> Logger;
 
         protected abstract string IntegrationName { get; }
         protected abstract string IntegrationDescription { get; }
@@ -22,7 +24,8 @@ namespace AccessPointMap.Application.Integration.Core
             IUnitOfWork unitOfWork,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService)
+            IOuiLookupService ouiLookupService,
+            ILogger<TIntegration> logger)
         {
             UnitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
@@ -35,6 +38,9 @@ namespace AccessPointMap.Application.Integration.Core
 
             OuiLookupService = ouiLookupService ??
                 throw new ArgumentNullException(nameof(ouiLookupService));
+
+            Logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         public override string ToString() =>
