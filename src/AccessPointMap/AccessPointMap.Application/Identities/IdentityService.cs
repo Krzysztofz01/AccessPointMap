@@ -65,7 +65,7 @@ namespace AccessPointMap.Application.Identities
         {
             var identity = await _unitOfWork.IdentityRepository.GetAsync(id, cancellationToken);
 
-            _logger.LogDomainEvent(@event);
+            _logger.LogDomainEvent(@event, id.ToString());
 
             identity.Apply(@event);
 
