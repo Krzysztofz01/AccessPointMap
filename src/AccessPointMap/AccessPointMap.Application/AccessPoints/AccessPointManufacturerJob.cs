@@ -57,11 +57,15 @@ namespace AccessPointMap.Application.AccessPoints
                     var ouiLookupResult = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid.Value, context.CancellationToken);
                     if (ouiLookupResult.IsFailure) continue;
 
-                    accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+                    var @event = new Events.V1.AccessPointManufacturerChanged
                     {
                         Id = accessPoint.Id,
                         Manufacturer = ouiLookupResult.Value
-                    });
+                    };
+
+                    _logger.LogDomainEvent(@event);
+
+                    accessPoint.Apply(@event);
                 }
 
                 await _unitOfWork.Commit(context.CancellationToken);
