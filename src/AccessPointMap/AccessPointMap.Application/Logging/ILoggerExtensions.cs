@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Application.Authentication;
 using AccessPointMap.Application.Core.Abstraction;
 using AccessPointMap.Domain.Core.Events;
+using AccessPointMap.Domain.Core.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text;
@@ -27,36 +28,39 @@ namespace AccessPointMap.Application.Logging
         const string _authenticationControllerDebugMessage = "Authentication controller: {ControllerName} | Request: {RequestName} | Path: {RequestPath} | IdentityId: {IdentityId} | Host: {HostAddress}\n    {SerializedRequest}";
         const string _jobBehaviourInformationMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}";
         const string _jobBehaviourErrorMessage = "Scheduled job: {JobName} | Behaviour: {BehaviourDescription}\n    {Exception}";
-        public static void LogDomainEvent(this ILogger logger, IEventBase @event)
+        const string _domainEventInformationMessage = "Domain event envoked at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}";
+        const string _domainEventDebugMessage = "Domain event envoked at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}\n    {SerializedEvent}";
+
+        public static void LogDomainEvent<TCategoryName>(this ILogger<TCategoryName> logger, IEvent @event)
+        {
+            logger.LogDomainEvent(@event, @event.Id.ToString());
+        }
+
+        public static void LogDomainCreationEvent<TCategoryName>(this ILogger<TCategoryName> logger, IEventBase @event)
+        {
+            logger.LogDomainEvent(@event, string.Empty);
+        }
+
+        public static void LogDomainEvent<TCategoryName>(this ILogger<TCategoryName> logger, IEventBase @event, string entityId)
         {
             if (logger.IsEnabled(LogLevel.Debug) || logger.IsEnabled(LogLevel.Trace))
             {
-                logger.LogDomainEventDebug(@event);
-                return;
+                var serializedEvent = JsonSerializer.Serialize(@event, _jsonSerialzierOptions);
+
+                logger.LogDebug(_domainEventDebugMessage,
+                    typeof(TCategoryName).Name,
+                    @event.GetType().Name,
+                    entityId,
+                    serializedEvent);
             }
 
-            logger.LogDomainEventInformation(@event);
-        }
-
-        private static void LogDomainEventInformation(this ILogger logger, IEventBase @event)
-        {
-            const string message = "Domain event: {EventName} triggered.";
-            logger.LogInformation(message, @event.GetType().Name);
-        }
-
-        private static void LogDomainEventDebug(this ILogger logger, IEventBase @event)
-        {
-            var values = new StringBuilder(string.Empty);        
-            foreach (var prop in @event.GetType().GetProperties())
+            if (logger.IsEnabled(LogLevel.Information))
             {
-                values.Append(prop.Name);
-                values.Append('=');
-                values.Append(prop.GetValue(@event, null));
-                values.Append(';');
+                logger.LogInformation(_domainEventInformationMessage,
+                    typeof(TCategoryName).Name,
+                    @event.GetType().Name,
+                    entityId);
             }
-
-            const string message = "Domain event: {EventName} triggered. Domain event properties: {EventPropertyDump}";
-            logger.LogDebug(message, @event.GetType().Name, values.ToString());
         }
 
         public static void LogApplicationCommand(this ILogger logger, ICommand command)

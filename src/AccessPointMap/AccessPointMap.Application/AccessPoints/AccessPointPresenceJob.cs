@@ -58,11 +58,15 @@ namespace AccessPointMap.Application.AccessPoints
                     {
                         var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(accessPointRepresentation.Id, context.CancellationToken);
 
-                        accessPoint.Apply(new Events.V1.AccessPointPresenceStatusChanged
+                        var @event = new Events.V1.AccessPointPresenceStatusChanged
                         {
                             Id = accessPoint.Id,
                             Presence = false
-                        });
+                        };
+
+                        _logger.LogDomainEvent(@event);
+
+                        accessPoint.Apply(@event);
                     }
                 }
 

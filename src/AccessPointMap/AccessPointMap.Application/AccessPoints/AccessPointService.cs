@@ -83,7 +83,7 @@ namespace AccessPointMap.Application.AccessPoints
         {
             var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(id, cancellationToken);
 
-            _logger.LogDomainEvent(@event);
+            _logger.LogDomainEvent(@event, id.ToString());
 
             accessPoint.Apply(@event);
 
@@ -182,7 +182,7 @@ namespace AccessPointMap.Application.AccessPoints
                         RunIdentifier = runId
                     };
 
-                    _logger.LogDomainEvent(accessPointCreateEvent);
+                    _logger.LogDomainCreationEvent(accessPointCreateEvent);
 
                     var accessPoint = AccessPoint.Factory.Create(accessPointCreateEvent);
 

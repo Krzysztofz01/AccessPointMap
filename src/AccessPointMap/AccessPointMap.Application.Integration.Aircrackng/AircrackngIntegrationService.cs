@@ -2,12 +2,15 @@
 using AccessPointMap.Application.Integration.Aircrackng.Models;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Integration.Core.Extensions;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,7 +40,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             IUnitOfWork unitOfWork,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService,
+            ILogger<AircrackngIntegrationService> logger) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService, logger) { }
 
         public async Task<Result> HandleCommandAsync(IIntegrationCommand command, CancellationToken cancellationToken = default)
         {
@@ -151,7 +155,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
         {
-            var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
+            var @event = new Events.V1.AccessPointCreated
             {
                 Bssid = record.Bssid,
                 Ssid = record.Ssid,
@@ -166,25 +170,29 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp,
                 RunIdentifier = runIdentifier
-            });
+            };
+
+            Logger.LogDomainCreationEvent(@event);
+
+            var accessPoint = AccessPoint.Factory.Create(@event);
 
             var ouiLookupResult = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
 
             if (ouiLookupResult.IsSuccess)
             {
-                accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointManufacturerChanged
                 {
                     Id = accessPoint.Id,
                     Manufacturer = ouiLookupResult.Value
-                });
+                }, Logger);
             }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
-            });
+            }, Logger);
 
             await UnitOfWork.AccessPointRepository.AddAsync(accessPoint, cancellationToken);
         }
@@ -193,7 +201,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Bssid, cancellationToken);
 
-            accessPoint.Apply(new Events.V1.AccessPointStampCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointStampCreated
             {
                 Id = accessPoint.Id,
                 Ssid = record.Ssid,
@@ -208,14 +216,14 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp,
                 RunIdentifier = runIdentifier
-            });
+            }, Logger);
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
-            });
+            }, Logger);
         }
 
         private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets, CancellationToken cancellationToken = default)
@@ -228,22 +236,22 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                accessPoint.Apply(new Events.V1.AccessPointPacketCreated
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointPacketCreated
                 {
                     Id = accessPoint.Id,
                     SourceAddress = packet.SourceAddress,
                     DestinationAddress = packet.DestinationAddress,
                     FrameType = packet.FrameType,
                     Data = packet.Data
-                });
+                }, Logger);
             }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
-            });
+            }, Logger);
         }
 
         private static IDictionary<Guid, IList<AccessPointRecord>> GroupAccessPointsByRun(IEnumerable<AccessPointRecord> records)

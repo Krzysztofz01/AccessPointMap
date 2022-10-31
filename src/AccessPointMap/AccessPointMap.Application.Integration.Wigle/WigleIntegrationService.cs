@@ -2,14 +2,17 @@
 using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Integration.Core.Extensions;
 using AccessPointMap.Application.Integration.Wigle.Extensions;
 using AccessPointMap.Application.Integration.Wigle.Models;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -45,7 +48,8 @@ namespace AccessPointMap.Application.Integration.Wigle
             IUnitOfWork unitOfWork,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService,
+            ILogger<WigleIntegrationService> logger) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService, logger) { }
 
         public async Task<Result> HandleCommandAsync(IIntegrationCommand command, CancellationToken cancellationToken = default)
         {
@@ -209,7 +213,7 @@ namespace AccessPointMap.Application.Integration.Wigle
 
         private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
         {
-            var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
+            var @event = new Events.V1.AccessPointCreated
             {
                 Bssid = record.Mac,
                 Ssid = record.Ssid,
@@ -224,25 +228,29 @@ namespace AccessPointMap.Application.Integration.Wigle
                 UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.FirstSeen,
                 RunIdentifier = runIdentifier
-            });
+            };
+
+            Logger.LogDomainCreationEvent(@event);
+
+            var accessPoint = AccessPoint.Factory.Create(@event);
 
             var ouiLookupResult = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
 
             if (ouiLookupResult.IsSuccess)
             {
-                accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointManufacturerChanged
                 {
                     Id = accessPoint.Id,
                     Manufacturer = ouiLookupResult.Value
-                });
+                }, Logger);
             }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
-            });
+            }, Logger);
 
             await UnitOfWork.AccessPointRepository.AddAsync(accessPoint, cancellationToken);
         }
@@ -251,7 +259,7 @@ namespace AccessPointMap.Application.Integration.Wigle
         {
             var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Mac, cancellationToken);
 
-            accessPoint.Apply(new Events.V1.AccessPointStampCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointStampCreated
             {
                 Id = accessPoint.Id,
                 Ssid = record.Ssid,
@@ -266,14 +274,14 @@ namespace AccessPointMap.Application.Integration.Wigle
                 UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.FirstSeen,
                 RunIdentifier = runIdentifier
-            });
+            }, Logger);
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
-            });
+            }, Logger);
         }
 
 

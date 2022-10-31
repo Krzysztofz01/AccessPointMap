@@ -1,8 +1,10 @@
 ﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Application.Settings;
 using AccessPointMap.Domain.Core.Extensions;
 using AccessPointMap.Domain.Identities;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
@@ -17,6 +19,7 @@ namespace AccessPointMap.Application.Authentication
         private readonly IAuthenticationDataAccessService _authenticationDataAccessService;
         private readonly IAuthenticationWrapperService _authenticationWrapperService;
         private readonly IScopeWrapperService _scopeWrapperService;
+        private readonly ILogger<AuthenticationService> _logger;
         private readonly JsonWebTokenSettings _jwtSettings;
         private readonly AuthorizationSettings _authorizationSettings;
 
@@ -25,6 +28,7 @@ namespace AccessPointMap.Application.Authentication
             IAuthenticationDataAccessService authenticationDataAccessService,
             IAuthenticationWrapperService authenticationWrapperService,
             IScopeWrapperService scopeWrapperService,
+            ILogger<AuthenticationService> logger,
             IOptions<JsonWebTokenSettings> jsonWebTokenSettings,
             IOptions<AuthorizationSettings> authorizationSettings)
         {
@@ -39,6 +43,9 @@ namespace AccessPointMap.Application.Authentication
 
             _scopeWrapperService = scopeWrapperService ??
                 throw new ArgumentNullException(nameof(scopeWrapperService));
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
 
             _jwtSettings = jsonWebTokenSettings.Value ??
                 throw new ArgumentNullException(nameof(jsonWebTokenSettings));
@@ -62,13 +69,24 @@ namespace AccessPointMap.Application.Authentication
 
             string refreshTokenHash = _authenticationWrapperService.HashString(refreshToken);
 
-            identity.Apply(new Events.V1.IdentityAuthenticated
+            var @event = new Events.V1.IdentityAuthenticated
             {
                 Id = identity.Id,
                 TokenExpirationDays = _jwtSettings.RefreshTokenExpirationDays,
                 IpAddress = _scopeWrapperService.GetIpAddress(),
                 TokenHash = refreshTokenHash
+            };
+
+            // NOTE: Making a new event instance with stripped fields
+            _logger.LogDomainEvent(new Events.V1.IdentityAuthenticated
+            {
+                Id = @event.Id,
+                TokenExpirationDays = @event.TokenExpirationDays,
+                IpAddress = @event.IpAddress,
+                TokenHash = "Value removed for log purposes."
             });
+
+            identity.Apply(@event);
 
             await _unitOfWork.Commit(cancellationToken);
 
@@ -86,12 +104,22 @@ namespace AccessPointMap.Application.Authentication
 
             string refreshTokenHash = _authenticationWrapperService.HashString(request.RefreshToken);
 
-            identity.Apply(new Events.V1.IdentityTokenRevoked
+            var @event = new Events.V1.IdentityTokenRevoked
             {
                 Id = identity.Id,
                 IpAddress = _scopeWrapperService.GetIpAddress(),
                 TokenHash = refreshTokenHash
+            };
+
+            // NOTE: Making a new event instance with stripped fields
+            _logger.LogDomainEvent(new Events.V1.IdentityTokenRevoked
+            {
+                Id = @event.Id,
+                IpAddress = @event.IpAddress,
+                TokenHash = "Value removed for log purposes."
             });
+
+            identity.Apply(@event);
 
             await _unitOfWork.Commit(cancellationToken);
 
@@ -108,11 +136,20 @@ namespace AccessPointMap.Application.Authentication
 
             var passwordHash = _authenticationWrapperService.HashPassword(request.Password);
 
-            identity.Apply(new Events.V1.IdentityPasswordChanged
+            var @event = new Events.V1.IdentityPasswordChanged
             {
                 Id = identity.Id,
                 PasswordHash = passwordHash
+            };
+
+            // NOTE: Making a new event instance with stripped fields
+            _logger.LogDomainEvent(new Events.V1.IdentityPasswordChanged
+            {
+                Id = identity.Id,
+                PasswordHash = "Value removed for log purposes."
             });
+
+            identity.Apply(@event);
 
             await _unitOfWork.Commit(cancellationToken);
 
@@ -134,14 +171,26 @@ namespace AccessPointMap.Application.Authentication
 
             var replacementTokenHash = _authenticationWrapperService.HashString(replacementToken);
 
-            identity.Apply(new Events.V1.IdentityTokenRefreshed
+            var @event = new Events.V1.IdentityTokenRefreshed
             {
                 Id = identity.Id,
                 IpAddress = _scopeWrapperService.GetIpAddress(),
                 TokenExpirationDays = _jwtSettings.RefreshTokenExpirationDays,
                 TokenHash = refreshTokenHash,
                 ReplacementTokenHash = replacementTokenHash
+            };
+
+            // NOTE: Making a new event instance with stripped fields
+            _logger.LogDomainEvent(new Events.V1.IdentityTokenRefreshed
+            {
+                Id = @event.Id,
+                IpAddress = @event.IpAddress,
+                TokenExpirationDays = @event.TokenExpirationDays,
+                TokenHash = "Value removed for log purposes.",
+                ReplacementTokenHash = "Value removed for log purposes."
             });
+
+            identity.Apply(@event);
 
             await _unitOfWork.Commit(cancellationToken);
 
@@ -162,27 +211,46 @@ namespace AccessPointMap.Application.Authentication
 
             string passwordHash = _authenticationWrapperService.HashPassword(request.Password);
 
-            var identity = Identity.Factory.Create(new Events.V1.IdentityCreated
+            var creationEvent = new Events.V1.IdentityCreated
             {
                 Email = request.Email,
                 IpAddress = _scopeWrapperService.GetIpAddress(),
                 Name = request.Name,
                 PasswordHash = passwordHash
+            };
+
+            // NOTE: Making a new event instance with stripped fields
+            _logger.LogDomainCreationEvent(new Events.V1.IdentityCreated
+            {
+                Email = creationEvent.Email,
+                IpAddress = creationEvent.IpAddress,
+                Name = creationEvent.Name,
+                PasswordHash = "Value removed for log purposes"
             });
+
+            var identity = Identity.Factory.Create(creationEvent);
 
             if (_authorizationSettings.PromoteFirstAccount && !await _authenticationDataAccessService.AnyUserExistsAsync(cancellationToken))
             {
-                identity.Apply(new Events.V1.IdentityActivationChanged
+                var activationEvent = new Events.V1.IdentityActivationChanged
                 {
                     Id = identity.Id,
                     Activated = true
-                });
+                };
 
-                identity.Apply(new Events.V1.IdentityRoleChanged
+                _logger.LogDomainEvent(activationEvent);
+
+                identity.Apply(activationEvent);
+
+                var roleEvent = new Events.V1.IdentityRoleChanged
                 {
                     Id = identity.Id,
                     Role = UserRole.Admin
-                });
+                };
+
+                _logger.LogDomainEvent(roleEvent);
+
+                identity.Apply(roleEvent);
             }
 
             await _unitOfWork.IdentityRepository.AddAsync(identity, cancellationToken);
