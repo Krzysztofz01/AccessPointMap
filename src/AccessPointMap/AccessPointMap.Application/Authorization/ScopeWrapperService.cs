@@ -1,5 +1,4 @@
 ﻿using AccessPointMap.Application.Extensions;
-using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Domain.Identities;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.AspNetCore.Http;
@@ -26,15 +25,23 @@ namespace AccessPointMap.Application.Authorization
         public Guid GetUserId()
         {
             var claimsValue = _httpContextAccessor.HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (claimsValue is null) SystemAuthorizationException.Unauthenticated();
+            if (claimsValue is null) throw new InvalidOperationException("Can not access the current user identifier.");
 
             return Guid.Parse(claimsValue);
         }
 
-        public UserRole GetUserRole()
+        public Guid? GetUserIdOrDefault()
+        {
+            var claimsValue = _httpContextAccessor.HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (claimsValue is null) return null;
+
+            return Guid.Parse(claimsValue);
+        }
+
+        public UserRole? GetUserRole()
         {
             var claimsValue = _httpContextAccessor.HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
-            if (claimsValue is null) SystemAuthorizationException.Unauthenticated();
+            if (claimsValue is null) return null;
 
             return (UserRole)Enum.Parse(typeof(UserRole), claimsValue);
         }

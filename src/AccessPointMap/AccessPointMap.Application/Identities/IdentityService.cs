@@ -17,12 +17,19 @@ namespace AccessPointMap.Application.Identities
     public class IdentityService : IIdentityService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IScopeWrapperService _scopeWrapperService;
         private readonly ILogger<IdentityService> _logger;
 
-        public IdentityService(IUnitOfWork unitOfWork, ILogger<IdentityService> logger)
+        public IdentityService(
+            IUnitOfWork unitOfWork,
+            IScopeWrapperService scopeWrapperService,
+            ILogger<IdentityService> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
+
+            _scopeWrapperService = scopeWrapperService ??
+                throw new ArgumentNullException(nameof(scopeWrapperService));
 
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
@@ -32,7 +39,7 @@ namespace AccessPointMap.Application.Identities
         {
             try
             {
-                _logger.LogApplicationCommand(command);
+                LogCommand(command);
 
                 switch (command)
                 {
@@ -70,6 +77,14 @@ namespace AccessPointMap.Application.Identities
             identity.Apply(@event);
 
             await _unitOfWork.Commit(cancellationToken);
+        }
+
+        private void LogCommand(IApplicationCommand<Identity> command)
+        {
+            var userId = _scopeWrapperService.GetUserIdOrDefault();
+            var userIdString = userId.HasValue ? userId.Value.ToString() : string.Empty;
+
+            _logger.LogApplicationCommand(command, userIdString);
         }
     }
 }
