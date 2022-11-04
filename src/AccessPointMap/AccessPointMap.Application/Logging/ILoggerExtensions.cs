@@ -31,6 +31,7 @@ namespace AccessPointMap.Application.Logging
         private const string _domainEventDebugMessage = "Domain event raised at: {AggregateEnvoker} | Event: {EventName} | EntityId : {EntityId}\n    {SerializedEvent}";
         private const string _applicationCommandInformationMessage = "Application command envoked at: {CommandEnvoker} | Command: {CommandName} | IdentityId: {IdentityId}";
         private const string _applicationCommandDebugMessage = "Application command envoked at: {CommandEnvoker} | Command: {CommandName} | IdentityId: {IdentityId}\n  {SerializedCommand}";
+        private const string _suppressedExceptionInformationMessage = "Suppressed exception at: {CategoryName}\n    {Exception}";
 
         public static void LogDomainEvent<TCategoryName>(this ILogger<TCategoryName> logger, IEvent @event)
         {
@@ -165,6 +166,16 @@ namespace AccessPointMap.Application.Logging
                 logger.LogError(_jobBehaviourErrorMessage,
                     typeof(TCategoryName).Name,
                     behaviourDescription,
+                    exception);
+            }
+        }
+
+        public static void LogSuppressedException<TCategoryName>(this ILogger<TCategoryName> logger, Exception exception)
+        {
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(_suppressedExceptionInformationMessage,
+                    typeof(TCategoryName).Name,
                     exception);
             }
         }
