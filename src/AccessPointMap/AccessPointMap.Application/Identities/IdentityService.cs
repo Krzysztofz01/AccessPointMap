@@ -62,9 +62,14 @@ namespace AccessPointMap.Application.Identities
             {
                 throw;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                // TODO: Currently the domain layer code is using exceptions that are not derived from the DomainException base class.
+                // In order to 500 Internal Server Error response codes on domain logic errors all exceptions are catched here.
+
+                _logger.LogSuppressedException(ex);
+
+                return Result.Failure(Error.FromException(ex));
             }
         }
 
