@@ -191,6 +191,8 @@ namespace AccessPointMap.Domain.Test
         [Fact]
         public void AccessPointShouldMergeWithStampAndAllValuesSetToMerge()
         {
+            var originalSecurityPayload = "[WPA2][WEP]";
+
             var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
             {
                 Bssid = "00:00:00:00:00:00",
@@ -202,7 +204,7 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLevel = -30,
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
-                RawSecurityPayload = "[WPA2][WEP]",
+                RawSecurityPayload = originalSecurityPayload,
                 UserId = Guid.NewGuid(),
                 ScanDate = DateTime.Now,
                 RunIdentifier = Guid.NewGuid()
@@ -219,6 +221,7 @@ namespace AccessPointMap.Domain.Test
             double updatedHighSignalLongitude = 1.0;
 
             string updatedSsid = "Test-Hotspot-New";
+            string updatedSecurityPayload = "[WPA2][WEP][WPS]";
 
             Guid updateRunIdentifier = Guid.NewGuid();
 
@@ -232,7 +235,7 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLevel = updatedHighSignalLevel,
                 HighSignalLatitude = updatedHighSignalLatitude,
                 HighSignalLongitude = updatedHighSignalLongitude,
-                RawSecurityPayload = "[WPA2][WEP]",
+                RawSecurityPayload = updatedSecurityPayload,
                 UserId = Guid.NewGuid(),
                 ScanDate = DateTime.Now.AddDays(2),
                 RunIdentifier = updateRunIdentifier
@@ -264,6 +267,9 @@ namespace AccessPointMap.Domain.Test
 
             Assert.Equal(updatedSsid, accesspoint.Ssid);
 
+            var expectedMergedSecurityPayload = $"{originalSecurityPayload}-{updatedSecurityPayload}";
+            Assert.Equal(expectedMergedSecurityPayload, accesspoint.Security.RawSecurityPayload);
+
             Assert.Null(accesspoint.RunIdentifier.Value);
 
             Assert.Equal(stamp.CreationTimestamp.Value, accesspoint.VersionTimestamp.Value);
@@ -276,7 +282,8 @@ namespace AccessPointMap.Domain.Test
         [Fact]
         public void AccessPointShouldMergeWithStampAndTheLowSignalLevelAndSsidIsSkiped()
         {
-            string initialSsid = "Test-Hotspot";
+            string originalSsid = "Test-Hotspot";
+            var originalSecurityPayload = "[WPA2][WEP]";
 
             int initialLowSignalLevel = -70;
             double initialLowSignalLatitude = 48.8583;
@@ -285,7 +292,7 @@ namespace AccessPointMap.Domain.Test
             var accesspoint = AccessPoint.Factory.Create(new V1.AccessPointCreated
             {
                 Bssid = "00:00:00:00:00:00",
-                Ssid = initialSsid,
+                Ssid = originalSsid,
                 Frequency = 2670,
                 LowSignalLevel = initialLowSignalLevel,
                 LowSignalLatitude = initialLowSignalLatitude,
@@ -293,7 +300,7 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLevel = -30,
                 HighSignalLatitude = 48.86,
                 HighSignalLongitude = 2.30,
-                RawSecurityPayload = "[WPA2][WEP]",
+                RawSecurityPayload = originalSecurityPayload,
                 UserId = Guid.NewGuid(),
                 ScanDate = DateTime.Now,
                 RunIdentifier = Guid.NewGuid()
@@ -308,6 +315,7 @@ namespace AccessPointMap.Domain.Test
             double updatedHighSignalLongitude = 1.0;
 
             string updatedSsid = "Test-Hotspot-New";
+            string updatedSecurityPayload = "[WPA2][WEP][WPS]";
 
             var stampCreationEvent = new V1.AccessPointStampCreated
             {
@@ -319,7 +327,7 @@ namespace AccessPointMap.Domain.Test
                 HighSignalLevel = updatedHighSignalLevel,
                 HighSignalLatitude = updatedHighSignalLatitude,
                 HighSignalLongitude = updatedHighSignalLongitude,
-                RawSecurityPayload = "[WPA2][WEP]",
+                RawSecurityPayload = updatedSecurityPayload,
                 UserId = Guid.NewGuid(),
                 ScanDate = DateTime.Now.AddDays(2),
                 RunIdentifier = Guid.NewGuid()
@@ -349,7 +357,10 @@ namespace AccessPointMap.Domain.Test
             Assert.NotEqual(updatedHighSignalLatitude, accesspoint.Positioning.HighSignalLatitude);
             Assert.NotEqual(updatedHighSignalLongitude, accesspoint.Positioning.HighSignalLongitude);
 
-            Assert.Equal(initialSsid, accesspoint.Ssid);
+            Assert.Equal(originalSsid, accesspoint.Ssid);
+
+            var expectedMergedSecurityPayload = $"{originalSecurityPayload}-{updatedSecurityPayload}";
+            Assert.Equal(expectedMergedSecurityPayload, accesspoint.Security.RawSecurityPayload);
 
             Assert.Equal(stamp.CreationTimestamp.Value, accesspoint.VersionTimestamp.Value);
 
