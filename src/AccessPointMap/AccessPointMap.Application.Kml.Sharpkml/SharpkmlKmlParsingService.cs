@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Application.Core;
 using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Domain.AccessPoints;
+using Microsoft.Extensions.Logging;
 using SharpKml.Base;
 using SharpKml.Dom;
 using SharpKml.Engine;
@@ -16,6 +17,8 @@ namespace AccessPointMap.Application.Kml.Sharpkml
 {
     internal sealed class SharpkmlKmlParsingService : IKmlParsingService
     {
+        private readonly ILogger<SharpkmlKmlParsingService> _logger;
+
         private const string _redPinUrl = "http://maps.google.com/mapfiles/ms/icons/red.png";
         private const string _yellowPinUrl = "http://maps.google.com/mapfiles/ms/icons/yellow.png";
         private const string _greenPinUrl = "http://maps.google.com/mapfiles/ms/icons/green.png";
@@ -26,7 +29,11 @@ namespace AccessPointMap.Application.Kml.Sharpkml
         private const string _pinGreen = "GREEN";
         private const string _pinBlue = "BLUE";
 
-        public SharpkmlKmlParsingService() { }
+        public SharpkmlKmlParsingService(ILogger<SharpkmlKmlParsingService> logger)
+        {
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
+        }
 
         public Task<Result<KmlResult>> GenerateKmlAsync(IEnumerable<AccessPoint> accessPoints, CancellationToken cancellationToken = default)
         {
@@ -56,8 +63,11 @@ namespace AccessPointMap.Application.Kml.Sharpkml
             {
                 throw;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning("Application service: {ServiceName} failure.\n   {Exception}",
+                    typeof(SharpkmlKmlParsingService).Name, ex);
+
                 return Task.FromResult(Result.Failure<KmlResult>(KmlParserError.FatalError));
             }
         }
