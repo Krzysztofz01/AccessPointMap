@@ -70,7 +70,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             {
                 return Result.Failure(IntegrationError.FromIntegrationException(ex));
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }
@@ -98,7 +98,7 @@ namespace AccessPointMap.Application.Integration.Wigle
             {
                 return Result.Failure<object>(IntegrationError.FromIntegrationException(ex));
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }

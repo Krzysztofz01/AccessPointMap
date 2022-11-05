@@ -8,6 +8,7 @@ using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace AccessPointMap.Application.Integration.Wireshark
             {
                 return Result.Failure(IntegrationError.FromIntegrationException(ex));
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }
@@ -80,7 +81,7 @@ namespace AccessPointMap.Application.Integration.Wireshark
             {
                 return await Task.FromResult(Result.Failure<object>(IntegrationError.FromIntegrationException(ex)));
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }

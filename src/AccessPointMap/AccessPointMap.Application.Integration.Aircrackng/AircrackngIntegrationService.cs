@@ -62,7 +62,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             {
                 return Result.Failure(IntegrationError.FromIntegrationException(ex));
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }
@@ -89,7 +89,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             {
                 return await Task.FromResult(Result.Failure<object>(IntegrationError.FromIntegrationException(ex)));
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }
