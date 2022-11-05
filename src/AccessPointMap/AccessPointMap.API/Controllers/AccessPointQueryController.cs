@@ -56,7 +56,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimpleAdministration>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllFull(
             [FromQuery] DateTime? startingData,
             [FromQuery] DateTime? endingDate,
@@ -71,7 +71,7 @@ namespace AccessPointMap.API.Controllers
             var query = _unitOfWork.AccessPointRepository
                 .GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize, cancellationToken);
 
-            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimple>), cancellationToken);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimpleAdministration>), cancellationToken);
         }
 
         [HttpGet("kml")]
@@ -146,7 +146,7 @@ namespace AccessPointMap.API.Controllers
 
         [HttpGet("run/{runId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimpleAdministration>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByRunIdFull(
             Guid runId,
             CancellationToken cancellationToken)
@@ -154,7 +154,7 @@ namespace AccessPointMap.API.Controllers
             var query = _unitOfWork.AccessPointRepository
                 .GetAllAccessPointsByRunIdAdministration(runId, cancellationToken);
 
-            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimple>), cancellationToken);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimpleAdministration>), cancellationToken);
         }
 
         [HttpGet("stamps/run/{runId}")]
