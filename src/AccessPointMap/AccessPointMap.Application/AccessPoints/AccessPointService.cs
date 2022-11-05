@@ -69,7 +69,7 @@ namespace AccessPointMap.Application.AccessPoints
                 
                 return Result.Failure(error);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }

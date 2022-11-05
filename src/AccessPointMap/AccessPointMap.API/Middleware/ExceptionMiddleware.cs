@@ -46,9 +46,9 @@ namespace AccessPointMap.API.Middleware
 
                 LogCurrentBehaviour(context, "Request handled without unexpected errors.");
             }
-            catch (TaskCanceledException ex)
+            catch (OperationCanceledException ex)
             {
-                LogCurrentBehaviour(context, "Request has been canceled from the client-side.");
+                LogCurrentBehaviour(context, "Request has been canceled from the client-side or by a service.");
 
                 await HandleRequestException(context, ex);
             }
@@ -87,7 +87,7 @@ namespace AccessPointMap.API.Middleware
             }
         }
 
-        private static async Task HandleRequestException(HttpContext context, TaskCanceledException _)
+        private static async Task HandleRequestException(HttpContext context, OperationCanceledException _)
         {
             context.Response.ContentType = "application/json";
 

@@ -74,7 +74,7 @@ namespace AccessPointMap.Application.AccessPoints
 
                 _logger.LogScheduledJobBehaviour("Scheduled job finished.");        
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 _logger.LogScheduledJobBehaviour("Scheduled job interupted via task cancellation.");
                 throw;

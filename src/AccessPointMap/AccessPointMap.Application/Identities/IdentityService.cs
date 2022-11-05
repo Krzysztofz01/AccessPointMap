@@ -58,7 +58,7 @@ namespace AccessPointMap.Application.Identities
 
                 return Result.Failure(error);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }
