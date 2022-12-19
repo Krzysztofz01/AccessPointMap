@@ -2,7 +2,7 @@
 using AccessPointMap.Infrastructure.Core.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AccessPointMap.Infrastructure.MySql.Builders
+namespace AccessPointMap.Infrastructure.Sqlite.Builders
 {
     internal sealed class IdentityTypeBuilder
     {

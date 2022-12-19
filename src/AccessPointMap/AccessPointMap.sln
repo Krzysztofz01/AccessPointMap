@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Kml.Sharpkml", "AccessPointMap.Application.Kml.Sharpkml\AccessPointMap.Application.Kml.Sharpkml.csproj", "{6689B4FE-9DAC-4718-98CF-11E9172EF171}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.Core", "AccessPointMap.Application.Core\AccessPointMap.Application.Core.csproj", "{D590DFA8-0E2F-47FC-8FB0-A0FD01BE3FE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Core", "AccessPointMap.Application.Core\AccessPointMap.Application.Core.csproj", "{D590DFA8-0E2F-47FC-8FB0-A0FD01BE3FE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Infrastructure.Sqlite", "AccessPointMap.Infrastructure.Sqlite\AccessPointMap.Infrastructure.Sqlite.csproj", "{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -265,6 +267,18 @@ Global
 		{D590DFA8-0E2F-47FC-8FB0-A0FD01BE3FE5}.Release|x64.Build.0 = Release|Any CPU
 		{D590DFA8-0E2F-47FC-8FB0-A0FD01BE3FE5}.Release|x86.ActiveCfg = Release|Any CPU
 		{D590DFA8-0E2F-47FC-8FB0-A0FD01BE3FE5}.Release|x86.Build.0 = Release|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Debug|x64.Build.0 = Debug|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Debug|x86.Build.0 = Debug|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x64.ActiveCfg = Release|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x64.Build.0 = Release|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x86.ActiveCfg = Release|Any CPU
+		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

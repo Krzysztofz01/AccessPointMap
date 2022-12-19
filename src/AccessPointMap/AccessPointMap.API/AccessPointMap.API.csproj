@@ -41,6 +41,7 @@
     <ProjectReference Include="..\AccessPointMap.Application.Pcap.ApmPcapNative\AccessPointMap.Application.Pcap.ApmPcapNative.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application\AccessPointMap.Application.csproj" />
     <ProjectReference Include="..\AccessPointMap.Infrastructure.MySql\AccessPointMap.Infrastructure.MySql.csproj" />
+    <ProjectReference Include="..\AccessPointMap.Infrastructure.Sqlite\AccessPointMap.Infrastructure.Sqlite.csproj" />
   </ItemGroup>
 
 </Project>
