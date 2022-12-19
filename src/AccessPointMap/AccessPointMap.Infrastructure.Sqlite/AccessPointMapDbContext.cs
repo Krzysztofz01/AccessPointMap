@@ -12,8 +12,6 @@ namespace AccessPointMap.Infrastructure.Sqlite
 {
     public class AccessPointMapDbContext : DbContext
     {
-        private const string _schemaName = "apm";
-
         public virtual DbSet<Identity> Identities { get; set; }
         public virtual DbSet<AccessPoint> AccessPoints { get; set; }
 
@@ -21,8 +19,6 @@ namespace AccessPointMap.Infrastructure.Sqlite
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema(_schemaName);
-
             new IdentityTypeBuilder(modelBuilder.Entity<Identity>());
 
             new AccessPointTypeBuilder(modelBuilder.Entity<AccessPoint>());
