@@ -30,7 +30,7 @@ namespace AccessPointMap.Infrastructure.Core.Extensions
         }
 
         public static OwnedNavigationBuilder<TChildEntity, TValueObject> OwnsOneValueObject<TParentEntity, TChildEntity, TValueObject>(this OwnedNavigationBuilder<TParentEntity, TChildEntity> entityTypeBuilder, Expression<Func<TChildEntity, TValueObject?>> navigationExpression)
-            where TParentEntity : AggregateRoot
+            where TParentEntity : Entity
             where TChildEntity : Entity
             where TValueObject : ValueObject<TValueObject>
         {
