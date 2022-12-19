@@ -21,6 +21,7 @@ COPY ["AccessPointMap.Application.Core/AccessPointMap.Application.Core.csproj", 
 COPY ["AccessPointMap.Application.Integration.Wireshark/AccessPointMap.Application.Integration.Wireshark.csproj", "AccessPointMap.Application.Integration.Wireshark/"]
 COPY ["AccessPointMap.Application.Integration.Aircrackng/AccessPointMap.Application.Integration.Aircrackng.csproj", "AccessPointMap.Application.Integration.Aircrackng/"]
 COPY ["AccessPointMap.Application/AccessPointMap.Application.csproj", "AccessPointMap.Application/"]
+COPY ["AccessPointMap.Infrastructure.Sqlite/AccessPointMap.Infrastructure.Sqlite.csproj", "AccessPointMap.Infrastructure.Sqlite/"]
 RUN dotnet restore "AccessPointMap.API/AccessPointMap.API.csproj"
 COPY . .
 WORKDIR "/src/AccessPointMap.API"
