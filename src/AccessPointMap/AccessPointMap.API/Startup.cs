@@ -26,7 +26,7 @@ namespace AccessPointMap.API
 
             services.AddWebApiUtilities();
 
-            services.AddMySqlPersistence(Configuration);
+            services.AddPersistenceInfrastructure(Configuration);
 
             services.AddApplicationServices();
 
@@ -59,7 +59,7 @@ namespace AccessPointMap.API
 
             app.UseWebApiUtilities();
 
-            app.UseMySqlPersistence(service);
+            app.UsePersistenceInfrastructure(service);
 
             app.UseDocumentation(service);
 

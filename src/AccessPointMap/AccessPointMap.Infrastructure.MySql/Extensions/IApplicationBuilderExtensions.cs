@@ -7,11 +7,11 @@ namespace AccessPointMap.Infrastructure.MySql.Extensions
 {
     public static class IApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseMySqlInfrastructure(this IApplicationBuilder app, IServiceProvider service)
+        public static IApplicationBuilder UseMySqlInfrastructure(this IApplicationBuilder app, IServiceProvider service, bool applyMigrations)
         {
             using var dbContext = service.GetRequiredService<AccessPointMapDbContext>();
 
-            dbContext.Database.Migrate();
+            if (applyMigrations) dbContext.Database.Migrate();
 
             return app;
         }
