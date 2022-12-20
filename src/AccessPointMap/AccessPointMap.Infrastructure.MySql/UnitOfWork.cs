@@ -3,11 +3,12 @@ using AccessPointMap.Domain.Identities;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using AccessPointMap.Infrastructure.MySql.Repositories;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Infrastructure.MySql
 {
-    public class UnitOfWork : IUnitOfWork
+    internal sealed class UnitOfWork : IUnitOfWork
     {
         private readonly AccessPointMapDbContext _dbcontext;
 
@@ -40,9 +41,9 @@ namespace AccessPointMap.Infrastructure.MySql
             }
         }
 
-        public async Task Commit()
+        public async Task Commit(CancellationToken cancellationToken = default)
         {
-            _ = await _dbcontext.SaveChangesAsync(); 
+            _ = await _dbcontext.SaveChangesAsync(cancellationToken); 
         }
     }
 }

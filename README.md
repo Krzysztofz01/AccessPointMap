@@ -1,22 +1,21 @@
 ![apm logo](https://user-images.githubusercontent.com/46250989/123469319-2b96bb80-d5f3-11eb-9b53-d8be8fa73c0b.png)
 #  AccessPointMap
 
-The AccessPointMap project can be described as "White hat war-driving". AccessPointMap consists in collecting and analyzing data about access points, their security and geolocation (without connecting to the network or interacting with it in any way). The platform also allows for the storage of collected (for example via: Aircrack-ng or Wireshark) IEEE802.11 frames, for later analysis. It is possible thanks to a custom implementation of a network frame parser. In contrast to similar projects, the project does not focus on statistics on a global, but on a local scale. The main assumption of the project is to pay attention to the lack of education and knowledge of people about their own networks, which often have a default, unsafe configuration. project consists in collecting and analyzing data on access points. From the technical side, the project consists of a mobile application for gathering information. The information is then sent to a server where the analysis is performed, the data is stored in a database and can be viewed through the web application. The main idea is to use the AccessPointMap platform as a self-hosted service, whether on a VPS or on a local machine. This guarantees us privacy and data security. The project supports many formats, both for importing and exporting data (such as CSV, NETXML, KML, etc.) The general format of the access points is so universal that it is very easy to integrate other tools with AccesPointMap.
-A more detailed description of the entire project can be found in the PDF file (*outdated*).
+The AccessPointMap project can be described as "White hat war-driving". AccessPointMap consists in collecting and analyzing data about access points, their security and geolocation (without connecting to the network or interacting with it in any way). The platform also allows for the storage of collected (for example via: Aircrack-ng or Wireshark) IEEE802.11 frames, for later analysis. It is possible thanks to a custom implementation of a network frame parser. In contrast to similar projects, the project does not focus on statistics on a global, but on a local scale. The main assumption of the project is to pay attention to the lack of education and knowledge of people about their own networks, which often have a default, unsafe configuration. Over time, the project has changed a lot, initially consisting of a mobile application for collecting data, a frontend website presenting the data, and a backend system that processes the data. However, now only the backend system is maintained, which is not dependent on a specific frontend implementation and can be easily interacted with via the REST API. The main idea is to use the AccessPointMap platform as a self-hosted service, whether on a VPS or on a local machine. This guarantees us privacy and data security. The project supports many formats, both for importing and exporting data (such as JSON, CSV, NETXML, KML, etc.). The general format of the access points is kept versatile, so it is very simple to integrate other tools with AccesPointMap.
 
-##  Segments
+##  Project parts
 
 The project consists of several parts:
 
-- MariaDB database (*SQL Server earlier*)
+- Relational database. Support for **MySQL**, **MariaDB** and **Sqlite** (*Only SQL Server earlier*)
 
 - ASP.NET Core REST API
 
-- Angular client/administration application (*The main client application is not currently developed, it is recommended to use [AccessPointLab](https://github.com/Krzysztofz01/AccessPointLab)*)
+- Angular client/administration application (*The concept of the main client application has been dropped and is not currently under development, it is recommended to use [AccessPointLab](https://github.com/Krzysztofz01/AccessPointLab)*)
 
-- Xamarin mobile application for collecting data (*The concept has been dropped and it is suggested to use one of the integrations*)
+- Xamarin-based mobile application for collecting data (*The concept of the mobile data collection application has been dropped and is not currently under development*)
 
-- A special device based on the ESP8266 microcontroller used to collect data slightly more efficiently than the mobile application (*The concept has been dropped and it is suggested to use one of the integrations*)
+- ESP8266 microcontroller based hardware device for collecting data (*The concept of the data collection hardware has been dropped and is not currently under development*)
 
 ## Integrations
 

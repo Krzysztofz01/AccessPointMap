@@ -1,7 +1,11 @@
-﻿namespace AccessPointMap.Application.Kml.Core
+﻿using AccessPointMap.Application.Core;
+
+namespace AccessPointMap.Application.Kml.Core
 {
-    public class KmlResult
+    public sealed class KmlResult : ExportFile
     {
-        public byte[] FileBuffer { get; init; }
+        private KmlResult(byte[] fileBuffer) : base(fileBuffer) { }
+
+        public static new KmlResult FromBuffer(byte[] buffer) => new(buffer);
     }
 }

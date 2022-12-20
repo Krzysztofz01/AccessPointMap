@@ -1,5 +1,5 @@
 ﻿using AccessPointMap.Application.Extensions;
-using Ganss.XSS;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace AccessPointMap.API.Middleware
 {
+    [Obsolete("This middleware was causing a lot of false-positives. Currently a custom json-converter is performing the XSS checks.")]
     public class AntiXssMiddleware
     {
         private readonly RequestDelegate _next;

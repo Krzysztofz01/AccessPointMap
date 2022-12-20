@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AccessPointMap.Application.Oui.MacToVendor.Database.Models
 {
     [Table("vendordb")]
-    public class Vendor
+    internal sealed class Vendor
     {
         [Key]
         [Column("mac")]

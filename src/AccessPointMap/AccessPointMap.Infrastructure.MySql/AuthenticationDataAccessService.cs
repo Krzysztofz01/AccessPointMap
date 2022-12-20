@@ -3,43 +3,56 @@ using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Infrastructure.MySql
 {
-    public class AuthenticationDataAccessService : IAuthenticationDataAccessService
+    internal sealed class AuthenticationDataAccessService : IAuthenticationDataAccessService
     {
         private readonly AccessPointMapDbContext _context;
 
         public AuthenticationDataAccessService(AccessPointMapDbContext dbContext) =>
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
-        public async Task<bool> AnyUsersExists()
+        public async Task<bool> AnyUserExistsAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Identities
+                .AsSingleQuery()
                 .AsNoTracking()
-                .AnyAsync();
+                .AnyAsync(cancellationToken);
         }
 
-        public async Task<Identity> GetUserByEmail(string email)
+        public async Task<Identity> GetUserOrDefaultByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             return await _context.Identities
                 .Include(e => e.Tokens)
-                .SingleAsync(e => e.Email.Value == email);
+                .AsSingleQuery()
+                .SingleOrDefaultAsync(e => e.Email.Value == email, cancellationToken);
         }
 
-        public async Task<Identity> GetUserByRefreshToken(string refreshTokenHash)
+        public async Task<Identity> GetUserOrDefaultByActiveRefreshTokenAsync(string refreshTokenHash, CancellationToken cancellationToken = default)
         {
-            return await _context.Identities
+            var resultIdentity = await _context.Identities
                 .Include(e => e.Tokens)
-                .SingleAsync(e => e.Tokens.Any(t => t.TokenHash == refreshTokenHash));
+                .AsSingleQuery()
+                .SingleOrDefaultAsync(e => e.Tokens.Any(t =>
+                    t.TokenHash == refreshTokenHash),
+                    cancellationToken);
+
+            if (resultIdentity is null) return null;
+
+            if (!resultIdentity.Tokens.Any(t => t.TokenHash == refreshTokenHash && t.IsActive)) return null;
+
+            return resultIdentity;
         }
 
-        public async Task<bool> UserWithEmailExsits(string email)
+        public async Task<bool> AnyUserWithEmailExsitsAsync(string email, CancellationToken cancellationToken = default)
         {
             return await _context.Identities
                 .AsNoTracking()
-                .AnyAsync(e => e.Email.Value == email);
+                .AsSingleQuery()
+                .AnyAsync(e => e.Email.Value == email, cancellationToken);
         }
     }
 }

@@ -92,7 +92,7 @@ namespace AccessPointMap.Domain.Test
         {
             var identity = MockupIdentity();
 
-            Assert.Throws<InvalidOperationException>(() => identity.Apply(new Events.V1.IdentityAuthenticated
+            Assert.Throws<BusinessLogicException>(() => identity.Apply(new Events.V1.IdentityAuthenticated
             {
                 Id = identity.Id,
                 TokenHash = Guid.NewGuid().ToString(),
@@ -159,7 +159,7 @@ namespace AccessPointMap.Domain.Test
             var refreshToken = Guid.NewGuid().ToString();
             var refreshTokenAfterAuth = Guid.NewGuid().ToString();
 
-            Assert.Throws<InvalidOperationException>(() => identity.Apply(new Events.V1.IdentityTokenRefreshed
+            Assert.Throws<BusinessLogicException>(() => identity.Apply(new Events.V1.IdentityTokenRefreshed
             {
                 Id = identity.Id,
                 TokenHash = refreshToken,

@@ -1,37 +1,48 @@
 ﻿using AccessPointMap.Domain.Identities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Infrastructure.MySql.Repositories
 {
-    public class IdentityRepository : IIdentityRepository
+    internal sealed class IdentityRepository : IIdentityRepository
     {
         private readonly AccessPointMapDbContext _context;
 
         public IdentityRepository(AccessPointMapDbContext dbContext) =>
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
-
-        public Task Add(Identity identity)
+        public IQueryable<Identity> Entities
         {
-            _context.Identities.Add(identity);
-            
+            get => _context.Identities
+                .AsSplitQuery()
+                .AsNoTracking();
+        }
+
+        public Task AddAsync(Identity entity, CancellationToken cancellationToken = default)
+        {
+            _ = _context.Identities.Add(entity);
+
             return Task.CompletedTask;
         }
 
-        public async Task<bool> Exists(Guid id)
+        public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.Identities
+                .AsSingleQuery()
                 .AsNoTracking()
-                .AnyAsync(i => i.Id == id);
+                .AnyAsync(a => a.Id == id, cancellationToken);
         }
 
-        public async Task<Identity> Get(Guid id)
+        public async Task<Identity> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.Identities
                 .Include(i => i.Tokens)
-                .FirstAsync(i => i.Id == id);
+                .AsSingleQuery()
+                .AsTracking()
+                .FirstAsync(a => a.Id == id, cancellationToken);
         }
     }
 }

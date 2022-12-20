@@ -1,6 +1,6 @@
 ﻿namespace AccessPointMap.Application.Pcap.Core
 {
-    public class Packet
+    public sealed class Packet
     {
         public string SourceAddress { get; init; }
         public string DestinationAddress { get; init; }

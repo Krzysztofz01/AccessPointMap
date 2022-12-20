@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace AccessPointMap.Domain.Core.Exceptions
 {
-    public class ValueObjectValidationException : Exception
+    public class ValueObjectValidationException : DomainException
     {
         public ValueObjectValidationException()
         {

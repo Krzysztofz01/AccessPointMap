@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace AccessPointMap.Domain.Core.Exceptions
 {
-    public class BusinessLogicException : Exception
+    public class BusinessLogicException : DomainException
     {
         public BusinessLogicException()
         {

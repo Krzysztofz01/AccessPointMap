@@ -1,40 +1,43 @@
 ﻿using AccessPointMap.Application.Settings;
-using AccessPointMap.Infrastructure.Core.Abstraction;
-using AccessPointMap.Infrastructure.MySql;
 using AccessPointMap.Infrastructure.MySql.Extensions;
+using AccessPointMap.Infrastructure.Sqlite.Extensions;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class PersistenceConfiguration
+    internal static class PersistenceConfiguration
     {
-        public static IServiceCollection AddMySqlPersistence(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPersistenceInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            var databaseSettings = configuration
-                .GetSection(nameof(DatabaseSettings))
-                .Get<DatabaseSettings>();
+            var databaseSettingsSection = configuration.GetSection(nameof(DatabaseSettings));
+            services.Configure<DatabaseSettings>(databaseSettingsSection);
 
-            services.AddDbContext<AccessPointMapDbContext>(options =>
-                options.UseMySql(databaseSettings.ConnectionString));
-
-            services.AddScoped<IAuthenticationDataAccessService, AuthenticationDataAccessService>();
-
-            services.AddScoped<IDataAccess, DataAccess>();
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            var databaseSettings = databaseSettingsSection.Get<DatabaseSettings>();
+            switch (databaseSettings.Driver.ToLower())
+            {
+                case "mysql": services.AddMySqlInfrastructure(databaseSettings.ConnectionString); break;
+                case "sqlite": services.AddSqliteInfrastructure(databaseSettings.ConnectionString); break;
+                default: throw new NotSupportedException("The selected database infrastructure driver is not supported.");
+            }
 
             return services;
         }
 
-        public static IApplicationBuilder UseMySqlPersistence(this IApplicationBuilder app, IServiceProvider service)
+        public static IApplicationBuilder UsePersistenceInfrastructure(this IApplicationBuilder app, IServiceProvider service)
         {
-            using var dbContext = service.GetRequiredService<AccessPointMapDbContext>();
+            var databaseSettings = service.GetService<IOptions<DatabaseSettings>>().Value ??
+                throw new InvalidOperationException("Database settings are not available.");
 
-            dbContext.Database.Migrate();
+            switch (databaseSettings.Driver.ToLower())
+            {
+                case "mysql": app.UseMySqlInfrastructure(service, databaseSettings.ApplyMigrations); break;
+                case "sqlite": app.UseSqliteInfrastructure(service, databaseSettings.ApplyMigrations); break;
+                default: throw new NotSupportedException("The selected database infrastructure driver is not supported.");
+            }
 
             return app;
         }

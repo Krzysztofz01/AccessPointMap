@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using System;
 using System.Text.RegularExpressions;
 using static AccessPointMap.Application.Authentication.Requests.V1;
 
@@ -31,7 +32,7 @@ namespace AccessPointMap.Application.Authentication
                     RuleFor(c => c.PasswordRepeat)
                         .NotEmpty()
                         .Must(IsPasswordFormatValid).WithMessage("The password is not matching the strength requirements.")
-                        .Equal(c => c.Password).WithMessage(c => $"'{nameof(c.PasswordRepeat)}' must be equal to '{nameof(c.Password)}'.");
+                        .Equal(c => c.Password).WithMessage(c => "The password and repeated password values do not match.");
                 }
             }
 
@@ -54,7 +55,7 @@ namespace AccessPointMap.Application.Authentication
                     RuleFor(c => c.PasswordRepeat)
                         .NotEmpty()
                         .Must(IsPasswordFormatValid).WithMessage("The password is not matching the strength requirements.")
-                        .Equal(c => c.Password).WithMessage(c => $"'{nameof(c.PasswordRepeat)}' must be equal to '{nameof(c.Password)}'.");
+                        .Equal(c => c.Password).WithMessage(c => "The password and repeated password values do not match.");
                 }
             }
 
@@ -68,12 +69,23 @@ namespace AccessPointMap.Application.Authentication
 
             private static bool IsPasswordFormatValid(string value)
             {
-                var hasNumber = new Regex(@"[0-9]+");
-                var hasUpperChar = new Regex(@"[A-Z]+");
-                var hasMinimum8Chars = new Regex(@".{8,}");
+                try
+                {
+                    if (value is null) return false;
 
-                if (value is null) return false;
-                return hasNumber.IsMatch(value) && hasUpperChar.IsMatch(value) && hasMinimum8Chars.IsMatch(value);
+                    return
+                        Regex.IsMatch(value, @"[0-9]+", RegexOptions.Compiled, TimeSpan.FromSeconds(1)) &&
+                        Regex.IsMatch(value, @"[A-Z]+", RegexOptions.Compiled, TimeSpan.FromSeconds(1)) &&
+                        Regex.IsMatch(value, @".{8,}", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+                }
+                catch (RegexMatchTimeoutException)
+                {
+                    return false;
+                }
+                catch
+                {
+                    throw;
+                }
             }
         }
     }

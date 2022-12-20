@@ -1,10 +1,11 @@
-﻿using AccessPointMap.Application.Oui.Core;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Logging;
+using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Domain.AccessPoints;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.AccessPoints
@@ -16,17 +17,13 @@ namespace AccessPointMap.Application.AccessPoints
         public const string JobName = "AccessPointManufacturerUpdate";
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IDataAccess _dataAccess;
         private readonly IOuiLookupService _ouiLookupService;
         private readonly ILogger<AccessPointManufacturerJob> _logger;
 
-        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IDataAccess dataAccess, IOuiLookupService ouiLookupService, ILogger<AccessPointManufacturerJob> logger)
+        public AccessPointManufacturerJob(IUnitOfWork unitOfWork, IOuiLookupService ouiLookupService, ILogger<AccessPointManufacturerJob> logger)
         {
             _unitOfWork = unitOfWork ??
                 throw new ArgumentNullException(nameof(unitOfWork));
-
-            _dataAccess = dataAccess ??
-                throw new ArgumentNullException(nameof(dataAccess));
 
             _ouiLookupService = ouiLookupService ??
                 throw new ArgumentNullException(nameof(ouiLookupService));
@@ -40,29 +37,49 @@ namespace AccessPointMap.Application.AccessPoints
         {
             try
             {
-                _logger.LogInformation($"{JobName} scheduled job started.");
+                _logger.LogScheduledJobBehaviour("Scheduled job started.");
 
-                var accessPoints = _dataAccess.AccessPointsTracked
-                    .Where(a => a.Manufacturer.Value == string.Empty);
+                var accessPointIdsResult = await _unitOfWork.AccessPointRepository
+                    .GetAccessPointIdsWithoutManufacturerSpecified(context.CancellationToken);
 
-                foreach (var accessPoint in accessPoints)
+                if (accessPointIdsResult.IsFailure && accessPointIdsResult.Error is NotFoundError)
                 {
-                    var manufacturerName = await _ouiLookupService.GetManufacturerName(accessPoint.Bssid.Value);
-
-                    accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
-                    {
-                        Id = accessPoint.Id,
-                        Manufacturer = manufacturerName
-                    });
+                    _logger.LogScheduledJobBehaviour("Quitting the scheduled job. No pending access point ids.");      
+                    return;
                 }
 
-                await _unitOfWork.Commit();
+                foreach (var accessPointId in accessPointIdsResult.Value)
+                {
+                    context.CancellationToken.ThrowIfCancellationRequested();
 
-                _logger.LogInformation($"{JobName} scheduled job finished.");
+                    var accessPoint = await _unitOfWork.AccessPointRepository.GetAsync(Guid.Parse(accessPointId), context.CancellationToken); 
+
+                    var ouiLookupResult = await _ouiLookupService.GetManufacturerNameAsync(accessPoint.Bssid.Value, context.CancellationToken);
+                    if (ouiLookupResult.IsFailure) continue;
+
+                    var @event = new Events.V1.AccessPointManufacturerChanged
+                    {
+                        Id = accessPoint.Id,
+                        Manufacturer = ouiLookupResult.Value
+                    };
+
+                    _logger.LogDomainEvent(@event);
+
+                    accessPoint.Apply(@event);
+                }
+
+                await _unitOfWork.Commit(context.CancellationToken);
+
+                _logger.LogScheduledJobBehaviour("Scheduled job finished.");
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogScheduledJobBehaviour("Scheduled job interupted via task cancellation.");
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{JobName} scheduled job failed.", ex);
+                _logger.LogScheduledJobBehaviour("Scheduled job failed.", ex);
             }
         }
     }

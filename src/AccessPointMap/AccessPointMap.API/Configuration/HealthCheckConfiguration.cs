@@ -10,7 +10,7 @@ using System;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class HealthCheckConfiguration
+    internal static class HealthCheckConfiguration
     {
         public const string _healthCheckPath = "/api/health";
 

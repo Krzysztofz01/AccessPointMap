@@ -1,17 +1,17 @@
-﻿using AccessPointMap.Application.Abstraction;
+﻿using AccessPointMap.Application.Authentication;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class ValidationConfiguration
+    internal static class ValidationConfiguration
     {
         public static IServiceCollection AddValidation(this IServiceCollection services)
         {
             services.AddFluentValidationAutoValidation();
 
-            services.AddValidatorsFromAssemblyContaining<ICommand>();
+            services.AddValidatorsFromAssemblyContaining<IAuthenticationService>();
 
             ValidatorOptions.Global.LanguageManager.Enabled = false;
 

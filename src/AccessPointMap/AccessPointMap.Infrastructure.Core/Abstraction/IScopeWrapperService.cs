@@ -7,6 +7,7 @@ namespace AccessPointMap.Infrastructure.Core.Abstraction
     {
         string GetIpAddress();
         Guid GetUserId();
-        UserRole GetUserRole();
+        Guid? GetUserIdOrDefault();
+        UserRole? GetUserRole();
     }
 }

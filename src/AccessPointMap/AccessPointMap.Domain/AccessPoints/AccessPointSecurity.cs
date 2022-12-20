@@ -1,5 +1,7 @@
-﻿using AccessPointMap.Domain.Core.Extensions;
+﻿using AccessPointMap.Domain.Core.Exceptions;
+using AccessPointMap.Domain.Core.Extensions;
 using AccessPointMap.Domain.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -7,16 +9,12 @@ using System.Text.RegularExpressions;
 
 namespace AccessPointMap.Domain.AccessPoints
 {
-    public class AccessPointSecurity : ValueObject<AccessPointSecurity>
+    public sealed class AccessPointSecurity : ValueObject<AccessPointSecurity>
     {
-        private const string _payloadTokenPattern = @"\b[A-Z0-9]+\b";
+        private const string _payloadTokenRegexPattern = @"\b[A-Z0-9]+\b";
         private const string _empty = "[]";
 
         public string RawSecurityPayload { get; private set; }
-        
-        // TODO: Breaking change. SerializedSecurityPayload splited into standards and protocols
-        // public string SerializedSecurityPayload { get; private set; }
-
         public string SecurityStandards { get; private set; }
         public string SecurityProtocols { get; private set; }
 
@@ -42,10 +40,7 @@ namespace AccessPointMap.Domain.AccessPoints
 
             RawSecurityPayload = rawSecurityPayload;
 
-            var tokenCollection = Regex.Matches(rawSecurityPayload.ToUpper(), _payloadTokenPattern)
-                .Cast<Match>()
-                .Select(m => m.Value)
-                .Distinct(); 
+            var tokenCollection = SplitSecurityCapabilities(rawSecurityPayload);
 
             var securityProtocols = new List<SecurityProtocol>();
             foreach (var token in tokenCollection)
@@ -81,6 +76,25 @@ namespace AccessPointMap.Domain.AccessPoints
                 .Any(p => p.Type != SecurityProtocolType.Framework && !p.IsSecure);
 
             if (IsSecure && containsUnsafeProtocols) IsSecure = false;
+        }
+
+        private static IEnumerable<string> SplitSecurityCapabilities(string rawSecurityCapabilitiesPayload)
+        {
+            try
+            {
+                return Regex.Matches(rawSecurityCapabilitiesPayload.ToUpper(), _payloadTokenRegexPattern, RegexOptions.Compiled, TimeSpan.FromSeconds(1))
+                    .Cast<Match>()
+                    .Select(m => m.Value)
+                    .Distinct();
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                throw new ValueObjectValidationException("Security capabilities payload parsing failed.");
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public static AccessPointSecurity FromString(string rawSecurityPayload) => new AccessPointSecurity(rawSecurityPayload);

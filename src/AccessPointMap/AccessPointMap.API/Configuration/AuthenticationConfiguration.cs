@@ -10,7 +10,7 @@ using System.Text;
 
 namespace AccessPointMap.API.Configuration
 {
-    public static class AuthenticationConfiguration
+    internal static class AuthenticationConfiguration
     {
         public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {

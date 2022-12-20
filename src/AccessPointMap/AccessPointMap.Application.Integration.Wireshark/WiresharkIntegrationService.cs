@@ -1,13 +1,18 @@
-﻿using AccessPointMap.Application.Integration.Core;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Integration.Core.Extensions;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
+using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Integration.Wireshark
@@ -26,71 +31,114 @@ namespace AccessPointMap.Application.Integration.Wireshark
 
         public WiresharkIntegrationService(
             IUnitOfWork unitOfWork,
-            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService,
+            ILogger<WiresharkIntegrationService> logger) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService, logger) { }
 
-        public async Task Handle(IIntegrationCommand command)
+        public async Task<Result> HandleCommandAsync(IIntegrationCommand command, CancellationToken cancellationToken = default)
         {
-            switch (command)
+            try
             {
-                case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
-
-                default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+                return command switch
+                {
+                    Commands.CreatePacketsFromPcapFile cmd => await HandleCommand(cmd, cancellationToken),
+                    _ => throw new IntegrationException($"This command is not supported by the {IntegrationName} integration."),
+                };
+            }
+            catch (DomainException ex)
+            {
+                return Result.Failure(IntegrationError.FromDomainException(ex));
+            }
+            catch (IntegrationException ex)
+            {
+                return Result.Failure(IntegrationError.FromIntegrationException(ex));
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
             }
         }
 
-        public Task<object> Query(IIntegrationQuery query)
+        public async Task<Result<object>> HandleQueryAsync(IIntegrationQuery query, CancellationToken cancellationToken = default)
         {
-            switch (query)
+            try
             {
-                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
+                return query switch
+                {
+                    _ => throw new IntegrationException($"This query is not supported by the {IntegrationName} integration."),
+                };
             }
+            catch (DomainException ex)
+            {
+                return await Task.FromResult(Result.Failure<object>(IntegrationError.FromDomainException(ex)));
+            }
+            catch (IntegrationException ex)
+            {
+                return await Task.FromResult(Result.Failure<object>(IntegrationError.FromIntegrationException(ex)));
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
+            } 
         }
 
-        private async Task HandleCommand(Commands.CreatePacketsFromPcapFile cmd)
+        private async Task<Result> HandleCommand(Commands.CreatePacketsFromPcapFile cmd, CancellationToken cancellationToken = default)
         {
             if (cmd.ScanPcapFile is null)
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(WiresharkIntegrationError.UploadedPcapFileIsNull);
 
             if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".pcap")
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(WiresharkIntegrationError.UploadedFileHasInvalidFormat);
 
-            var packetMap = await PcapParsingService.MapPacketsToMacAddresses(cmd.ScanPcapFile);
+            var packetMapResult = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile, cancellationToken);
 
-            foreach (var map in packetMap)
+            if (packetMapResult.IsFailure) return Result.Failure(packetMapResult.Error);
+
+            foreach (var map in packetMapResult.Value)
             {
-                await CreateAccessPointPackets(map.Key, map.Value);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                await CreateAccessPointPackets(map.Key, map.Value, cancellationToken);
             }
 
-            await UnitOfWork.Commit();
+            await UnitOfWork.Commit(cancellationToken);
+
+            return Result.Success();
         }
 
-        private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets)
+        private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets, CancellationToken cancellationToken = default)
         {
-            if (!await UnitOfWork.AccessPointRepository.Exists(bssid)) return;
+            if (!await UnitOfWork.AccessPointRepository.ExistsAsync(bssid, cancellationToken)) return;
 
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(bssid);
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(bssid, cancellationToken);
 
             foreach (var packet in packets)
             {
-                accessPoint.Apply(new Events.V1.AccessPointPacketCreated
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointPacketCreated
                 {
                     Id = accessPoint.Id,
                     SourceAddress = packet.SourceAddress,
                     DestinationAddress = packet.DestinationAddress,
                     FrameType = packet.FrameType,
                     Data = packet.Data
-                });
+                }, Logger);
             }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
-            });
+            }, Logger);
         }
     }
 }

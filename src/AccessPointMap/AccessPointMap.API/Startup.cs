@@ -16,13 +16,21 @@ namespace AccessPointMap.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMySqlPersistence(Configuration);
+            services.AddHttps(Configuration);
+
+            services.AddRoutingAndCors(Configuration);
 
             services.AddAuthentication(Configuration);
 
             services.AddAuthorization(Configuration);
 
+            services.AddWebApiUtilities();
+
+            services.AddPersistenceInfrastructure(Configuration);
+
             services.AddApplicationServices();
+
+            services.AddBackgroundJobs();
 
             services.AddIntegrationServices();
 
@@ -30,24 +38,30 @@ namespace AccessPointMap.API
 
             services.AddValidation();
 
-            services.AddBackgroundJobs();
-
-            services.AddCaching();
+            services.AddDocumentation(Configuration);
 
             services.AddServiceHealthChecks(Configuration);
 
-            services.AddWebUtilities(Configuration);
+            services.AddCaching();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider service)
         {
-            app.UseWebUtilities(env, service);
+            app.UseExceptionFilter();
 
-            app.UseMySqlPersistence(service);
+            app.UseHttps(service);
+
+            app.UseRoutingAndCors(service);
 
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseWebApiUtilities();
+
+            app.UsePersistenceInfrastructure(service);
+
+            app.UseDocumentation(service);
 
             app.UseServiceHealthChecks(service);
 

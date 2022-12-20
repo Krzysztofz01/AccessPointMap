@@ -10,6 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using static AccessPointMap.Application.AccessPoints.Dto;
 
@@ -17,19 +18,18 @@ namespace AccessPointMap.API.Controllers
 {
     [Route("api/v{version:apiVersion}/accesspoints")]
     [ApiVersion("1.0")]
-    public class AccessPointQueryController : QueryController
+    public class AccessPointQueryController : QueryController<AccessPointQueryController>
     {
         private readonly IKmlParsingService _kmlParsingService;
 
-        private const int _defaultLimit = 100;
-        private const string _kmlContentType = "text/kml";
+        private const string KmlContentMimeType = "text/kml";
 
         public AccessPointQueryController(
-            IDataAccess dataAccess,
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IMemoryCache memoryCache,
             ILogger<AccessPointQueryController> logger,
-            IKmlParsingService kmlParsingService) : base(dataAccess, mapper, memoryCache, logger)
+            IKmlParsingService kmlParsingService) : base(unitOfWork, mapper, memoryCache, logger)
         {
             _kmlParsingService = kmlParsingService ??
                 throw new ArgumentNullException(nameof(kmlParsingService));
@@ -45,23 +45,18 @@ namespace AccessPointMap.API.Controllers
             [FromQuery]double? distance,
             [FromQuery]string keyword,
             [FromQuery]int? page,
-            [FromQuery]int? pageSize)
+            [FromQuery]int? pageSize,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize, cancellationToken);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
-
-            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
-
-            StoreToCache(mappedResponse);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, true, typeof(IEnumerable<AccessPointSimple>), cancellationToken);
         }
 
         [HttpGet("full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimpleAdministration>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllFull(
             [FromQuery] DateTime? startingData,
             [FromQuery] DateTime? endingDate,
@@ -70,271 +65,281 @@ namespace AccessPointMap.API.Controllers
             [FromQuery] double? distance,
             [FromQuery] string keyword,
             [FromQuery] int? page,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize, cancellationToken);
 
-            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimpleAdministration>), cancellationToken);
         }
 
         [HttpGet("kml")]
-        [Produces(_kmlContentType)]
-        public async Task<IActionResult> GetAllInKml()
+        [Produces(KmlContentMimeType)]
+        public async Task<IActionResult> GetAllInKml(
+            CancellationToken cancellationToken)
         {
-            var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = false);
+            var accessPointsResult = await _unitOfWork.AccessPointRepository
+                .GetAllAccessPoints(null, null, null, null, null, null, null, null, cancellationToken);
 
-            return MapToFile(response.FileBuffer, _kmlContentType);
+            if (accessPointsResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
+
+            var kmlFileResult = await _kmlParsingService.GenerateKmlAsync(accessPointsResult.Value, cancellationToken);
+
+            if (kmlFileResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
+
+            return await HandleFileResult(kmlFileResult.Value, true, KmlContentMimeType, cancellationToken);
         }
 
         [HttpGet("kml/full")]
         [Authorize(Roles = "Admin, Support")]
-        [Produces(_kmlContentType)]
-        public async Task<IActionResult> GetAllInKmlFull()
+        [Produces(KmlContentMimeType)]
+        public async Task<IActionResult> GetAllInKmlFull(
+            CancellationToken cancellationToken)
         {
-            var response = await _kmlParsingService.GenerateKml(options => options.IncludeHiddenAccessPoints = true);
+            var accessPointsResult = await _unitOfWork.AccessPointRepository
+                .GetAllAccessPointsAdministration(null, null, null, null, null, null, null, null, cancellationToken);
 
-            return MapToFile(response.FileBuffer, _kmlContentType);
+            if (accessPointsResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
+
+            var kmlFileResult = await _kmlParsingService.GenerateKmlAsync(accessPointsResult.Value, cancellationToken);
+
+            if (kmlFileResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
+
+            return await HandleFileResult(kmlFileResult.Value, true, KmlContentMimeType, cancellationToken);
         }
 
         [HttpGet("run")]
         [ProducesResponseType(typeof(IEnumerable<Guid>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllRunIds()
+        public async Task<IActionResult> GetAllRunIds(
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointRunIds();
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointRunIds(cancellationToken);
 
-            return Ok(response);
+            return await HandleQueryResult(query, true, cancellationToken);
         }
 
         [HttpGet("run/full")]
         [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(IEnumerable<Guid>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllRunIdsAdministration()
+        public async Task<IActionResult> GetAllRunIdsAdministration(
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointRunIdsAdministration();
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointRunIdsAdministration(cancellationToken);
 
-            return Ok(response);
+            return await HandleQueryResult(query, false, cancellationToken);
         }
 
         [HttpGet("run/{runId}")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllByRunId(Guid runId)
+        public async Task<IActionResult> GetAllByRunId(
+            Guid runId,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointsByRunId(runId, cancellationToken);
 
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunId(runId);
-
-            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
-
-            StoreToCache(mappedResponse);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, true, typeof(IEnumerable<AccessPointSimple>), cancellationToken);
         }
 
         [HttpGet("run/{runId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllByRunIdFull(Guid runId)
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimpleAdministration>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllByRunIdFull(
+            Guid runId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsByRunIdAdministration(runId);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointsByRunIdAdministration(runId, cancellationToken);
 
-            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimpleAdministration>), cancellationToken);
         }
 
         [HttpGet("stamps/run/{runId}")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointStampSimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllStampsBysRunId(Guid runId)
+        public async Task<IActionResult> GetAllStampsBysRunId(
+            Guid runId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointStampsByRunId(runId);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointStampsByRunId(runId, cancellationToken);
 
-            var mappedResponse = MapToDto<IEnumerable<AccessPointStampSimple>>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, true, typeof(IEnumerable<AccessPointStampSimple>), cancellationToken);
         }
 
         [HttpGet("stamps/run/{runId}/full")]
         [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointStampSimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllStampsBysRunIdAdministration(Guid runId)
+        public async Task<IActionResult> GetAllStampsBysRunIdAdministration(
+            Guid runId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointStampsByRunIdAdministration(runId);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointStampsByRunIdAdministration(runId, cancellationToken);
 
-            var mappedResponse = MapToDto<IEnumerable<AccessPointStampSimple>>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointStampSimple>), cancellationToken);
         }
 
         [HttpGet("{accessPointId}")]
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetById(Guid accessPointId)
+        public async Task<IActionResult> GetById(
+            Guid accessPointId,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAccessPointById(accessPointId, cancellationToken);
 
-            var response = await _dataAccess.AccessPoints.GetAccessPointById(accessPointId);
-
-            var mappedResponse = MapToDto<AccessPointDetails>(response);
-
-            StoreToCache(mappedResponse);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, true, typeof(AccessPointDetails), cancellationToken);
         }
 
         [HttpGet("{accessPointId}/full")]
         [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByIdFull(Guid accessPointId)
+        public async Task<IActionResult> GetByIdFull(
+            Guid accessPointId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAccessPointByIdAdministration(accessPointId);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAccessPointByIdAdministration(accessPointId, cancellationToken);
 
-            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(AccessPointDetailsAdministration), cancellationToken);
         }
 
         [HttpGet("{accessPointId}/packet")]
         [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointPacketDetails>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllPackets(Guid accessPointId)
+        public async Task<IActionResult> GetAllPackets(
+            Guid accessPointId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAllAccessPointsAccessPointPackets(accessPointId);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAllAccessPointsAccessPointPackets(accessPointId, cancellationToken);
 
-            var mappedResponse = MapToDto<IEnumerable<AccessPointPacketDetails>>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointPacketDetails>), cancellationToken);
         }
 
         [HttpGet("{accessPointId}/packet/{accessPointPacketId}")]
         [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointPacketDetails>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetPacketById(Guid accessPointId, Guid accessPointPacketId)
+        public async Task<IActionResult> GetPacketById(
+            Guid accessPointId,
+            Guid accessPointPacketId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.GetAccessPointsAccessPointPacketById(accessPointId, accessPointPacketId);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAccessPointsAccessPointPacketById(accessPointId, accessPointPacketId, cancellationToken);
 
-            var mappedResponse = MapToDto<AccessPointPacketDetails>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(AccessPointPacketDetails), cancellationToken);
         }
 
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByKeyword([FromQuery] string keyword)
+        [Obsolete("This endpoint will be removed in the upcoming major release.")]
+        public async Task<IActionResult> GetByKeyword(
+            [FromQuery] string keyword,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.SearchByKeyword(keyword);
+            var query = _unitOfWork.AccessPointRepository
+                .SearchByKeyword(keyword, cancellationToken);
 
-            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(IEnumerable<AccessPointSimple>), cancellationToken);
         }
 
         [HttpGet("match/stamp/{accessPointStampId}")]
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
-        public async Task<IActionResult> MatchByStampId(Guid accessPointStampId)
+        public async Task<IActionResult> MatchByStampId(
+            Guid accessPointStampId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampId(accessPointStampId);
+            var query = _unitOfWork.AccessPointRepository
+                .MatchAccessPointByAccessPointStampId(accessPointStampId, cancellationToken);
 
-            var mappedResponse = MapToDto<AccessPointDetails>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(AccessPointDetails), cancellationToken);
         }
 
         [HttpGet("match/stamp/{accessPointStampId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
-        public async Task<IActionResult> MatchByStampIdFull(Guid accessPointStampId)
+        [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByStampIdFull(
+            Guid accessPointStampId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointStampIdAdministration(accessPointStampId);
+            var query = _unitOfWork.AccessPointRepository
+                .MatchAccessPointByAccessPointStampIdAdministration(accessPointStampId, cancellationToken);
 
-            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(AccessPointDetailsAdministration), cancellationToken);
         }
 
         [HttpGet("match/packet/{accessPointPacketId}")]
-        [Authorize(Roles = "Admin, Support")]
         [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
-        public async Task<IActionResult> MatchByPacketId(Guid accessPointPacketId)
+        public async Task<IActionResult> MatchByPacketId(
+            Guid accessPointPacketId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketId(accessPointPacketId);
+            var query = _unitOfWork.AccessPointRepository
+                .MatchAccessPointByAccessPointPacketId(accessPointPacketId, cancellationToken);
 
-            var mappedResponse = MapToDto<AccessPointDetails>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(AccessPointDetails), cancellationToken);
         }
 
         [HttpGet("match/packet/{accessPointPacketId}/full")]
         [Authorize(Roles = "Admin, Support")]
-        [ProducesResponseType(typeof(AccessPointDetails), StatusCodes.Status200OK)]
-        public async Task<IActionResult> MatchByPacketIdFull(Guid accessPointPacketId)
+        [ProducesResponseType(typeof(AccessPointDetailsAdministration), StatusCodes.Status200OK)]
+        public async Task<IActionResult> MatchByPacketIdFull(
+            Guid accessPointPacketId,
+            CancellationToken cancellationToken)
         {
-            var response = await _dataAccess.AccessPoints.MatchAccessPointByAccessPointPacketIdAdministration(accessPointPacketId);
+            var query = _unitOfWork.AccessPointRepository
+                .MatchAccessPointByAccessPointPacketIdAdministration(accessPointPacketId, cancellationToken);
 
-            var mappedResponse = MapToDto<AccessPointDetailsAdministration>(response);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, false, typeof(AccessPointDetailsAdministration), cancellationToken);
         }
 
         [HttpGet("statistics/signal")]
         [ProducesResponseType(typeof(IEnumerable<AccessPointSimple>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange([FromQuery] int? limit)
+        public async Task<IActionResult> GetStatisticsAccessPointWithGreaterSignalRange(
+            [FromQuery] int? limit,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetAccessPointsWithGreatestSignalRange(NormalizePaginationLimit(limit), cancellationToken);
 
-            var response = await _dataAccess.AccessPoints
-                .GetAccessPointsWithGreatestSignalRange(limit ?? _defaultLimit);
-
-            var mappedResponse = MapToDto<IEnumerable<AccessPointSimple>>(response);
-
-            StoreToCache(mappedResponse);
-
-            return Ok(mappedResponse);
+            return await HandleQueryResult(query, true, typeof(IEnumerable<AccessPointSimple>), cancellationToken);
         }
 
         [HttpGet("statistics/frequency")]
-        public async Task<IActionResult> GetStatisticsMostCommonUsedFrequency([FromQuery] int? limit)
+        public async Task<IActionResult> GetStatisticsMostCommonUsedFrequency(
+            [FromQuery] int? limit,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetMostCommonUsedFrequency(NormalizePaginationLimit(limit), cancellationToken);
 
-            var response = await _dataAccess.AccessPoints
-                .GetMostCommonUsedFrequency(limit ?? _defaultLimit);
-
-            StoreToCache(response);
-
-            return Ok(response);
+            return await HandleQueryResult(query, true, cancellationToken);
         }
 
         [HttpGet("statistics/manufacturer")]
-        public async Task<IActionResult> GetStatisticsMostCommonUsedManufacturer([FromQuery] int? limit)
+        public async Task<IActionResult> GetStatisticsMostCommonUsedManufacturer(
+            [FromQuery] int? limit,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetMostCommonUsedManufacturer(NormalizePaginationLimit(limit), cancellationToken);
 
-            var response = await _dataAccess.AccessPoints
-                .GetMostCommonUsedManufacturer(limit ?? _defaultLimit);
-
-            StoreToCache(response);
-
-            return Ok(response);
+            return await HandleQueryResult(query, true, cancellationToken);
         }
 
         [HttpGet("statistics/encryption")]
-        public async Task<IActionResult> GetStatisticsMostCommonUsedEncryption([FromQuery] int? limit)
+        public async Task<IActionResult> GetStatisticsMostCommonUsedEncryption(
+            [FromQuery] int? limit,
+            CancellationToken cancellationToken)
         {
-            var cachedResponse = ResolveFromCache();
-            if (cachedResponse is not null) return Ok(cachedResponse);
+            var query = _unitOfWork.AccessPointRepository
+                .GetMostCommonUsedEncryptionTypes(NormalizePaginationLimit(limit), cancellationToken);
 
-            var response = await _dataAccess.AccessPoints
-                .GetMostCommonUsedEncryptionTypes(limit ?? _defaultLimit);
-
-            StoreToCache(response);
-
-            return Ok(response);
+            return await HandleQueryResult(query, true, cancellationToken);
         }
     }
 }

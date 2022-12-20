@@ -1,17 +1,23 @@
-﻿using AccessPointMap.Application.Integration.Aircrackng.Models;
+﻿using AccessPointMap.Application.Core;
+using AccessPointMap.Application.Integration.Aircrackng.Models;
 using AccessPointMap.Application.Integration.Core;
 using AccessPointMap.Application.Integration.Core.Exceptions;
+using AccessPointMap.Application.Integration.Core.Extensions;
+using AccessPointMap.Application.Logging;
 using AccessPointMap.Application.Oui.Core;
 using AccessPointMap.Application.Pcap.Core;
 using AccessPointMap.Domain.AccessPoints;
+using AccessPointMap.Domain.Core.Exceptions;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using CsvHelper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessPointMap.Application.Integration.Aircrackng
@@ -32,58 +38,98 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
         public AircrackngIntegrationService(
             IUnitOfWork unitOfWork,
-            IDataAccess dataAccess,
             IScopeWrapperService scopeWrapperService,
             IPcapParsingService pcapParsingService,
-            IOuiLookupService ouiLookupService) : base(unitOfWork, dataAccess, scopeWrapperService, pcapParsingService, ouiLookupService) { }
+            IOuiLookupService ouiLookupService,
+            ILogger<AircrackngIntegrationService> logger) : base(unitOfWork, scopeWrapperService, pcapParsingService, ouiLookupService, logger) { }
 
-
-        public async Task Handle(IIntegrationCommand command)
+        public async Task<Result> HandleCommandAsync(IIntegrationCommand command, CancellationToken cancellationToken = default)
         {
-            switch (command)
+            try
             {
-                case Commands.CreateAccessPointsFromCsvFile cmd: await HandleCommand(cmd); break;
-                case Commands.CreatePacketsFromPcapFile cmd: await HandleCommand(cmd); break;
-
-                default: throw new IntegrationException($"This command is not supported by the {IntegrationName} integration.");
+                return command switch
+                {
+                    Commands.CreateAccessPointsFromCsvFile cmd => await HandleCommand(cmd, cancellationToken),
+                    Commands.CreatePacketsFromPcapFile cmd => await HandleCommand(cmd, cancellationToken),
+                    _ => throw new IntegrationException($"This command is not supported by the {IntegrationName} integration."),
+                };
+            }
+            catch (DomainException ex)
+            {
+                return Result.Failure(IntegrationError.FromDomainException(ex));
+            }
+            catch (IntegrationException ex)
+            {
+                return Result.Failure(IntegrationError.FromIntegrationException(ex));
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
             }
         }
 
-        public Task<object> Query(IIntegrationQuery query)
+        public async Task<Result<object>> HandleQueryAsync(IIntegrationQuery query, CancellationToken cancellationToken = default)
         {
-            switch (query)
+            try
             {
-                default: throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.");
+                return query switch
+                {
+                    _ => throw new IntegrationException($"This query is not supported by the {IntegrationName} integration.")
+                };
+            }
+            catch (DomainException ex)
+            {
+                return await Task.FromResult(Result.Failure<object>(IntegrationError.FromDomainException(ex)));
+            }
+            catch (IntegrationException ex)
+            {
+                return await Task.FromResult(Result.Failure<object>(IntegrationError.FromIntegrationException(ex)));
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw;
             }
         }
 
-        private async Task HandleCommand(Commands.CreatePacketsFromPcapFile cmd)
+        private async Task<Result> HandleCommand(Commands.CreatePacketsFromPcapFile cmd, CancellationToken cancellationToken = default)
         {
             if (cmd.ScanPcapFile is null)
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(AircrackngIntegrationError.UploadedPcapFileIsNull);
 
             if (Path.GetExtension(cmd.ScanPcapFile.FileName).ToLower() != ".cap")
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(AircrackngIntegrationError.UploadedFileHasInvalidFormat);
 
-            var packetMap = await PcapParsingService.MapPacketsToMacAddresses(cmd.ScanPcapFile);
+            var packetMapResult = await PcapParsingService.MapPacketsToMacAddressesAsync(cmd.ScanPcapFile, cancellationToken);
 
-            foreach (var map in packetMap)
+            if (packetMapResult.IsFailure) return Result.Failure(packetMapResult.Error);
+
+            foreach (var map in packetMapResult.Value)
             {
-                await CreateAccessPointPackets(map.Key, map.Value);
+                await CreateAccessPointPackets(map.Key, map.Value, cancellationToken);
             }
 
-            await UnitOfWork.Commit();
+            await UnitOfWork.Commit(cancellationToken);
+
+            return Result.Success();
         }
 
-        private async Task HandleCommand(Commands.CreateAccessPointsFromCsvFile cmd)
+        private async Task<Result> HandleCommand(Commands.CreateAccessPointsFromCsvFile cmd, CancellationToken cancellationToken = default)
         {
             if (cmd.ScanCsvFile is null)
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(AircrackngIntegrationError.UploadedCsvFileIsNull);
 
             if (Path.GetExtension(cmd.ScanCsvFile.FileName).ToLower() != ".csv")
-                throw new ArgumentNullException(nameof(cmd));
+                return Result.Failure(AircrackngIntegrationError.UploadedFileHasInvalidFormat);
 
-            var accessPoints = ParseCsvAccessPointScanFile(cmd.ScanCsvFile.OpenReadStream());
+            var accessPoints = ParseCsvAccessPointScanFile(cmd.ScanCsvFile.OpenReadStream(), cancellationToken);
             var runRecordGroups = GroupAccessPointsByRun(accessPoints);
 
             foreach (var runGroup in runRecordGroups)
@@ -92,22 +138,24 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
                 foreach (var record in runGroup.Value)
                 {
-                    if (await UnitOfWork.AccessPointRepository.Exists(record.Bssid))
+                    if (await UnitOfWork.AccessPointRepository.ExistsAsync(record.Bssid, cancellationToken))
                     {
-                        await CreateAccessPointStamp(record, runIdentifier);
+                        await CreateAccessPointStamp(record, runIdentifier, cancellationToken);
                         continue;
                     }
 
-                    await CreateAccessPoint(record, runIdentifier);
+                    await CreateAccessPoint(record, runIdentifier, cancellationToken);
                 }
             }
 
-            await UnitOfWork.Commit();
+            await UnitOfWork.Commit(cancellationToken);
+
+            return Result.Success();
         }
 
-        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier)
+        private async Task CreateAccessPoint(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
         {
-            var accessPoint = AccessPoint.Factory.Create(new Events.V1.AccessPointCreated
+            var @event = new Events.V1.AccessPointCreated
             {
                 Bssid = record.Bssid,
                 Ssid = record.Ssid,
@@ -122,31 +170,38 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp,
                 RunIdentifier = runIdentifier
-            });
+            };
 
-            var manufacturer = await OuiLookupService.GetManufacturerName(accessPoint.Bssid);
+            Logger.LogDomainCreationEvent(@event);
 
-            accessPoint.Apply(new Events.V1.AccessPointManufacturerChanged
+            var accessPoint = AccessPoint.Factory.Create(@event);
+
+            var ouiLookupResult = await OuiLookupService.GetManufacturerNameAsync(accessPoint.Bssid, cancellationToken);
+
+            if (ouiLookupResult.IsSuccess)
             {
-                Id = accessPoint.Id,
-                Manufacturer = manufacturer
-            });
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointManufacturerChanged
+                {
+                    Id = accessPoint.Id,
+                    Manufacturer = ouiLookupResult.Value
+                }, Logger);
+            }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
-            });
+            }, Logger);
 
-            await UnitOfWork.AccessPointRepository.Add(accessPoint);
+            await UnitOfWork.AccessPointRepository.AddAsync(accessPoint, cancellationToken);
         }
 
-        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier)
+        private async Task CreateAccessPointStamp(AccessPointRecord record, Guid? runIdentifier, CancellationToken cancellationToken = default)
         {
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(record.Bssid);
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(record.Bssid, cancellationToken);
 
-            accessPoint.Apply(new Events.V1.AccessPointStampCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointStampCreated
             {
                 Id = accessPoint.Id,
                 Ssid = record.Ssid,
@@ -161,40 +216,42 @@ namespace AccessPointMap.Application.Integration.Aircrackng
                 UserId = ScopeWrapperService.GetUserId(),
                 ScanDate = record.LocalTimestamp,
                 RunIdentifier = runIdentifier
-            });
+            }, Logger);
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = SerializeRawAccessPointRecord(record)
-            });
+            }, Logger);
         }
 
-        private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets)
+        private async Task CreateAccessPointPackets(string bssid, IEnumerable<Packet> packets, CancellationToken cancellationToken = default)
         {
-            if (!await UnitOfWork.AccessPointRepository.Exists(bssid)) return;
-            
-            var accessPoint = await UnitOfWork.AccessPointRepository.Get(bssid);
+            if (!await UnitOfWork.AccessPointRepository.ExistsAsync(bssid, cancellationToken)) return;
+
+            var accessPoint = await UnitOfWork.AccessPointRepository.GetAsync(bssid, cancellationToken);
 
             foreach (var packet in packets)
             {
-                accessPoint.Apply(new Events.V1.AccessPointPacketCreated
+                cancellationToken.ThrowIfCancellationRequested();
+
+                accessPoint.ApplyWithLogging(new Events.V1.AccessPointPacketCreated
                 {
                     Id = accessPoint.Id,
                     SourceAddress = packet.SourceAddress,
                     DestinationAddress = packet.DestinationAddress,
                     FrameType = packet.FrameType,
                     Data = packet.Data
-                });
+                }, Logger);
             }
 
-            accessPoint.Apply(new Events.V1.AccessPointAdnnotationCreated
+            accessPoint.ApplyWithLogging(new Events.V1.AccessPointAdnnotationCreated
             {
                 Id = accessPoint.Id,
                 Title = _adnnotationName,
                 Content = $"Inserted {packets.Count()} IEEE 802.11 frames."
-            });
+            }, Logger);
         }
 
         private static IDictionary<Guid, IList<AccessPointRecord>> GroupAccessPointsByRun(IEnumerable<AccessPointRecord> records)
@@ -236,7 +293,7 @@ namespace AccessPointMap.Application.Integration.Aircrackng
             });
         }
 
-        private static IEnumerable<AccessPointRecord> ParseCsvAccessPointScanFile(Stream csvFileStream)
+        private static IEnumerable<AccessPointRecord> ParseCsvAccessPointScanFile(Stream csvFileStream, CancellationToken cancellationToken = default)
         {
             const string _allowedType = "AP";
 
@@ -248,6 +305,8 @@ namespace AccessPointMap.Application.Integration.Aircrackng
 
             while (csv.Read())
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // TODO: Some SSID'S are containing comma's which are confusing the CsvHelper parser
                 // The current solution is to skip all invalid rows.
                 AccessPointRecord record = null;

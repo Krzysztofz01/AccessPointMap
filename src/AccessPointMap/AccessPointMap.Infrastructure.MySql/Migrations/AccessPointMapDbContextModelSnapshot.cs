@@ -17,7 +17,7 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("apm")
-                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AccessPointMap.Domain.AccessPoints.AccessPoint", b =>
@@ -394,7 +394,8 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                             b1.Navigation("Content")
                                 .IsRequired();
 
-                            b1.Navigation("Timestamp");
+                            b1.Navigation("Timestamp")
+                                .IsRequired();
 
                             b1.Navigation("Title")
                                 .IsRequired();
@@ -684,26 +685,32 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                         .HasForeignKey("AccessPointStampId");
                                 });
 
-                            b1.Navigation("ContributorId");
+                            b1.Navigation("ContributorId")
+                                .IsRequired();
 
-                            b1.Navigation("CreationTimestamp");
+                            b1.Navigation("CreationTimestamp")
+                                .IsRequired();
 
                             b1.Navigation("DeviceType")
                                 .IsRequired();
 
-                            b1.Navigation("Frequency");
+                            b1.Navigation("Frequency")
+                                .IsRequired();
 
-                            b1.Navigation("Positioning");
+                            b1.Navigation("Positioning")
+                                .IsRequired();
 
                             b1.Navigation("RunIdentifier")
                                 .IsRequired();
 
-                            b1.Navigation("Security");
+                            b1.Navigation("Security")
+                                .IsRequired();
 
                             b1.Navigation("Ssid")
                                 .IsRequired();
 
-                            b1.Navigation("Status");
+                            b1.Navigation("Status")
+                                .IsRequired();
                         });
 
                     b.Navigation("Adnnotations");
@@ -711,16 +718,20 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                     b.Navigation("Bssid")
                         .IsRequired();
 
-                    b.Navigation("ContributorId");
+                    b.Navigation("ContributorId")
+                        .IsRequired();
 
-                    b.Navigation("CreationTimestamp");
+                    b.Navigation("CreationTimestamp")
+                        .IsRequired();
 
                     b.Navigation("DeviceType")
                         .IsRequired();
 
-                    b.Navigation("DisplayStatus");
+                    b.Navigation("DisplayStatus")
+                        .IsRequired();
 
-                    b.Navigation("Frequency");
+                    b.Navigation("Frequency")
+                        .IsRequired();
 
                     b.Navigation("Manufacturer")
                         .IsRequired();
@@ -730,21 +741,25 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
 
                     b.Navigation("Packets");
 
-                    b.Navigation("Positioning");
+                    b.Navigation("Positioning")
+                        .IsRequired();
 
-                    b.Navigation("Presence");
+                    b.Navigation("Presence")
+                        .IsRequired();
 
                     b.Navigation("RunIdentifier")
                         .IsRequired();
 
-                    b.Navigation("Security");
+                    b.Navigation("Security")
+                        .IsRequired();
 
                     b.Navigation("Ssid")
                         .IsRequired();
 
                     b.Navigation("Stamps");
 
-                    b.Navigation("VersionTimestamp");
+                    b.Navigation("VersionTimestamp")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AccessPointMap.Domain.Identities.Identity", b =>
@@ -906,12 +921,14 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                                 .HasForeignKey("identityId");
                         });
 
-                    b.Navigation("Activation");
+                    b.Navigation("Activation")
+                        .IsRequired();
 
                     b.Navigation("Email")
                         .IsRequired();
 
-                    b.Navigation("LastLogin");
+                    b.Navigation("LastLogin")
+                        .IsRequired();
 
                     b.Navigation("Name")
                         .IsRequired();
@@ -919,7 +936,8 @@ namespace AccessPointMap.Infrastructure.MySql.Migrations
                     b.Navigation("PasswordHash")
                         .IsRequired();
 
-                    b.Navigation("Role");
+                    b.Navigation("Role")
+                        .IsRequired();
 
                     b.Navigation("Tokens");
                 });
