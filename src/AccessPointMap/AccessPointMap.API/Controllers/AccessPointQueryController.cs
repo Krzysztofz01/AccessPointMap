@@ -341,5 +341,15 @@ namespace AccessPointMap.API.Controllers
 
             return await HandleQueryResult(query, true, cancellationToken);
         }
+
+        [HttpGet("map/center")]
+        public async Task<IActionResult> GetMapCenterLocation(
+            CancellationToken cancellationToken)
+        {
+            var query = _unitOfWork.AccessPointRepository
+                .GetAveragePublicAccessPointsLocation(cancellationToken);
+
+            return await HandleQueryResult(query, true, cancellationToken);
+        }
     }
 }

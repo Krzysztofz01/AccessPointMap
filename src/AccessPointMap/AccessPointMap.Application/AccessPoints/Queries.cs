@@ -548,6 +548,21 @@ namespace AccessPointMap.Application.AccessPoints
                 .ToResultObjectAsync();
         }
 
+        public static async Task<Result<object>> GetAveragePublicAccessPointsLocation(
+            this IAccessPointRepository accessPointRepository,
+            CancellationToken cancellationToken = default)
+        {
+            var positions = accessPointRepository.Entities
+                .Where(a => a.DisplayStatus.Value)
+                .Select(a => new { Latitude = a.Positioning.HighSignalLatitude, Longitude = a.Positioning.HighSignalLongitude });
+
+            return Result.Success<object>(new
+            {
+                Latitude = await positions.AverageAsync(p => p.Latitude, cancellationToken),
+                Longitude = await positions.AverageAsync(p => p.Longitude, cancellationToken)
+            });
+        }
+
         private static class Helpers
         {
             public static bool IsAccessPointInArea(
