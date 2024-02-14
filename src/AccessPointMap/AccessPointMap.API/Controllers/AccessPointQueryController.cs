@@ -2,6 +2,7 @@
 using AccessPointMap.Application.AccessPoints;
 using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
