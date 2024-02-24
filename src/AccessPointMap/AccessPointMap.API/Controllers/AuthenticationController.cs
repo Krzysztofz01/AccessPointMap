@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.Authentication;
 using AccessPointMap.Application.Core;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

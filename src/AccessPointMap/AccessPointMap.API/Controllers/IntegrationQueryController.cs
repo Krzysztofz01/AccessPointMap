@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;

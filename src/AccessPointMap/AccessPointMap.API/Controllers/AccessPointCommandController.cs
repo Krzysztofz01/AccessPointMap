@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.Core.Abstraction;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

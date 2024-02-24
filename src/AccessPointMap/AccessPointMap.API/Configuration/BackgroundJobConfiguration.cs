@@ -2,6 +2,7 @@
 using AccessPointMap.Application.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
+using Quartz.AspNetCore;
 
 namespace AccessPointMap.API.Configuration
 {
