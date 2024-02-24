@@ -2,6 +2,7 @@
 using AccessPointMap.Application.AccessPoints;
 using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -338,6 +339,16 @@ namespace AccessPointMap.API.Controllers
         {
             var query = _unitOfWork.AccessPointRepository
                 .GetMostCommonUsedEncryptionTypes(NormalizePaginationLimit(limit), cancellationToken);
+
+            return await HandleQueryResult(query, true, cancellationToken);
+        }
+
+        [HttpGet("map/center")]
+        public async Task<IActionResult> GetMapCenterLocation(
+            CancellationToken cancellationToken)
+        {
+            var query = _unitOfWork.AccessPointRepository
+                .GetAveragePublicAccessPointsLocation(cancellationToken);
 
             return await HandleQueryResult(query, true, cancellationToken);
         }

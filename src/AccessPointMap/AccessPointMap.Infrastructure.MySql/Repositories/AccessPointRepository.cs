@@ -33,7 +33,7 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
             return await _context.AccessPoints
                 .AsSingleQuery()
                 .AsNoTracking()
-                .AnyAsync(a => a.Bssid.Value == bssid, cancellationToken);
+                .AnyAsync(a => a.Bssid.Value == bssid.ToUpper(), cancellationToken);
         }
 
         public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
@@ -52,7 +52,7 @@ namespace AccessPointMap.Infrastructure.MySql.Repositories
                 .Include(a => a.Packets)
                 .AsSingleQuery()
                 .AsTracking()
-                .FirstAsync(a => a.Bssid.Value == bssid, cancellationToken);
+                .FirstAsync(a => a.Bssid.Value == bssid.ToUpper(), cancellationToken);
         }
 
         public async Task<AccessPoint> GetAsync(Guid id, CancellationToken cancellationToken = default)

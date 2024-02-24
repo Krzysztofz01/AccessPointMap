@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
+using Asp.Versioning;
 
 namespace AccessPointMap.API.Controllers
 {
