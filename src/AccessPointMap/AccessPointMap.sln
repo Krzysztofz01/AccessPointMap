@@ -39,7 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Application.Core", "AccessPointMap.Application.Core\AccessPointMap.Application.Core.csproj", "{D590DFA8-0E2F-47FC-8FB0-A0FD01BE3FE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Infrastructure.Sqlite", "AccessPointMap.Infrastructure.Sqlite\AccessPointMap.Infrastructure.Sqlite.csproj", "{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessPointMap.Infrastructure.Sqlite", "AccessPointMap.Infrastructure.Sqlite\AccessPointMap.Infrastructure.Sqlite.csproj", "{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessPointMap.Application.GeoJson.Core", "AccessPointMap.Application.GeoJson.Core\AccessPointMap.Application.GeoJson.Core.csproj", "{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -279,6 +281,18 @@ Global
 		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x64.Build.0 = Release|Any CPU
 		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x86.ActiveCfg = Release|Any CPU
 		{36DFFA66-9C10-4AB5-8B1C-D883864F2F8B}.Release|x86.Build.0 = Release|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Debug|x64.Build.0 = Debug|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Release|x64.ActiveCfg = Release|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Release|x64.Build.0 = Release|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{52C327EA-97CD-4C54-AA34-9DAE3D7DDAE7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -47,6 +47,21 @@ namespace AccessPointMap.API.Controllers.Base
                 throw new ArgumentNullException(nameof(logger));
         }
 
+        protected IActionResult HandleQueryResult<T>(T result, bool useCaching, CancellationToken cancellationToken = default) where T : class
+        {
+            LogCurrentScope();
+
+            if (useCaching)
+            {
+                if (_memoryCache.TryGetValue(GetCacheEntryKey(false), out object cachedValue))
+                    return new OkObjectResult(cachedValue);
+
+                StoreToMemoryCache(result, cancellationToken);
+            }
+
+            return new OkObjectResult(result);
+        }
+
         protected async Task<IActionResult> HandleQueryResult<T>(Task<Result<T>> queryResultTask, bool useCaching, CancellationToken cancellationToken = default) where T : class
         {
             LogCurrentScope();

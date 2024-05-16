@@ -4,6 +4,7 @@ using AccessPointMap.Application.Integration.Wireshark;
 using AccessPointMap.Application.Kml.Sharpkml.Extensions;
 using AccessPointMap.Application.Oui.MacTwoVendor.Extensions;
 using AccessPointMap.Application.Pcap.ApmPcapNative.Extensions;
+using AccessPointMap.Application.GeoJson.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AccessPointMap.API.Configuration
@@ -22,6 +23,9 @@ namespace AccessPointMap.API.Configuration
 
             // Sharpkml internal KML service provider
             services.AddSharpkmlKmlParser();
+
+            // GeoJson internal GeoJSON service provider
+            services.AddNativeGeoJsonParser();
 
             // Integrations
 

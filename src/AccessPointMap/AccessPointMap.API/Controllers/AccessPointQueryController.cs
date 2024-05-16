@@ -1,5 +1,6 @@
 ﻿using AccessPointMap.API.Controllers.Base;
 using AccessPointMap.Application.AccessPoints;
+using AccessPointMap.Application.GeoJson.Core;
 using AccessPointMap.Application.Kml.Core;
 using AccessPointMap.Infrastructure.Core.Abstraction;
 using Asp.Versioning;
@@ -22,6 +23,7 @@ namespace AccessPointMap.API.Controllers
     public class AccessPointQueryController : QueryController<AccessPointQueryController>
     {
         private readonly IKmlParsingService _kmlParsingService;
+        private readonly IGeoJsonParsingService _geoJsonParsingService;
 
         private const string KmlContentMimeType = "text/kml";
 
@@ -30,10 +32,14 @@ namespace AccessPointMap.API.Controllers
             IMapper mapper,
             IMemoryCache memoryCache,
             ILogger<AccessPointQueryController> logger,
-            IKmlParsingService kmlParsingService) : base(unitOfWork, mapper, memoryCache, logger)
+            IKmlParsingService kmlParsingService,
+            IGeoJsonParsingService geoJsonParsingService) : base(unitOfWork, mapper, memoryCache, logger)
         {
             _kmlParsingService = kmlParsingService ??
                 throw new ArgumentNullException(nameof(kmlParsingService));
+
+            _geoJsonParsingService = geoJsonParsingService ??
+                throw new ArgumentNullException(nameof(geoJsonParsingService));
         }
 
         [HttpGet]
@@ -108,6 +114,56 @@ namespace AccessPointMap.API.Controllers
             if (kmlFileResult.IsFailure) return GetFailureResponse(accessPointsResult.Error);
 
             return await HandleFileResult(kmlFileResult.Value, true, KmlContentMimeType, cancellationToken);
+        }
+
+        [HttpGet("geojson")]
+        public async Task<IActionResult> GetAllInGeoJson(
+            [FromQuery] DateTime? startingData,
+            [FromQuery] DateTime? endingDate,
+            [FromQuery] double? latitude,
+            [FromQuery] double? longitude,
+            [FromQuery] double? distance,
+            [FromQuery] string keyword,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken cancellationToken)
+        {
+            var query = await _unitOfWork.AccessPointRepository
+                .GetAllAccessPoints(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize, cancellationToken);
+
+            if (query.IsFailure) return GetFailureResponse(query.Error);
+
+            var geoJsonResult = await _geoJsonParsingService.GenerateGeoJsonAsync(query.Value);
+
+            if (geoJsonResult.IsFailure) return GetFailureResponse(geoJsonResult.Error);
+
+            return HandleQueryResult(geoJsonResult.Value, true, cancellationToken);
+        }
+
+        [HttpGet("geojson/full")]
+        [Authorize(Roles = "Admin, Support")]
+        [ProducesResponseType(typeof(IEnumerable<AccessPointSimpleAdministration>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllInGeoJsonFull(
+            [FromQuery] DateTime? startingData,
+            [FromQuery] DateTime? endingDate,
+            [FromQuery] double? latitude,
+            [FromQuery] double? longitude,
+            [FromQuery] double? distance,
+            [FromQuery] string keyword,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken cancellationToken)
+        {
+            var query = await _unitOfWork.AccessPointRepository
+                .GetAllAccessPointsAdministration(startingData, endingDate, latitude, longitude, distance, keyword, page, pageSize, cancellationToken);
+
+            if (query.IsFailure) return GetFailureResponse(query.Error);
+
+            var geoJsonResult = await _geoJsonParsingService.GenerateGeoJsonAsync(query.Value);
+
+            if (geoJsonResult.IsFailure) return GetFailureResponse(geoJsonResult.Error);
+
+            return HandleQueryResult(geoJsonResult.Value, true, cancellationToken);
         }
 
         [HttpGet("run")]

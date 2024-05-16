@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AccessPointMap.Application.GeoJson.Core\AccessPointMap.Application.GeoJson.Core.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Aircrackng\AccessPointMap.Application.Integration.Aircrackng.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wigle\AccessPointMap.Application.Integration.Wigle.csproj" />
     <ProjectReference Include="..\AccessPointMap.Application.Integration.Wireshark\AccessPointMap.Application.Integration.Wireshark.csproj" />
