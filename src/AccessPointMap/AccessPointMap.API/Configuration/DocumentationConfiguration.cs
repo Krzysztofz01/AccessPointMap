@@ -26,25 +26,33 @@ namespace AccessPointMap.API.Configuration
                         Title = "AccessPointMap Web API"
                     };
 
-                    var securityDefinition = new OpenApiSecurityScheme
+                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
                         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                        Name = "Bearer",
+                        Name = "Authorization",
                         In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.Http,
-                        Scheme = "bearer",
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
                         BearerFormat = "JWT"
-                    };
+                    });
 
-                    var securityRequirements = new OpenApiSecurityRequirement
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {
-                        { securityDefinition, Array.Empty<string>() }
-                    };
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
 
                     options.SwaggerDoc("v1", apiInfo);
                     options.CustomSchemaIds(type => type.FullName.Replace('+', '_'));
-                    options.AddSecurityDefinition("Bearer", securityDefinition);
-                    options.AddSecurityRequirement(securityRequirements);
                 });
             }
 
