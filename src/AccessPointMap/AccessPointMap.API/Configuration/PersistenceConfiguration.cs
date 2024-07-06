@@ -1,6 +1,7 @@
 ﻿using AccessPointMap.Application.Settings;
 using AccessPointMap.Infrastructure.MySql.Extensions;
 using AccessPointMap.Infrastructure.Sqlite.Extensions;
+using AccessPointMap.Infrastructure.PostgreSql.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ namespace AccessPointMap.API.Configuration
             {
                 case "mysql": services.AddMySqlInfrastructure(databaseSettings.ConnectionString); break;
                 case "sqlite": services.AddSqliteInfrastructure(databaseSettings.ConnectionString); break;
+                case "postgresql": services.AddPostgreSqlInfrastructure(databaseSettings.ConnectionString); break;
                 default: throw new NotSupportedException("The selected database infrastructure driver is not supported.");
             }
 
@@ -36,6 +38,7 @@ namespace AccessPointMap.API.Configuration
             {
                 case "mysql": app.UseMySqlInfrastructure(service, databaseSettings.ApplyMigrations); break;
                 case "sqlite": app.UseSqliteInfrastructure(service, databaseSettings.ApplyMigrations); break;
+                case "postgresql": app.UsePostgreSqlInfrastructure(service, databaseSettings.ApplyMigrations); break;
                 default: throw new NotSupportedException("The selected database infrastructure driver is not supported.");
             }
 
